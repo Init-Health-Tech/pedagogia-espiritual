@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Box, Card, CardContent, Grid, Typography } from '@mui/material'
 import { contentAPI } from '../../services/api'
+import PageHeader from '../../components/common/PageHeader'
+import LoadingScreen from '../../components/common/LoadingScreen'
+import EmptyState from '../../components/common/EmptyState'
 
 export default function Videos() {
   const [videos, setVideos] = useState([])
@@ -9,38 +13,31 @@ export default function Videos() {
     contentAPI.videos().then((r) => setVideos(r.data)).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <div className="loading"><div className="spinner" /></div>
+  if (loading) return <LoadingScreen />
 
   return (
     <>
-      <header className="page-header">
-        <h1>Videos formativos</h1>
-        <p>Material audiovisual para tu formación espiritual</p>
-      </header>
+      <PageHeader title="Videos formativos" subtitle="Material audiovisual para tu formación espiritual" />
       {videos.length === 0 ? (
-        <div className="empty-state"><div className="empty-state-icon">▶</div><p>No hay videos disponibles.</p></div>
+        <EmptyState title="Sin videos" description="No hay videos disponibles en este momento." />
       ) : (
-        <div className="grid-2">
+        <Grid container spacing={2}>
           {videos.map((v) => (
-            <article key={v.id} className="content-card">
-              <div className="content-card-thumb">▶</div>
-              <div className="content-card-body">
-                <h3>{v.titulo}</h3>
-                <p>{v.descripcion}</p>
-                {v.url_externa && (
-                  <div style={{ marginTop: '1rem', position: 'relative', paddingBottom: '56.25%' }}>
-                    <iframe
-                      title={v.titulo}
-                      src={v.url_externa}
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', borderRadius: '8px' }}
-                      allowFullScreen
-                    />
-                  </div>
-                )}
-              </div>
-            </article>
+            <Grid key={v.id} size={{ xs: 12, md: 6 }}>
+              <Card>
+                <CardContent>
+                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>{v.titulo}</Typography>
+                  <Typography variant="body2" sx={{ mb: 2 }}>{v.descripcion}</Typography>
+                  {v.url_externa && (
+                    <Box sx={{ position: 'relative', paddingBottom: '56.25%', borderRadius: 1, overflow: 'hidden', bgcolor: 'action.hover' }}>
+                      <Box component="iframe" title={v.titulo} src={v.url_externa} sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }} />
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
           ))}
-        </div>
+        </Grid>
       )}
     </>
   )

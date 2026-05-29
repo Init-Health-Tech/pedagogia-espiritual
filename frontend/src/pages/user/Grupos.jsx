@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Card, CardContent, Chip, Grid, Typography } from '@mui/material'
 import { groupsAPI } from '../../services/api'
+import PageHeader from '../../components/common/PageHeader'
+import LoadingScreen from '../../components/common/LoadingScreen'
+import EmptyState from '../../components/common/EmptyState'
 
 export default function Grupos() {
   const [grupos, setGrupos] = useState([])
@@ -9,28 +13,29 @@ export default function Grupos() {
     groupsAPI.misGrupos().then((r) => setGrupos(r.data)).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <div className="loading"><div className="spinner" /></div>
+  if (loading) return <LoadingScreen />
 
   return (
     <>
-      <header className="page-header">
-        <h1>Grupos de Pastoreo</h1>
-        <p>Tu comunidad de formación y acompañamiento</p>
-      </header>
+      <PageHeader title="Grupos de pastoreo" subtitle="Tu comunidad de formación y acompañamiento" />
       {grupos.length === 0 ? (
-        <div className="empty-state"><div className="empty-state-icon">☘</div><p>Aún no perteneces a un grupo de pastoreo.</p></div>
+        <EmptyState title="Sin grupos asignados" description="Aún no perteneces a un grupo de pastoreo." />
       ) : (
-        <div className="grid-2">
+        <Grid container spacing={2}>
           {grupos.map((g) => (
-            <div key={g.id} className="card">
-              <h3 className="card-title">{g.nombre}</h3>
-              <p style={{ color: 'var(--color-text-muted)', marginBottom: '1rem' }}>{g.descripcion}</p>
-              <p><strong>Coordinador:</strong> {g.coordinador_nombre || '—'}</p>
-              <p><strong>Reunión:</strong> {g.horario_reunion || 'Por definir'}</p>
-              <p style={{ marginTop: '0.5rem' }}><span className="badge badge-sage">{g.total_miembros} miembros</span></p>
-            </div>
+            <Grid key={g.id} size={{ xs: 12, sm: 6 }}>
+              <Card>
+                <CardContent>
+                  <Typography variant="subtitle1" fontWeight={600}>{g.nombre}</Typography>
+                  <Typography variant="body2" sx={{ my: 1 }}>{g.descripcion}</Typography>
+                  <Typography variant="body2"><strong>Coordinador:</strong> {g.coordinador_nombre || '—'}</Typography>
+                  <Typography variant="body2"><strong>Reunión:</strong> {g.horario_reunion || 'Por definir'}</Typography>
+                  <Chip label={`${g.total_miembros} miembros`} size="small" sx={{ mt: 1.5 }} />
+                </CardContent>
+              </Card>
+            </Grid>
           ))}
-        </div>
+        </Grid>
       )}
     </>
   )

@@ -1,24 +1,47 @@
 from django.contrib.auth import get_user_model
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts.permissions import IsModeratorOrAdmin
-from .models import AvanceEspiritual, EtapaEspiritual, FichaPedagogica
+from .models import AvanceEspiritual, FichaPedagogica, Modulo, PreguntaChecklist, RespuestaChecklist
 from .serializers import (
     AvanceEspiritualSerializer,
-    EtapaEspiritualSerializer,
     FichaPedagogicaSerializer,
     FichaPedagogicaUpdateSerializer,
+    ModuloSerializer,
+    PreguntaChecklistSerializer,
+    ResponderChecklistSerializer,
 )
 
 User = get_user_model()
 
 
-class EtapaEspiritualViewSet(viewsets.ModelViewSet):
-    queryset = EtapaEspiritual.objects.all()
-    serializer_class = EtapaEspiritualSerializer
+class ModuloViewSet(viewsets.ModelViewSet):
+    queryset = Modulo.objects.all()
+    serializer_class = ModuloSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.is_moderator:
+            return Modulo.objects.all()
+        return Modulo.objects.filter(activo=True)
+
+    def get_permissions(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return [IsModeratorOrAdmin()]
+        return super().get_permissions()
+
+
+class PreguntaChecklistViewSet(viewsets.ModelViewSet):
+    queryset = PreguntaChecklist.objects.select_related('modulo')
+    serializer_class = PreguntaChecklistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.is_moderator:
+            return self.queryset
+        return self.queryset.filter(activa=True)
 
     def get_permissions(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
@@ -27,7 +50,9 @@ class EtapaEspiritualViewSet(viewsets.ModelViewSet):
 
 
 class FichaPedagogicaViewSet(viewsets.ModelViewSet):
-    queryset = FichaPedagogica.objects.select_related('usuario', 'etapa_actual').prefetch_related('avances')
+    queryset = FichaPedagogica.objects.select_related(
+        'usuario', 'modulo_actual'
+    ).prefetch_related('avances', 'respuestas_checklist')
     serializer_class = FichaPedagogicaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -46,6 +71,28 @@ class FichaPedagogicaViewSet(viewsets.ModelViewSet):
     def mi_ficha(self, request):
         ficha, _ = FichaPedagogica.objects.get_or_create(usuario=request.user)
         return Response(FichaPedagogicaSerializer(ficha).data)
+
+    @action(detail=False, methods=['post'])
+    def responder_checklist(self, request):
+        ser = ResponderChecklistSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        ficha, _ = FichaPedagogica.objects.get_or_create(usuario=request.user)
+        pregunta = PreguntaChecklist.objects.get(
+            pk=ser.validated_data['pregunta_id'],
+            activa=True,
+        )
+        respuesta, _ = RespuestaChecklist.objects.get_or_create(
+            ficha=ficha,
+            pregunta=pregunta,
+        )
+        respuesta.completada = ser.validated_data['completada']
+        respuesta.nota = ser.validated_data.get('nota', '')
+        respuesta.save()
+        progreso = ficha.recalcular_progreso()
+        return Response({
+            'progreso_general': progreso,
+            'ficha': FichaPedagogicaSerializer(ficha).data,
+        })
 
 
 class AvanceEspiritualViewSet(viewsets.ModelViewSet):

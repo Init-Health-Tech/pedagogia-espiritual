@@ -1,62 +1,40 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import PageTransitionOutlet from '../components/layout/PageTransitionOutlet'
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
+import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined'
+import LibraryBooksOutlinedIcon from '@mui/icons-material/LibraryBooksOutlined'
+import ChecklistOutlinedIcon from '@mui/icons-material/ChecklistOutlined'
+import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined'
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined'
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined'
+import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined'
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
+import AppShell from '../components/layout/AppShell'
 
 const navItems = [
-  { to: '/admin', icon: '⌂', label: 'Panel', end: true },
-  { to: '/admin/usuarios', icon: '👥', label: 'Usuarios y accesos' },
-  { to: '/admin/contenidos', icon: '📚', label: 'Contenidos' },
-  { to: '/admin/grupos', icon: '☘', label: 'Grupos' },
-  { to: '/admin/pagos', icon: '💳', label: 'Pagos' },
-  { to: '/admin/anuncios', icon: '📢', label: 'Anuncios' },
+  { to: '/admin', icon: <DashboardOutlinedIcon />, label: 'Panel', end: true },
+  { to: '/admin/usuarios', icon: <PeopleOutlinedIcon />, label: 'Usuarios y accesos' },
+  { to: '/admin/modulos', icon: <LibraryBooksOutlinedIcon />, label: 'Módulos (manuales)' },
+  { to: '/admin/preguntas', icon: <ChecklistOutlinedIcon />, label: 'Checklist' },
+  { to: '/admin/contenidos', icon: <VideoLibraryOutlinedIcon />, label: 'Contenidos' },
+  { to: '/admin/grupos', icon: <GroupsOutlinedIcon />, label: 'Grupos' },
+  { to: '/admin/pagos', icon: <PaymentsOutlinedIcon />, label: 'Pagos' },
+  { to: '/admin/anuncios', icon: <CampaignOutlinedIcon />, label: 'Anuncios' },
+]
+
+const footerItems = [
+  { to: '/app', icon: <ArrowBackOutlinedIcon />, label: 'Vista de miembro' },
 ]
 
 export default function AdminLayout() {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
-  const initials = (user?.first_name?.[0] || user?.username?.[0] || 'A').toUpperCase()
-
   return (
-    <div className="app-layout">
-      <aside className="sidebar sidebar-admin">
-        <div className="sidebar-header">
-          <h2>Administración</h2>
-          <span>MFST — Panel de control</span>
-        </div>
-        <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
-            >
-              <span className="icon">{item.icon}</span>
-              {item.label}
-            </NavLink>
-          ))}
-          <NavLink to="/app" className="sidebar-link">
-            <span className="icon">↩</span>
-            Vista de miembro
-          </NavLink>
-        </nav>
-        <div className="sidebar-footer">
-          <div className="sidebar-user">
-            <div className="sidebar-avatar">{initials}</div>
-            <div className="sidebar-user-info">
-              <div className="sidebar-user-name">{user?.full_name || user?.username}</div>
-              <div className="sidebar-user-role">Administrador</div>
-            </div>
-          </div>
-          <button className="btn btn-secondary btn-sm" style={{ width: '100%', color: 'var(--color-cream)', borderColor: 'rgba(255,255,255,0.3)' }} onClick={() => { logout(); navigate('/') }}>
-            Cerrar sesión
-          </button>
-        </div>
-      </aside>
-      <main className="main-content">
-        <div className="main-content-inner">
-          <Outlet />
-        </div>
-      </main>
-    </div>
+    <AppShell
+      variant="admin"
+      title="Administración"
+      subtitle="Panel de control MFST"
+      navItems={navItems}
+      footerItems={footerItems}
+    >
+      <PageTransitionOutlet />
+    </AppShell>
   )
 }

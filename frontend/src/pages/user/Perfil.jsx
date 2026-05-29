@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { Alert, Box, Button, Card, CardContent, Grid, TextField } from '@mui/material'
 import { useAuth } from '../../context/AuthContext'
 import { authAPI } from '../../services/api'
+import PageHeader from '../../components/common/PageHeader'
 
 export default function Perfil() {
   const { user, fetchUser } = useAuth()
@@ -11,7 +13,7 @@ export default function Perfil() {
     phone: user?.phone || '',
     bio: user?.bio || '',
   })
-  const [msg, setMsg] = useState('')
+  const [msg, setMsg] = useState({ type: '', text: '' })
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
@@ -20,9 +22,9 @@ export default function Perfil() {
     try {
       await authAPI.updateMe(form)
       await fetchUser()
-      setMsg('Perfil actualizado correctamente')
+      setMsg({ type: 'success', text: 'Perfil actualizado correctamente.' })
     } catch {
-      setMsg('Error al actualizar')
+      setMsg({ type: 'error', text: 'Error al actualizar el perfil.' })
     } finally {
       setLoading(false)
     }
@@ -30,38 +32,34 @@ export default function Perfil() {
 
   return (
     <>
-      <header className="page-header">
-        <h1>Mi Perfil</h1>
-        <p>Datos personales de tu cuenta</p>
-      </header>
-      {msg && <div className="alert alert-success">{msg}</div>}
-      <div className="card" style={{ maxWidth: '560px' }}>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Nombre</label>
-            <input className="form-control" value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
-          </div>
-          <div className="form-group">
-            <label>Apellido</label>
-            <input className="form-control" value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
-          </div>
-          <div className="form-group">
-            <label>Correo</label>
-            <input className="form-control" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          </div>
-          <div className="form-group">
-            <label>Teléfono</label>
-            <input className="form-control" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-          </div>
-          <div className="form-group">
-            <label>Biografía</label>
-            <textarea className="form-control" rows={3} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
-          </div>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Guardando...' : 'Guardar cambios'}
-          </button>
-        </form>
-      </div>
+      <PageHeader title="Mi perfil" subtitle="Datos personales de tu cuenta" />
+      {msg.text && <Alert severity={msg.type} sx={{ mb: 2 }}>{msg.text}</Alert>}
+      <Card sx={{ maxWidth: 560 }}>
+        <CardContent component="form" onSubmit={handleSubmit}>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField label="Nombre" fullWidth value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField label="Apellido" fullWidth value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
+            </Grid>
+            <Grid size={12}>
+              <TextField label="Correo" type="email" fullWidth value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </Grid>
+            <Grid size={12}>
+              <TextField label="Teléfono" fullWidth value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            </Grid>
+            <Grid size={12}>
+              <TextField label="Biografía" multiline rows={3} fullWidth value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
+            </Grid>
+          </Grid>
+          <Box sx={{ mt: 2 }}>
+            <Button type="submit" variant="contained" disabled={loading}>
+              {loading ? 'Guardando…' : 'Guardar cambios'}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
     </>
   )
 }

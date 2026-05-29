@@ -40,7 +40,7 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py seed_data
-python manage.py runserver
+python manage.py runserver 8005
 ```
 
 ### Frontend
@@ -51,7 +51,11 @@ npm install
 npm run dev
 ```
 
-Abre [http://localhost:5173](http://localhost:5173)
+El archivo `frontend/.env` debe apuntar al mismo puerto del backend (`VITE_BACKEND_PORT=8005`).
+
+Abre la URL que muestre Vite (ej. [http://localhost:5173](http://localhost:5173) o 5175 si ese puerto está ocupado).
+
+> **Importante:** Si cambias el puerto del backend, actualiza `VITE_BACKEND_PORT` en `frontend/.env` y reinicia `npm run dev`.
 
 ## Usuarios de demostración
 

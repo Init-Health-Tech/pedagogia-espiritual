@@ -48,8 +48,15 @@ export const authAPI = {
 export const pedagogiaAPI = {
   miFicha: () => api.get('/pedagogia/fichas/mi_ficha/'),
   fichas: () => api.get('/pedagogia/fichas/'),
-  etapas: () => api.get('/pedagogia/etapas/'),
-  avances: (fichaId) => api.get('/pedagogia/avances/', { params: { ficha: fichaId } }),
+  modulos: () => api.get('/pedagogia/modulos/'),
+  preguntas: () => api.get('/pedagogia/preguntas/'),
+  responderChecklist: (data) => api.post('/pedagogia/fichas/responder_checklist/', data),
+  createModulo: (data) => api.post('/pedagogia/modulos/', data),
+  updateModulo: (id, data) => api.patch(`/pedagogia/modulos/${id}/`, data),
+  deleteModulo: (id) => api.delete(`/pedagogia/modulos/${id}/`),
+  createPregunta: (data) => api.post('/pedagogia/preguntas/', data),
+  updatePregunta: (id, data) => api.patch(`/pedagogia/preguntas/${id}/`, data),
+  deletePregunta: (id) => api.delete(`/pedagogia/preguntas/${id}/`),
 }
 
 export const contentAPI = {

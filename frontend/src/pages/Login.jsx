@@ -1,6 +1,20 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import {
+  Alert,
+  Box,
+  Button,
+  Container,
+  Link,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
+import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import MeshBackground from '../components/common/MeshBackground'
+import { fadeInUp, scaleIn } from '../animations/variants'
 
 export default function Login() {
   const [username, setUsername] = useState('')
@@ -16,55 +30,102 @@ export default function Login() {
     setLoading(true)
     try {
       const userData = await login(username, password)
-      const dest = userData.role === 'admin' ? '/admin' : '/app'
-      navigate(dest)
+      navigate(userData.role === 'admin' ? '/admin' : '/app')
     } catch (err) {
-      setError(err.response?.data?.detail || 'Credenciales incorrectas. Intente de nuevo.')
+      if (!err.response) {
+        setError('No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.')
+      } else {
+        setError(err.response?.data?.detail || 'Credenciales incorrectas.')
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h1>Bienvenido</h1>
-        <p className="auth-subtitle">Movimiento Franciscano — Pedagogía Espiritual</p>
-        {error && <div className="alert alert-error">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Usuario</label>
-            <input
-              id="username"
-              className="form-control"
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        position: 'relative',
+        py: 4,
+      }}
+    >
+      <MeshBackground subtle />
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+        <Paper
+          component={motion.div}
+          initial="initial"
+          animate="animate"
+          variants={scaleIn}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          sx={{
+            p: { xs: 3, sm: 4 },
+            backdropFilter: 'blur(8px)',
+            bgcolor: 'rgba(255,255,255,0.92)',
+          }}
+          elevation={0}
+        >
+          <Stack spacing={3} component="form" onSubmit={handleSubmit}>
+            <Box component={motion.div} variants={fadeInUp} textAlign="center">
+              <Typography variant="overline" color="text.secondary">
+                Movimiento Franciscano
+              </Typography>
+              <Typography variant="h1" sx={{ mt: 0.5 }}>
+                Iniciar sesión
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                Pedagogía Espiritual de la Santísima Trinidad
+              </Typography>
+            </Box>
+            {error && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                <Alert severity="error">{error}</Alert>
+              </motion.div>
+            )}
+            <TextField
+              label="Usuario"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              fullWidth
               autoFocus
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
+            <TextField
+              label="Contraseña"
               type="password"
-              className="form-control"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              fullWidth
             />
-          </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Ingresando...' : 'Iniciar sesión'}
-          </button>
-        </form>
-        <p className="auth-footer">
-          ¿No tienes cuenta? <Link to="/registro">Regístrate aquí</Link>
-        </p>
-        <p className="auth-footer" style={{ marginTop: '0.5rem' }}>
-          <Link to="/">← Volver al inicio</Link>
-        </p>
-      </div>
-    </div>
+            <motion.div whileTap={{ scale: 0.98 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                fullWidth
+                disabled={loading}
+                className="btn-glow"
+              >
+                {loading ? 'Ingresando…' : 'Ingresar'}
+              </Button>
+            </motion.div>
+            <Typography variant="body2" textAlign="center" color="text.secondary">
+              ¿No tienes cuenta?{' '}
+              <Link component={RouterLink} to="/registro">
+                Regístrate
+              </Link>
+            </Typography>
+            <Typography variant="body2" textAlign="center">
+              <Link component={RouterLink} to="/" color="text.secondary">
+                Volver al inicio
+              </Link>
+            </Typography>
+          </Stack>
+        </Paper>
+      </Container>
+    </Box>
   )
 }

@@ -1,5 +1,21 @@
 import { useEffect, useState } from 'react'
+import {
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
 import { paymentsAPI } from '../../services/api'
+import PageHeader from '../../components/common/PageHeader'
+import LoadingScreen from '../../components/common/LoadingScreen'
 
 export default function AdminPagos() {
   const [pagos, setPagos] = useState([])
@@ -18,35 +34,52 @@ export default function AdminPagos() {
     setPagos(r.data.results || r.data)
   }
 
-  if (loading) return <div className="loading"><div className="spinner" /></div>
+  if (loading) return <LoadingScreen />
 
   return (
     <>
-      <header className="page-header"><h1>Pagos y suscripciones</h1></header>
-      <div className="grid-3" style={{ marginBottom: '2rem' }}>
+      <PageHeader title="Pagos y suscripciones" subtitle="Planes, pagos pendientes y membresías" />
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         {planes.map((p) => (
-          <div key={p.id} className="card">
-            <h3>{p.nombre}</h3>
-            <p style={{ fontSize: '1.5rem', fontFamily: 'var(--font-display)', color: 'var(--color-gold)' }}>${p.precio}</p>
-            <p style={{ color: 'var(--color-text-muted)' }}>{p.duracion_meses} meses</p>
-          </div>
+          <Grid key={p.id} size={{ xs: 12, sm: 6, md: 4 }}>
+            <Card>
+              <CardContent>
+                <Typography variant="subtitle1" fontWeight={600}>{p.nombre}</Typography>
+                <Typography variant="h3" color="secondary.main" sx={{ my: 1 }}>${p.precio}</Typography>
+                <Typography variant="body2">{p.duracion_meses} meses</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
-      <div className="card table-wrap">
-        <table>
-          <thead><tr><th>Usuario</th><th>Monto</th><th>Método</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody>
-            {pagos.map((p) => (
-              <tr key={p.id}>
-                <td>{p.usuario_detalle?.full_name || p.usuario}</td>
-                <td>${p.monto}</td><td>{p.metodo}</td>
-                <td><span className={`badge badge-${p.estado === 'completado' ? 'sage' : 'gold'}`}>{p.estado}</span></td>
-                <td>{p.estado === 'pendiente' && <button className="btn btn-sm btn-primary" onClick={() => confirmar(p.id)}>Confirmar</button>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      </Grid>
+      <Card>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Usuario</TableCell>
+                <TableCell>Monto</TableCell>
+                <TableCell>Método</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell align="right">Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {pagos.map((p) => (
+                <TableRow key={p.id} hover>
+                  <TableCell>{p.usuario_detalle?.full_name || p.usuario}</TableCell>
+                  <TableCell>${p.monto}</TableCell>
+                  <TableCell>{p.metodo}</TableCell>
+                  <TableCell><Chip label={p.estado} size="small" color={p.estado === 'completado' ? 'success' : 'default'} /></TableCell>
+                  <TableCell align="right">
+                    {p.estado === 'pendiente' && <Button size="small" variant="contained" onClick={() => confirmar(p.id)}>Confirmar</Button>}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
     </>
   )
 }

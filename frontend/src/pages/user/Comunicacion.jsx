@@ -1,101 +1,119 @@
 import { useEffect, useState } from 'react'
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Stack,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { communicationsAPI } from '../../services/api'
+import PageHeader from '../../components/common/PageHeader'
+import LoadingScreen from '../../components/common/LoadingScreen'
 
 export default function Comunicacion() {
-  const [tab, setTab] = useState('anuncios')
+  const [tab, setTab] = useState(0)
   const [anuncios, setAnuncios] = useState([])
   const [recibidos, setRecibidos] = useState([])
   const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
+  const [open, setOpen] = useState(false)
   const [form, setForm] = useState({ destinatario: '', asunto: '', cuerpo: '' })
 
   const load = () => {
     setLoading(true)
-    Promise.all([
-      communicationsAPI.anuncios(),
-      communicationsAPI.mensajesRecibidos(),
-    ]).then(([a, m]) => {
-      setAnuncios(a.data.results || a.data)
-      setRecibidos(m.data)
-    }).finally(() => setLoading(false))
+    Promise.all([communicationsAPI.anuncios(), communicationsAPI.mensajesRecibidos()])
+      .then(([a, m]) => {
+        setAnuncios(a.data.results || a.data)
+        setRecibidos(m.data)
+      })
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => { load() }, [])
 
   const enviar = async (e) => {
     e.preventDefault()
-    await communicationsAPI.enviarMensaje({ ...form, destinatario: parseInt(form.destinatario) })
-    setShowForm(false)
+    await communicationsAPI.enviarMensaje({ ...form, destinatario: parseInt(form.destinatario, 10) })
+    setOpen(false)
     setForm({ destinatario: '', asunto: '', cuerpo: '' })
     load()
   }
 
-  if (loading) return <div className="loading"><div className="spinner" /></div>
+  if (loading) return <LoadingScreen />
 
   return (
     <>
-      <header className="page-header">
-        <h1>Comunicación interna</h1>
-        <p>Anuncios y mensajes del movimiento</p>
-      </header>
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-        <button className={`btn ${tab === 'anuncios' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('anuncios')}>Anuncios</button>
-        <button className={`btn ${tab === 'mensajes' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('mensajes')}>Mensajes</button>
-        <button className="btn btn-gold" onClick={() => setShowForm(true)}>Nuevo mensaje</button>
-      </div>
-      {tab === 'anuncios' && (
-        <div className="message-list">
+      <PageHeader
+        title="Comunicación interna"
+        subtitle="Anuncios institucionales y mensajería"
+        action={<Button variant="contained" onClick={() => setOpen(true)}>Nuevo mensaje</Button>}
+      />
+
+      <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
+        <Tab label="Anuncios" />
+        <Tab label="Mensajes recibidos" />
+      </Tabs>
+
+      {tab === 0 && (
+        <Stack spacing={1.5} divider={<Divider />}>
           {anuncios.map((a) => (
-            <div key={a.id} className="message-item">
-              <div className="message-item-header">
-                <strong>{a.titulo}</strong>
-                {a.importante && <span className="badge badge-gold">Importante</span>}
-              </div>
-              <p>{a.contenido}</p>
-              <small style={{ color: 'var(--color-text-muted)' }}>Por {a.autor_nombre}</small>
-            </div>
+            <Card key={a.id} variant="outlined">
+              <CardContent>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                  <Typography variant="subtitle1" fontWeight={600}>{a.titulo}</Typography>
+                  {a.importante && <Chip label="Importante" size="small" color="warning" variant="outlined" />}
+                </Stack>
+                <Typography variant="body2">{a.contenido}</Typography>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+                  {a.autor_nombre}
+                </Typography>
+              </CardContent>
+            </Card>
           ))}
-        </div>
+        </Stack>
       )}
-      {tab === 'mensajes' && (
-        <div className="message-list">
+
+      {tab === 1 && (
+        <Stack spacing={1.5}>
           {recibidos.map((m) => (
-            <div key={m.id} className={`message-item${!m.leido ? ' unread' : ''}`}>
-              <div className="message-item-header">
-                <strong>{m.asunto}</strong>
-                <time>{new Date(m.created_at).toLocaleDateString('es')}</time>
-              </div>
-              <p>De: {m.remitente_detalle?.full_name || m.remitente_detalle?.username}</p>
-              <p>{m.cuerpo}</p>
-            </div>
+            <Card key={m.id} variant="outlined" sx={{ borderLeft: m.leido ? undefined : 3, borderLeftColor: 'secondary.main' }}>
+              <CardContent>
+                <Typography variant="subtitle2">{m.asunto}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  De: {m.remitente_detalle?.full_name || m.remitente_detalle?.username}
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 1 }}>{m.cuerpo}</Typography>
+              </CardContent>
+            </Card>
           ))}
-        </div>
+        </Stack>
       )}
-      {showForm && (
-        <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Enviar mensaje</h2>
-            <form onSubmit={enviar}>
-              <div className="form-group">
-                <label>ID destinatario</label>
-                <input className="form-control" value={form.destinatario} onChange={(e) => setForm({ ...form, destinatario: e.target.value })} required />
-              </div>
-              <div className="form-group">
-                <label>Asunto</label>
-                <input className="form-control" value={form.asunto} onChange={(e) => setForm({ ...form, asunto: e.target.value })} required />
-              </div>
-              <div className="form-group">
-                <label>Mensaje</label>
-                <textarea className="form-control" rows={4} value={form.cuerpo} onChange={(e) => setForm({ ...form, cuerpo: e.target.value })} required />
-              </div>
-              <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancelar</button>
-                <button type="submit" className="btn btn-primary">Enviar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Enviar mensaje</DialogTitle>
+        <Box component="form" onSubmit={enviar}>
+          <DialogContent>
+            <Stack spacing={2}>
+              <TextField label="ID destinatario" value={form.destinatario} onChange={(e) => setForm({ ...form, destinatario: e.target.value })} required fullWidth />
+              <TextField label="Asunto" value={form.asunto} onChange={(e) => setForm({ ...form, asunto: e.target.value })} required fullWidth />
+              <TextField label="Mensaje" multiline rows={4} value={form.cuerpo} onChange={(e) => setForm({ ...form, cuerpo: e.target.value })} required fullWidth />
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button type="submit" variant="contained">Enviar</Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
     </>
   )
 }

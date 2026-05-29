@@ -1,6 +1,21 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import {
+  Alert,
+  Box,
+  Button,
+  Container,
+  Grid,
+  Link,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
+import { motion } from 'framer-motion'
 import api from '../services/api'
+import MeshBackground from '../components/common/MeshBackground'
+import { scaleIn } from '../animations/variants'
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -19,12 +34,11 @@ export default function Register() {
     setLoading(true)
     try {
       await api.post('/accounts/register/', form)
-      navigate('/login', { state: { message: 'Cuenta creada. Inicia sesión.' } })
+      navigate('/login')
     } catch (err) {
       const data = err.response?.data
       if (typeof data === 'object') {
-        const msgs = Object.entries(data).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-        setError(msgs.join(' | '))
+        setError(Object.entries(data).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' · '))
       } else {
         setError('Error al registrar. Verifique los datos.')
       }
@@ -34,48 +48,52 @@ export default function Register() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card" style={{ maxWidth: '480px' }}>
-        <h1>Registro</h1>
-        <p className="auth-subtitle">Únete al camino de formación espiritual</p>
-        {error && <div className="alert alert-error">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Nombre</label>
-            <input className="form-control" name="first_name" value={form.first_name} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-            <label>Apellido</label>
-            <input className="form-control" name="last_name" value={form.last_name} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-            <label>Usuario</label>
-            <input className="form-control" name="username" value={form.username} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-            <label>Correo electrónico</label>
-            <input className="form-control" type="email" name="email" value={form.email} onChange={handleChange} required />
-          </div>
-          <div className="form-group">
-            <label>Teléfono</label>
-            <input className="form-control" name="phone" value={form.phone} onChange={handleChange} />
-          </div>
-          <div className="form-group">
-            <label>Contraseña</label>
-            <input className="form-control" type="password" name="password" value={form.password} onChange={handleChange} required minLength={8} />
-          </div>
-          <div className="form-group">
-            <label>Confirmar contraseña</label>
-            <input className="form-control" type="password" name="password_confirm" value={form.password_confirm} onChange={handleChange} required />
-          </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Registrando...' : 'Crear cuenta'}
-          </button>
-        </form>
-        <p className="auth-footer">
-          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
-        </p>
-      </div>
-    </div>
+    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', py: 4 }}>
+      <MeshBackground subtle />
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+        <Paper
+          component={motion.div}
+          initial="initial"
+          animate="animate"
+          variants={scaleIn}
+          sx={{ p: { xs: 3, sm: 4 }, bgcolor: 'rgba(255,255,255,0.92)' }}
+        >
+          <Stack spacing={3} component="form" onSubmit={handleSubmit}>
+            <Box textAlign="center">
+              <Typography variant="h1">Crear cuenta</Typography>
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                Únete al camino de formación espiritual
+              </Typography>
+            </Box>
+            {error && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Alert severity="error">{error}</Alert>
+              </motion.div>
+            )}
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField label="Nombre" name="first_name" value={form.first_name} onChange={handleChange} required fullWidth />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField label="Apellido" name="last_name" value={form.last_name} onChange={handleChange} required fullWidth />
+              </Grid>
+            </Grid>
+            <TextField label="Usuario" name="username" value={form.username} onChange={handleChange} required fullWidth />
+            <TextField label="Correo" name="email" type="email" value={form.email} onChange={handleChange} required fullWidth />
+            <TextField label="Teléfono" name="phone" value={form.phone} onChange={handleChange} fullWidth />
+            <TextField label="Contraseña" name="password" type="password" value={form.password} onChange={handleChange} required fullWidth inputProps={{ minLength: 8 }} />
+            <TextField label="Confirmar contraseña" name="password_confirm" type="password" value={form.password_confirm} onChange={handleChange} required fullWidth />
+            <motion.div whileTap={{ scale: 0.98 }}>
+              <Button type="submit" variant="contained" size="large" fullWidth disabled={loading} className="btn-glow">
+                {loading ? 'Registrando…' : 'Crear cuenta'}
+              </Button>
+            </motion.div>
+            <Typography variant="body2" textAlign="center">
+              ¿Ya tienes cuenta? <Link component={RouterLink} to="/login">Inicia sesión</Link>
+            </Typography>
+          </Stack>
+        </Paper>
+      </Container>
+    </Box>
   )
 }

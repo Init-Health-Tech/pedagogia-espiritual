@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
+import { Box, Button, Card, CardContent, Grid, TextField, Typography } from '@mui/material'
 import { groupsAPI } from '../../services/api'
+import PageHeader from '../../components/common/PageHeader'
+import LoadingScreen from '../../components/common/LoadingScreen'
 
 export default function AdminGrupos() {
   const [grupos, setGrupos] = useState([])
@@ -17,30 +20,34 @@ export default function AdminGrupos() {
     load()
   }
 
-  if (loading) return <div className="loading"><div className="spinner" /></div>
+  if (loading) return <LoadingScreen />
 
   return (
     <>
-      <header className="page-header"><h1>Grupos de Pastoreo</h1></header>
-      <div className="card" style={{ marginBottom: '2rem' }}>
-        <h3 className="card-title">Nuevo grupo</h3>
-        <form onSubmit={crear}>
-          <div className="form-group"><label>Nombre</label><input className="form-control" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required /></div>
-          <div className="form-group"><label>Descripción</label><textarea className="form-control" value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} /></div>
-          <div className="form-group"><label>Horario</label><input className="form-control" value={form.horario_reunion} onChange={(e) => setForm({ ...form, horario_reunion: e.target.value })} /></div>
-          <button type="submit" className="btn btn-primary">Crear grupo</button>
-        </form>
-      </div>
-      <div className="grid-2">
+      <PageHeader title="Grupos de pastoreo" subtitle="Comunidades de formación y coordinación" />
+      <Card sx={{ mb: 3, maxWidth: 560 }}>
+        <CardContent component="form" onSubmit={crear}>
+          <Typography variant="h3" gutterBottom>Nuevo grupo</Typography>
+          <TextField label="Nombre" fullWidth required sx={{ mb: 2 }} value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+          <TextField label="Descripción" multiline rows={2} fullWidth sx={{ mb: 2 }} value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} />
+          <TextField label="Horario" fullWidth sx={{ mb: 2 }} value={form.horario_reunion} onChange={(e) => setForm({ ...form, horario_reunion: e.target.value })} />
+          <Button type="submit" variant="contained">Crear grupo</Button>
+        </CardContent>
+      </Card>
+      <Grid container spacing={2}>
         {grupos.map((g) => (
-          <div key={g.id} className="card">
-            <h3>{g.nombre}</h3>
-            <p style={{ color: 'var(--color-text-muted)' }}>{g.descripcion}</p>
-            <p><strong>Miembros:</strong> {g.total_miembros}</p>
-            <p><strong>Horario:</strong> {g.horario_reunion}</p>
-          </div>
+          <Grid key={g.id} size={{ xs: 12, sm: 6 }}>
+            <Card>
+              <CardContent>
+                <Typography variant="subtitle1" fontWeight={600}>{g.nombre}</Typography>
+                <Typography variant="body2" sx={{ my: 1 }}>{g.descripcion}</Typography>
+                <Typography variant="body2">Miembros: {g.total_miembros}</Typography>
+                <Typography variant="body2">Horario: {g.horario_reunion || '—'}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
+      </Grid>
     </>
   )
 }

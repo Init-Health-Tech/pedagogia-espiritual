@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
+import LoadingScreen from './components/common/LoadingScreen'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -18,11 +19,12 @@ import AdminContenidos from './pages/admin/AdminContenidos'
 import AdminPagos from './pages/admin/AdminPagos'
 import AdminGrupos from './pages/admin/AdminGrupos'
 import AdminAnuncios from './pages/admin/AdminAnuncios'
-import './styles/layout.css'
+import AdminModulos from './pages/admin/AdminModulos'
+import AdminPreguntas from './pages/admin/AdminPreguntas'
 
 function PrivateRoute({ children, adminOnly = false }) {
   const { user, loading, isAdmin } = useAuth()
-  if (loading) return <div className="loading"><div className="spinner" /></div>
+  if (loading) return <LoadingScreen />
   if (!user) return <Navigate to="/login" replace />
   if (adminOnly && !isAdmin) return <Navigate to="/app" replace />
   return children
@@ -30,7 +32,7 @@ function PrivateRoute({ children, adminOnly = false }) {
 
 function PublicRoute({ children }) {
   const { user, loading } = useAuth()
-  if (loading) return <div className="loading"><div className="spinner" /></div>
+  if (loading) return <LoadingScreen />
   if (user) return <Navigate to={user.role === 'admin' ? '/admin' : '/app'} replace />
   return children
 }
@@ -59,6 +61,8 @@ export default function App() {
         <Route path="pagos" element={<AdminPagos />} />
         <Route path="grupos" element={<AdminGrupos />} />
         <Route path="anuncios" element={<AdminAnuncios />} />
+        <Route path="modulos" element={<AdminModulos />} />
+        <Route path="preguntas" element={<AdminPreguntas />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
