@@ -5,9 +5,9 @@ After=network.target postgresql.service
 [Service]
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/pedagogia-espiritual/backend
-EnvironmentFile=/var/www/pedagogia-espiritual/backend/.env
-ExecStart=/var/www/pedagogia-espiritual/backend/.venv/bin/gunicorn \
+WorkingDirectory=/opt/apps/pedagogia-espiritual/backend
+EnvironmentFile=/opt/apps/pedagogia-espiritual/backend/.env
+ExecStart=/opt/apps/pedagogia-espiritual/backend/.venv/bin/gunicorn \
     --workers 3 \
     --bind 127.0.0.1:8000 \
     --timeout 120 \

@@ -1,5 +1,8 @@
 # Despliegue en producción
 
+> **Recomendado:** usa Docker → [`DEPLOY-DOCKER.md`](DEPLOY-DOCKER.md)  
+> Esta guía es la alternativa manual (Gunicorn + systemd + nginx en el host).
+
 Arquitectura:
 
 | Componente | Dominio | Plataforma |
@@ -63,10 +66,10 @@ SQL
 ### 3.3 Clonar y configurar la app
 
 ```bash
-sudo mkdir -p /var/www/pedagogia-espiritual
-sudo chown $USER:$USER /var/www/pedagogia-espiritual
-git clone <url-del-repo> /var/www/pedagogia-espiritual
-cd /var/www/pedagogia-espiritual/backend
+sudo mkdir -p /opt/apps/pedagogia-espiritual
+sudo chown $USER:$USER /opt/apps/pedagogia-espiritual
+git clone <url-del-repo> /opt/apps/pedagogia-espiritual
+cd /opt/apps/pedagogia-espiritual/backend
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -91,14 +94,14 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 ### 3.4 Permisos
 
 ```bash
-sudo chown -R www-data:www-data /var/www/pedagogia-espiritual/backend/media
-sudo chown -R www-data:www-data /var/www/pedagogia-espiritual/backend/staticfiles
+sudo chown -R www-data:www-data /opt/apps/pedagogia-espiritual/backend/media
+sudo chown -R www-data:www-data /opt/apps/pedagogia-espiritual/backend/staticfiles
 ```
 
 ### 3.5 Systemd (Gunicorn)
 
 ```bash
-sudo cp /var/www/pedagogia-espiritual/deploy/systemd/pedagogia-api.service /etc/systemd/system/
+sudo cp /opt/apps/pedagogia-espiritual/deploy/systemd/pedagogia-api.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable pedagogia-api
 sudo systemctl start pedagogia-api
@@ -108,7 +111,7 @@ sudo systemctl status pedagogia-api
 ### 3.6 Nginx
 
 ```bash
-sudo cp /var/www/pedagogia-espiritual/deploy/nginx/pedagogia-api.conf /etc/nginx/sites-available/pedagogia-api
+sudo cp /opt/apps/pedagogia-espiritual/deploy/nginx/pedagogia-api.conf /etc/nginx/sites-available/pedagogia-api
 sudo ln -s /etc/nginx/sites-available/pedagogia-api /etc/nginx/sites-enabled/
 sudo nginx -t
 ```
@@ -159,7 +162,7 @@ Push a la rama conectada → Vercel despliega automáticamente.
 ### Backend (VM)
 
 ```bash
-cd /var/www/pedagogia-espiritual
+cd /opt/apps/pedagogia-espiritual
 git pull
 cd backend
 source .venv/bin/activate

@@ -101,22 +101,21 @@ Base URL: `http://localhost:8000/api/`
 Despliegue separado:
 
 - **Frontend:** Vercel → `https://pedagogia-espiritual.init.com.mx`
-- **Backend:** VM DigitalOcean → `https://api.pedagogia-espiritual.init.com.mx`
+- **Backend:** VM DigitalOcean (Docker) → `https://api.pedagogia-espiritual.init.com.mx`
 
-Guía paso a paso: [`deploy/DEPLOY.md`](deploy/DEPLOY.md)
+**Guía recomendada (Docker):** [`deploy/DEPLOY-DOCKER.md`](deploy/DEPLOY-DOCKER.md)
 
-### Resumen rápido
+Alternativa sin Docker: [`deploy/DEPLOY.md`](deploy/DEPLOY.md)
+
+### Resumen rápido (Docker)
+
+```bash
+cd /opt/apps/pedagogia-espiritual/deploy/docker
+cp .env.example .env   # editar SECRET_KEY y DB_PASSWORD
+docker compose up -d --build
+```
 
 **Vercel:** root directory `frontend`, variable `VITE_API_URL=https://api.pedagogia-espiritual.init.com.mx/api`
-
-**DigitalOcean:** Django + Gunicorn + Nginx + PostgreSQL. Copia `backend/.env.example` a `.env` y configura `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` y la base de datos.
-
-Checklist adicional:
-
-1. Generar `SECRET_KEY` único (no usar el de desarrollo)
-2. `DEBUG=False` en producción
-3. Configurar almacenamiento de archivos en la VM o S3 para uploads
-4. Integrar pasarela de pago real (Stripe, Mercado Pago, etc.)
 
 ## Licencia
 
