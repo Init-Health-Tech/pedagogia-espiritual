@@ -1,21 +1,12 @@
 import { useEffect, useState } from 'react'
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Checkbox,
-  FormControlLabel,
-  Grid,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Alert, Box, Button, Card, CardContent, Checkbox, FormControlLabel, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { pedagogiaAPI } from '../../services/api'
 import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
+import EmptyState from '../../components/common/EmptyState'
+import ConfirmDialog from '../../components/common/ConfirmDialog'
+import FormField from '../../components/common/FormField'
+import StatusBadge from '../../components/common/StatusBadge'
 
 const emptyForm = { texto: '', orden: 1, modulo: '', ayuda: '', activa: true }
 
@@ -25,6 +16,7 @@ export default function AdminPreguntas() {
   const [form, setForm] = useState(emptyForm)
   const [editId, setEditId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [confirmId, setConfirmId] = useState(null)
 
   const load = () =>
     Promise.all([pedagogiaAPI.preguntas(), pedagogiaAPI.modulos()]).then(([p, m]) => {
@@ -44,7 +36,13 @@ export default function AdminPreguntas() {
     load()
   }
 
-  if (loading) return <LoadingScreen />
+  const eliminar = async (id) => {
+    await pedagogiaAPI.deletePregunta(id)
+    setConfirmId(null)
+    load()
+  }
+
+  if (loading) return <LoadingScreen rows={2} />
 
   return (
     <>
@@ -53,44 +51,62 @@ export default function AdminPreguntas() {
       <Card sx={{ mb: 3 }}>
         <CardContent component="form" onSubmit={handleSubmit}>
           <Typography variant="h3" gutterBottom>{editId ? 'Editar pregunta' : 'Nueva pregunta'}</Typography>
-          <Stack spacing={2}>
-            <TextField label="Pregunta" multiline rows={2} required fullWidth value={form.texto} onChange={(e) => setForm({ ...form, texto: e.target.value })} />
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField label="Orden" type="number" fullWidth value={form.orden} onChange={(e) => setForm({ ...form, orden: +e.target.value })} inputProps={{ min: 1, max: 20 }} />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 8 }}>
-                <TextField select label="Módulo" fullWidth value={form.modulo} onChange={(e) => setForm({ ...form, modulo: e.target.value })}>
-                  <MenuItem value="">Sin módulo</MenuItem>
-                  {modulos.map((m) => <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>)}
-                </TextField>
-              </Grid>
-            </Grid>
-            <TextField label="Texto de ayuda" fullWidth value={form.ayuda} onChange={(e) => setForm({ ...form, ayuda: e.target.value })} />
-            <FormControlLabel control={<Checkbox checked={form.activa} onChange={(e) => setForm({ ...form, activa: e.target.checked })} />} label="Activa" />
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button type="submit" variant="contained">{editId ? 'Guardar' : 'Agregar'}</Button>
-              {editId && <Button variant="outlined" onClick={() => { setEditId(null); setForm(emptyForm) }}>Cancelar</Button>}
-            </Box>
-          </Stack>
+          <FormField label="Pregunta de reflexión" required helper="Esta pregunta aparecerá en la ficha pedagógica de cada miembro">
+            <TextField multiline rows={2} required fullWidth value={form.texto} onChange={(e) => setForm({ ...form, texto: e.target.value })} hiddenLabel />
+          </FormField>
+          <FormField label="Orden" helper="Número del 1 al 10">
+            <TextField type="number" fullWidth value={form.orden} onChange={(e) => setForm({ ...form, orden: +e.target.value })} hiddenLabel inputProps={{ min: 1, max: 20 }} />
+          </FormField>
+          <FormField label="Módulo relacionado">
+            <TextField select fullWidth value={form.modulo} onChange={(e) => setForm({ ...form, modulo: e.target.value })} hiddenLabel>
+              <MenuItem value="">Sin módulo específico</MenuItem>
+              {modulos.map((m) => <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>)}
+            </TextField>
+          </FormField>
+          <FormField label="Texto de ayuda" helper="Orientación breve para quien responde">
+            <TextField fullWidth value={form.ayuda} onChange={(e) => setForm({ ...form, ayuda: e.target.value })} hiddenLabel />
+          </FormField>
+          <FormControlLabel control={<Checkbox checked={form.activa} onChange={(e) => setForm({ ...form, activa: e.target.checked })} />} label="Pregunta activa en el checklist" sx={{ mt: 1 }} />
+          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            <Button type="submit" variant="contained">{editId ? 'Guardar cambios' : 'Agregar pregunta'}</Button>
+            {editId && <Button variant="outlined" onClick={() => { setEditId(null); setForm(emptyForm) }}>Cancelar</Button>}
+          </Box>
         </CardContent>
       </Card>
-      <Stack spacing={1}>
-        {preguntas.map((p) => (
-          <Card key={p.id} variant="outlined" sx={{ opacity: p.activa ? 1 : 0.6 }}>
-            <CardContent sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
-              <Box>
-                <Typography variant="overline">#{p.orden} {p.modulo_nombre && `· ${p.modulo_nombre}`}</Typography>
-                <Typography variant="body1">{p.texto}</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <Button size="small" onClick={() => { setEditId(p.id); setForm({ texto: p.texto, orden: p.orden, modulo: p.modulo || '', ayuda: p.ayuda || '', activa: p.activa }) }}>Editar</Button>
-                <Button size="small" color="error" onClick={async () => { if (confirm('¿Eliminar?')) { await pedagogiaAPI.deletePregunta(p.id); load() } }}>Eliminar</Button>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
-      </Stack>
+
+      {preguntas.length === 0 ? (
+        <EmptyState title="No hay preguntas en el checklist" description="Agrega la primera pregunta de reflexión usando el formulario de arriba." />
+      ) : (
+        <Stack spacing={1.5}>
+          {preguntas.map((p) => (
+            <Card key={p.id} sx={{ opacity: p.activa ? 1 : 0.75 }}>
+              <CardContent sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+                <Box sx={{ flex: 1 }}>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                    <Typography variant="overline">Pregunta {p.orden}</Typography>
+                    <StatusBadge status={p.activa ? 'active' : 'pending'} label={p.activa ? 'Activa' : 'Inactiva'} />
+                  </Stack>
+                  <Typography variant="body1">{p.texto}</Typography>
+                  {p.modulo_nombre && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{p.modulo_nombre}</Typography>}
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button size="small" variant="outlined" onClick={() => { setEditId(p.id); setForm({ texto: p.texto, orden: p.orden, modulo: p.modulo || '', ayuda: p.ayuda || '', activa: p.activa }) }}>Editar</Button>
+                  <Button size="small" color="error" variant="outlined" onClick={() => setConfirmId(p.id)}>Eliminar</Button>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
+      )}
+
+      <ConfirmDialog
+        open={Boolean(confirmId)}
+        title="¿Eliminar esta pregunta?"
+        message="Se quitará del checklist de todos los miembros. Esta acción no se puede deshacer."
+        confirmLabel="Sí, eliminar pregunta"
+        onConfirm={() => eliminar(confirmId)}
+        onClose={() => setConfirmId(null)}
+      />
     </>
   )
 }

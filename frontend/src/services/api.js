@@ -51,6 +51,7 @@ export const pedagogiaAPI = {
   modulos: () => api.get('/pedagogia/modulos/'),
   preguntas: () => api.get('/pedagogia/preguntas/'),
   responderChecklist: (data) => api.post('/pedagogia/fichas/responder_checklist/', data),
+  updateFicha: (id, data) => api.patch(`/pedagogia/fichas/${id}/`, data),
   createModulo: (data) => api.post('/pedagogia/modulos/', data),
   updateModulo: (id, data) => api.patch(`/pedagogia/modulos/${id}/`, data),
   deleteModulo: (id) => api.delete(`/pedagogia/modulos/${id}/`),

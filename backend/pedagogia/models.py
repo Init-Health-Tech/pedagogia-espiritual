@@ -9,7 +9,12 @@ class Modulo(models.Model):
     orden = models.PositiveIntegerField(default=0)
     color = models.CharField(max_length=7, default='#6B8CAE')
     manual_archivo = models.FileField(upload_to='manuales/', blank=True, null=True)
-    manual_url = models.URLField(blank=True, help_text='Enlace al manual en PDF o recurso externo')
+    manual_url = models.URLField(blank=True, help_text='Enlace complementario opcional')
+    contenido_manual = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='Secciones del manual digital interactivo',
+    )
     activo = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -34,7 +39,8 @@ class PreguntaChecklist(models.Model):
         help_text='Módulo al que pertenece esta pregunta (opcional)',
     )
     activa = models.BooleanField(default=True)
-    ayuda = models.TextField(blank=True, help_text='Texto orientador para responder')
+    ayuda = models.TextField(blank=True, help_text='Orientación para la reflexión semanal')
+    semana = models.PositiveIntegerField(default=1, help_text='Semana del diario')
 
     class Meta:
         ordering = ['orden']
@@ -77,11 +83,11 @@ class FichaPedagogica(models.Model):
         total = preguntas.count()
         if total == 0:
             return 0
-        completadas = RespuestaChecklist.objects.filter(
-            ficha=self,
-            pregunta__in=preguntas,
-            completada=True,
-        ).count()
+        respuestas = RespuestaChecklist.objects.filter(ficha=self, pregunta__in=preguntas)
+        completadas = sum(
+            1 for r in respuestas
+            if r.completada or (r.nota and len(r.nota.strip()) >= 15)
+        )
         progreso = int((completadas / total) * 100)
         self.progreso_general = progreso
         self.save(update_fields=['progreso_general', 'updated_at'])
@@ -100,7 +106,7 @@ class RespuestaChecklist(models.Model):
         related_name='respuestas',
     )
     completada = models.BooleanField(default=False)
-    nota = models.TextField(blank=True)
+    nota = models.TextField(blank=True, help_text='Respuesta abierta del diario semanal')
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

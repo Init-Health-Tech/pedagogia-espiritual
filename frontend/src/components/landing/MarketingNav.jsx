@@ -23,8 +23,10 @@ import CloseIcon from '@mui/icons-material/Close'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { NAV_ITEMS } from '../../data/marketingContent'
+import TorLogo from '../common/TorLogo'
+import { colors } from '../../theme/muiTheme'
 
-const HEADER_HEIGHT = 72
+const HEADER_HEIGHT = 64
 
 function scrollTo(href) {
   if (!href.startsWith('#')) return
@@ -43,14 +45,9 @@ function NavDropdown({ item, onNavigate }) {
     <>
       <Button
         color="inherit"
-        endIcon={<ExpandMoreIcon sx={{ fontSize: 18, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none' }} />}
+        endIcon={<ExpandMoreIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
         onClick={(e) => setAnchor(e.currentTarget)}
-        sx={{
-          fontWeight: 500,
-          fontSize: '0.9rem',
-          color: 'text.primary',
-          '&:hover': { bgcolor: 'action.hover' },
-        }}
+        sx={{ fontWeight: 400, fontSize: '0.8125rem', color: colors.muted, minHeight: 36, px: 1.5, '&:hover': { color: colors.primary, bgcolor: 'transparent' } }}
       >
         {item.label}
       </Button>
@@ -58,22 +55,10 @@ function NavDropdown({ item, onNavigate }) {
         anchorEl={anchor}
         open={open}
         onClose={() => setAnchor(null)}
-        slotProps={{
-          paper: {
-            sx: { mt: 1, minWidth: 240, borderRadius: 2, border: 1, borderColor: 'divider' },
-          },
-        }}
+        slotProps={{ paper: { sx: { mt: 0.5, minWidth: 220, borderRadius: 1, border: `1px solid ${colors.border}`, boxShadow: 'none' } } }}
       >
         {item.children.map((child) => (
-          <MenuItem
-            key={child.href}
-            onClick={() => {
-              scrollTo(child.href)
-              setAnchor(null)
-              onNavigate?.()
-            }}
-            sx={{ py: 1.25, fontSize: '0.9rem' }}
-          >
+          <MenuItem key={child.href} onClick={() => { scrollTo(child.href); setAnchor(null); onNavigate?.() }} sx={{ py: 1, fontSize: '0.875rem' }}>
             {child.label}
           </MenuItem>
         ))}
@@ -84,37 +69,24 @@ function NavDropdown({ item, onNavigate }) {
 
 function MobileNavGroup({ item, onNavigate }) {
   const [open, setOpen] = useState(false)
-
   if (!item.children) {
     return (
-      <ListItemButton
-        onClick={() => {
-          scrollTo(item.href)
-          onNavigate()
-        }}
-      >
-        <ListItemText primary={item.label} />
+      <ListItemButton onClick={() => { scrollTo(item.href); onNavigate() }} sx={{ py: 1.25 }}>
+        <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: '0.9375rem' }} />
       </ListItemButton>
     )
   }
-
   return (
     <>
-      <ListItemButton onClick={() => setOpen(!open)}>
-        <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 600 }} />
-        {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+      <ListItemButton onClick={() => setOpen(!open)} sx={{ py: 1.25 }}>
+        <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: '0.9375rem' }} />
+        {open ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
       </ListItemButton>
       <Collapse in={open}>
         <List disablePadding sx={{ pl: 2 }}>
           {item.children.map((child) => (
-            <ListItemButton
-              key={child.href}
-              onClick={() => {
-                scrollTo(child.href)
-                onNavigate()
-              }}
-            >
-              <ListItemText primary={child.label} primaryTypographyProps={{ fontSize: '0.9rem' }} />
+            <ListItemButton key={child.href} onClick={() => { scrollTo(child.href); onNavigate() }} sx={{ py: 1 }}>
+              <ListItemText primary={child.label} primaryTypographyProps={{ fontSize: '0.875rem', color: colors.muted }} />
             </ListItemButton>
           ))}
         </List>
@@ -134,41 +106,25 @@ export default function MarketingNav() {
         position="fixed"
         elevation={0}
         sx={{
-          bgcolor: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(14px)',
+          bgcolor: 'rgba(250, 246, 239, 0.92)',
+          backdropFilter: 'blur(8px)',
           color: 'text.primary',
-          borderBottom: 1,
-          borderColor: 'divider',
+          borderBottom: `1px solid ${colors.border}`,
           zIndex: theme.zIndex.drawer + 1,
         }}
       >
-        <Toolbar sx={{ minHeight: HEADER_HEIGHT, gap: 2 }}>
-          <Box
-            component="a"
-            href="#inicio"
-            onClick={(e) => { e.preventDefault(); scrollTo('#inicio') }}
-            sx={{ textDecoration: 'none', color: 'inherit', flexShrink: 0 }}
-          >
-            <Typography variant="subtitle1" fontWeight={700} color="primary" lineHeight={1.2}>
-              Movimiento Franciscano
-            </Typography>
-            <Typography variant="caption" color="text.secondary" display="block">
-              Pedagogía Espiritual — SST
-            </Typography>
+        <Toolbar sx={{ minHeight: HEADER_HEIGHT, gap: 1.5, px: { xs: 2, md: 3 } }}>
+          <Box component="a" href="#inicio" onClick={(e) => { e.preventDefault(); scrollTo('#inicio') }} sx={{ textDecoration: 'none', color: 'inherit' }}>
+            <TorLogo size="sm" />
           </Box>
 
           {!isMobile && (
-            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ flex: 1, ml: 2 }}>
+            <Stack direction="row" alignItems="center" sx={{ flex: 1, ml: 1 }}>
               {NAV_ITEMS.map((item) =>
                 item.children ? (
                   <NavDropdown key={item.label} item={item} />
                 ) : (
-                  <Button
-                    key={item.label}
-                    color="inherit"
-                    onClick={() => scrollTo(item.href)}
-                    sx={{ fontWeight: 500, fontSize: '0.9rem', color: 'text.primary' }}
-                  >
+                  <Button key={item.label} color="inherit" onClick={() => scrollTo(item.href)} sx={{ fontWeight: 400, fontSize: '0.8125rem', color: colors.muted, minHeight: 36, px: 1.5, '&:hover': { color: colors.primary, bgcolor: 'transparent' } }}>
                     {item.label}
                   </Button>
                 ),
@@ -179,46 +135,33 @@ export default function MarketingNav() {
           <Box sx={{ flex: isMobile ? 1 : undefined }} />
 
           {!isMobile && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Button component={RouterLink} to="/login" color="inherit" sx={{ fontWeight: 500 }}>
-                Iniciar sesión
-              </Button>
-              <Button component={RouterLink} to="/registro" variant="contained" className="btn-glow">
-                Registrarse
-              </Button>
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <Button component={RouterLink} to="/login" variant="text" className="landing-btn" sx={{ color: colors.muted, minHeight: 36 }}>Iniciar sesión</Button>
+              <Button component={RouterLink} to="/registro" variant="contained" className="landing-btn" sx={{ minHeight: 36 }}>Registrarse</Button>
             </Stack>
           )}
 
           {isMobile && (
-            <IconButton edge="end" onClick={() => setDrawerOpen(true)} aria-label="menú">
-              <MenuIcon />
+            <IconButton edge="end" onClick={() => setDrawerOpen(true)} aria-label="menú" size="small">
+              <MenuIcon fontSize="small" />
             </IconButton>
           )}
         </Toolbar>
       </AppBar>
 
-      <Drawer
-        anchor="right"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        PaperProps={{ sx: { width: 300 } }}
-      >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderBottom: 1, borderColor: 'divider' }}>
-          <Typography variant="subtitle2" fontWeight={600}>Menú</Typography>
-          <IconButton onClick={() => setDrawerOpen(false)}><CloseIcon /></IconButton>
+      <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)} PaperProps={{ sx: { width: 280, borderLeft: `1px solid ${colors.border}` } }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderBottom: `1px solid ${colors.border}` }}>
+          <Typography variant="body2" color="text.secondary">Menú</Typography>
+          <IconButton onClick={() => setDrawerOpen(false)} size="small"><CloseIcon fontSize="small" /></IconButton>
         </Box>
-        <List sx={{ py: 1 }}>
+        <List sx={{ py: 0.5 }}>
           {NAV_ITEMS.map((item) => (
             <MobileNavGroup key={item.label} item={item} onNavigate={() => setDrawerOpen(false)} />
           ))}
         </List>
-        <Stack spacing={1} sx={{ p: 2, mt: 'auto', borderTop: 1, borderColor: 'divider' }}>
-          <Button component={RouterLink} to="/login" fullWidth variant="outlined" onClick={() => setDrawerOpen(false)}>
-            Iniciar sesión
-          </Button>
-          <Button component={RouterLink} to="/registro" fullWidth variant="contained" className="btn-glow" onClick={() => setDrawerOpen(false)}>
-            Registrarse
-          </Button>
+        <Stack spacing={1} sx={{ p: 2, mt: 'auto', borderTop: `1px solid ${colors.border}` }}>
+          <Button component={RouterLink} to="/login" fullWidth variant="text" className="landing-btn" onClick={() => setDrawerOpen(false)}>Iniciar sesión</Button>
+          <Button component={RouterLink} to="/registro" fullWidth variant="contained" className="landing-btn" onClick={() => setDrawerOpen(false)}>Registrarse</Button>
         </Stack>
       </Drawer>
     </>

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Card, CardContent, Chip, Grid, Link, Typography, Box } from '@mui/material'
+import { Box, Button, Card, CardContent, Grid, Link, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
+import { BookOpen } from 'lucide-react'
 import { staggerContainer, staggerItem } from '../../animations/variants'
 import { contentAPI } from '../../services/api'
 import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
+import StatusBadge from '../../components/common/StatusBadge'
 
 const tipoLabel = { video: 'Video', documento: 'Documento', presentacion: 'Presentación', esquema: 'Esquema', audio: 'Audio' }
 
@@ -17,27 +19,39 @@ export default function Contenidos() {
     contentAPI.list().then((r) => setItems(r.data.results || r.data)).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <LoadingScreen />
+  if (loading) return <LoadingScreen rows={3} />
 
   return (
     <>
       <PageHeader title="Biblioteca de contenidos" subtitle="Documentos, esquemas, presentaciones y materiales de formación" />
       {items.length === 0 ? (
-        <EmptyState title="Sin contenidos" description="No hay materiales disponibles en este momento." />
+        <EmptyState
+          title="La biblioteca está vacía por ahora"
+          description="Los manuales y materiales de tu módulo aparecerán aquí cuando estén disponibles."
+          actionLabel="Ver mi ficha pedagógica"
+          onAction={() => { window.location.href = '/app/ficha' }}
+        />
       ) : (
-        <Grid container spacing={2} component={motion.div} variants={staggerContainer} initial="initial" animate="animate">
+        <Grid container spacing={2.5} component={motion.div} variants={staggerContainer} initial="initial" animate="animate">
           {items.map((c) => (
             <Grid key={c.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-              <Box component={motion.div} variants={staggerItem} whileHover={{ y: -4 }} style={{ height: '100%' }}>
-              <Card sx={{ height: '100%' }}>
-                <CardContent>
-                  <Chip label={tipoLabel[c.tipo] || c.tipo} size="small" sx={{ mb: 1.5 }} />
-                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>{c.titulo}</Typography>
-                  <Typography variant="body2" sx={{ mb: 1 }}>{c.descripcion}</Typography>
-                  {c.url_externa && <Link href={c.url_externa} target="_blank" rel="noreferrer" variant="body2">Abrir recurso</Link>}
-                </CardContent>
-              </Card>
-              </Box>
+              <motion.div variants={staggerItem} style={{ height: '100%' }}>
+                <Card className="card-hover" sx={{ height: '100%' }}>
+                  <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                      <BookOpen size={20} color="#6B4C2A" />
+                      <StatusBadge status="info" label={tipoLabel[c.tipo] || c.tipo} />
+                    </Box>
+                    <Typography variant="h3" sx={{ fontWeight: 400, mb: 1 }}>{c.titulo}</Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 2, flex: 1 }}>{c.descripcion}</Typography>
+                    {c.url_externa && (
+                      <Button component={Link} href={c.url_externa} target="_blank" rel="noreferrer" variant="contained" fullWidth>
+                        Abrir material
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
           ))}
         </Grid>

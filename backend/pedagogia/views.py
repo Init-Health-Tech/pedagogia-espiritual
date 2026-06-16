@@ -23,7 +23,7 @@ class ModuloViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.is_moderator:
+        if self.request.user.is_formador:
             return Modulo.objects.all()
         return Modulo.objects.filter(activo=True)
 
@@ -39,7 +39,7 @@ class PreguntaChecklistViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.is_moderator:
+        if self.request.user.is_formador:
             return self.queryset
         return self.queryset.filter(activa=True)
 
@@ -58,9 +58,14 @@ class FichaPedagogicaViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_moderator:
+        if user.is_formador:
             return self.queryset
         return self.queryset.filter(usuario=user)
+
+    def get_permissions(self):
+        if self.action in ('update', 'partial_update', 'destroy'):
+            return [IsModeratorOrAdmin()]
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ('update', 'partial_update'):
@@ -85,8 +90,10 @@ class FichaPedagogicaViewSet(viewsets.ModelViewSet):
             ficha=ficha,
             pregunta=pregunta,
         )
-        respuesta.completada = ser.validated_data['completada']
-        respuesta.nota = ser.validated_data.get('nota', '')
+        respuesta.completada = ser.validated_data.get('completada', True)
+        respuesta.nota = ser.validated_data['nota'].strip()
+        if respuesta.nota:
+            respuesta.completada = True
         respuesta.save()
         progreso = ficha.recalcular_progreso()
         return Response({

@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Alert, Box, Button, Card, CardContent, Grid, TextField } from '@mui/material'
+import { Alert, Box, Button, Card, CardContent, TextField, Typography } from '@mui/material'
 import { useAuth } from '../../context/AuthContext'
 import { authAPI } from '../../services/api'
 import PageHeader from '../../components/common/PageHeader'
+import FormField from '../../components/common/FormField'
 
 export default function Perfil() {
   const { user, fetchUser } = useAuth()
@@ -22,9 +23,9 @@ export default function Perfil() {
     try {
       await authAPI.updateMe(form)
       await fetchUser()
-      setMsg({ type: 'success', text: 'Perfil actualizado correctamente.' })
+      setMsg({ type: 'success', text: 'Tus datos se guardaron correctamente.' })
     } catch {
-      setMsg({ type: 'error', text: 'Error al actualizar el perfil.' })
+      setMsg({ type: 'error', text: 'No pudimos guardar tus datos. Inténtalo de nuevo en un momento.' })
     } finally {
       setLoading(false)
     }
@@ -32,32 +33,28 @@ export default function Perfil() {
 
   return (
     <>
-      <PageHeader title="Mi perfil" subtitle="Datos personales de tu cuenta" />
+      <PageHeader title="Mi perfil" subtitle="Actualiza tu información personal" />
       {msg.text && <Alert severity={msg.type} sx={{ mb: 2 }}>{msg.text}</Alert>}
       <Card sx={{ maxWidth: 560 }}>
         <CardContent component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="Nombre" fullWidth value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="Apellido" fullWidth value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
-            </Grid>
-            <Grid size={12}>
-              <TextField label="Correo" type="email" fullWidth value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-            </Grid>
-            <Grid size={12}>
-              <TextField label="Teléfono" fullWidth value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-            </Grid>
-            <Grid size={12}>
-              <TextField label="Biografía" multiline rows={3} fullWidth value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
-            </Grid>
-          </Grid>
-          <Box sx={{ mt: 2 }}>
-            <Button type="submit" variant="contained" disabled={loading}>
-              {loading ? 'Guardando…' : 'Guardar cambios'}
-            </Button>
-          </Box>
+          <FormField label="Nombre">
+            <TextField fullWidth value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} hiddenLabel />
+          </FormField>
+          <FormField label="Apellido">
+            <TextField fullWidth value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} hiddenLabel />
+          </FormField>
+          <FormField label="Correo electrónico" helper="Usaremos este correo para comunicaciones importantes">
+            <TextField type="email" fullWidth value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} hiddenLabel />
+          </FormField>
+          <FormField label="Teléfono">
+            <TextField fullWidth value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} hiddenLabel placeholder="Opcional" />
+          </FormField>
+          <FormField label="Biografía" helper="Una breve presentación sobre ti y tu camino de fe">
+            <TextField multiline rows={3} fullWidth value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} hiddenLabel />
+          </FormField>
+          <Button type="submit" variant="contained" disabled={loading} sx={{ mt: 1 }}>
+            {loading ? 'Guardando…' : 'Guardar cambios'}
+          </Button>
         </CardContent>
       </Card>
     </>

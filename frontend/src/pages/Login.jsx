@@ -1,20 +1,14 @@
 import { useState } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  Link,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Alert, Box, Button, Container, Link, Paper, Stack, TextField, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import { getHomeRoute } from '../utils/routes'
 import MeshBackground from '../components/common/MeshBackground'
-import { fadeInUp, scaleIn } from '../animations/variants'
+import TorLogo from '../components/common/TorLogo'
+import FormField from '../components/common/FormField'
+import { scaleIn } from '../animations/variants'
+import { colors } from '../theme/muiTheme'
 
 export default function Login() {
   const [username, setUsername] = useState('')
@@ -30,12 +24,12 @@ export default function Login() {
     setLoading(true)
     try {
       const userData = await login(username, password)
-      navigate(userData.role === 'admin' ? '/admin' : '/app')
+      navigate(getHomeRoute(userData))
     } catch (err) {
       if (!err.response) {
-        setError('No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.')
+        setError('No pudimos conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.')
       } else {
-        setError(err.response?.data?.detail || 'Credenciales incorrectas.')
+        setError('El usuario o la contraseña no son correctos. Revísalos e inténtalo otra vez.')
       }
     } finally {
       setLoading(false)
@@ -43,85 +37,31 @@ export default function Login() {
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        position: 'relative',
-        py: 4,
-      }}
-    >
+    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', py: 6, bgcolor: colors.light }}>
       <MeshBackground subtle />
       <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
-        <Paper
-          component={motion.div}
-          initial="initial"
-          animate="animate"
-          variants={scaleIn}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          sx={{
-            p: { xs: 3, sm: 4 },
-            backdropFilter: 'blur(8px)',
-            bgcolor: 'rgba(255,255,255,0.92)',
-          }}
-          elevation={0}
-        >
+        <Paper component={motion.div} initial="initial" animate="animate" variants={scaleIn} sx={{ p: { xs: 3, sm: 5 }, bgcolor: colors.surface, border: `1px solid ${colors.border}`, borderRadius: 4 }}>
           <Stack spacing={3} component="form" onSubmit={handleSubmit}>
-            <Box component={motion.div} variants={fadeInUp} textAlign="center">
-              <Typography variant="overline" color="text.secondary">
-                Movimiento Franciscano
-              </Typography>
-              <Typography variant="h1" sx={{ mt: 0.5 }}>
-                Iniciar sesión
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Pedagogía Espiritual de la Santísima Trinidad
-              </Typography>
+            <Box textAlign="center">
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}><TorLogo size="lg" /></Box>
+              <Typography variant="h2" sx={{ fontWeight: 300 }}>Iniciar sesión</Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>Accede a tu espacio de formación espiritual</Typography>
             </Box>
-            {error && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                <Alert severity="error">{error}</Alert>
-              </motion.div>
-            )}
-            <TextField
-              label="Usuario"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              fullWidth
-              autoFocus
-            />
-            <TextField
-              label="Contraseña"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              fullWidth
-            />
-            <motion.div whileTap={{ scale: 0.98 }}>
-              <Button
-                type="submit"
-                variant="contained"
-                size="large"
-                fullWidth
-                disabled={loading}
-                className="btn-glow"
-              >
-                {loading ? 'Ingresando…' : 'Ingresar'}
-              </Button>
-            </motion.div>
-            <Typography variant="body2" textAlign="center" color="text.secondary">
-              ¿No tienes cuenta?{' '}
-              <Link component={RouterLink} to="/registro">
-                Regístrate
-              </Link>
+            {error && <Alert severity="error">{error}</Alert>}
+            <FormField label="Usuario" helper="El nombre con el que te registraste">
+              <TextField value={username} onChange={(e) => setUsername(e.target.value)} required fullWidth autoFocus hiddenLabel placeholder="Tu usuario" />
+            </FormField>
+            <FormField label="Contraseña">
+              <TextField type="password" value={password} onChange={(e) => setPassword(e.target.value)} required fullWidth hiddenLabel placeholder="Tu contraseña" />
+            </FormField>
+            <Button type="submit" variant="contained" size="large" fullWidth disabled={loading}>
+              {loading ? 'Ingresando…' : 'Ingresar'}
+            </Button>
+            <Typography variant="body1" textAlign="center" color="text.secondary">
+              ¿No tienes cuenta? <Link component={RouterLink} to="/registro" color="secondary">Regístrate aquí</Link>
             </Typography>
-            <Typography variant="body2" textAlign="center">
-              <Link component={RouterLink} to="/" color="text.secondary">
-                Volver al inicio
-              </Link>
+            <Typography variant="body1" textAlign="center">
+              <Link component={RouterLink} to="/" color="text.secondary">Volver al sitio</Link>
             </Typography>
           </Stack>
         </Paper>

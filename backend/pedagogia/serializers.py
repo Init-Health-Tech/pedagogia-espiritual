@@ -61,11 +61,12 @@ class FichaPedagogicaSerializer(serializers.ModelSerializer):
             items.append({
                 'pregunta_id': p.id,
                 'orden': p.orden,
+                'semana': p.semana,
                 'texto': p.texto,
                 'ayuda': p.ayuda,
                 'modulo_id': p.modulo_id,
                 'modulo_nombre': p.modulo.nombre if p.modulo else None,
-                'completada': r.completada if r else False,
+                'completada': (r.completada if r else False) or bool(r and r.nota and len(r.nota.strip()) >= 15),
                 'nota': r.nota if r else '',
                 'respuesta_id': r.id if r else None,
             })
@@ -83,5 +84,5 @@ class FichaPedagogicaUpdateSerializer(serializers.ModelSerializer):
 
 class ResponderChecklistSerializer(serializers.Serializer):
     pregunta_id = serializers.IntegerField()
-    completada = serializers.BooleanField()
-    nota = serializers.CharField(required=False, allow_blank=True)
+    nota = serializers.CharField(required=True, allow_blank=False)
+    completada = serializers.BooleanField(required=False, default=True)

@@ -1,6 +1,7 @@
 import { Card, CardContent, Typography, Box } from '@mui/material'
 import { motion } from 'framer-motion'
 import { staggerItem } from '../../animations/variants'
+import { colors } from '../../theme/muiTheme'
 
 export default function StatCard({ label, value, sublabel, accent }) {
   return (
@@ -19,7 +20,7 @@ export default function StatCard({ label, value, sublabel, accent }) {
             left: 0,
             right: 0,
             height: 3,
-            background: 'linear-gradient(90deg, #5B7C99, #9BA8C4)',
+            background: `linear-gradient(90deg, ${colors.secondary}, ${colors.accent})`,
             opacity: 0,
             transition: 'opacity 0.3s ease',
           },

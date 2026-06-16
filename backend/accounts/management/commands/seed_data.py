@@ -7,22 +7,12 @@ from communications.models import Anuncio
 from content.models import CategoriaContenido, Contenido
 from groups.models import GrupoPastoreo
 from pedagogia.models import Modulo, PreguntaChecklist
+from pedagogia.manual_demo import MANUAL_BUSQUEDA, PREGUNTAS_DIARIO
 from payments.models import PlanSuscripcion
 
 User = get_user_model()
 
-PREGUNTAS_DEFAULT = [
-    ('¿He establecido un tiempo diario de oración personal?', 'Búsqueda'),
-    ('¿Conozco y practico el examen de conciencia?', 'Búsqueda'),
-    ('¿Participo activamente en la Eucaristía dominical?', 'Discipulado'),
-    ('¿Lee o medita la Palabra de Dios con regularidad?', 'Discipulado'),
-    ('¿Tengo un acompañante espiritual o director?', 'Discipulado'),
-    ('¿Practico la caridad con los más necesitados?', 'Consagración'),
-    ('¿Vivo en simplicidad y agradecimiento (espíritu franciscano)?', 'Consagración'),
-    ('¿He renovado mis promesas o compromisos de fe este año?', 'Consagración'),
-    ('¿Comparto mi fe con otros de forma natural?', 'Misión'),
-    ('¿Sirvo en algún ministerio o grupo del movimiento?', 'Misión'),
-]
+PREGUNTAS_DEFAULT = []  # legacy; usamos PREGUNTAS_DIARIO
 
 
 class Command(BaseCommand):
@@ -63,11 +53,26 @@ class Command(BaseCommand):
         member.set_password('miembro123')
         member.save()
 
+        coordinator, created = User.objects.get_or_create(
+            username='coordinador',
+            defaults={
+                'email': 'coord@mfst.org',
+                'first_name': 'María',
+                'last_name': 'López',
+                'role': User.Role.COORDINATOR,
+            },
+        )
+        if created:
+            self.stdout.write(self.style.SUCCESS('Usuario coordinador creado (coordinador / coordinador123)'))
+        coordinator.set_password('coordinador123')
+        coordinator.role = User.Role.COORDINATOR
+        coordinator.save()
+
         modulos_data = [
-            ('Módulo I — Búsqueda', 'Manual de inicio del camino de fe', 1, '#5B7C99'),
-            ('Módulo II — Discipulado', 'Manual de formación en la fe', 2, '#7B8FA8'),
-            ('Módulo III — Consagración', 'Manual de entrega y consagración', 3, '#9BA8C4'),
-            ('Módulo IV — Misión', 'Manual de servicio y testimonio', 4, '#B8956B'),
+            ('Etapa I — Búsqueda', 'Apertura al encuentro con Dios en lo cotidiano', 1, '#5B7C99'),
+            ('Etapa II — Discipulado', 'Formación en la fe y la vida cristiana', 2, '#7B8FA8'),
+            ('Etapa III — Consagración', 'Entrega y compromiso con el Señor', 3, '#9BA8C4'),
+            ('Etapa IV — Misión', 'Servicio, testimonio y envío', 4, '#B8956B'),
         ]
         modulos = {}
         for nombre, desc, orden, color in modulos_data:
@@ -79,7 +84,11 @@ class Command(BaseCommand):
             # simpler map by orden
             modulos[orden] = m
 
-        modulos_por_nombre = {m.nombre: m for m in Modulo.objects.all()}
+        etapa1 = modulos.get(1)
+        if etapa1:
+            etapa1.contenido_manual = MANUAL_BUSQUEDA
+            etapa1.save(update_fields=['contenido_manual'])
+
         mapa_corto = {
             'Búsqueda': modulos.get(1),
             'Discipulado': modulos.get(2),
@@ -87,14 +96,15 @@ class Command(BaseCommand):
             'Misión': modulos.get(4),
         }
 
-        for i, (texto, modulo_key) in enumerate(PREGUNTAS_DEFAULT, start=1):
+        for i, (semana, texto, modulo_key, ayuda) in enumerate(PREGUNTAS_DIARIO, start=1):
             PreguntaChecklist.objects.update_or_create(
                 orden=i,
                 defaults={
                     'texto': texto,
+                    'semana': semana,
                     'modulo': mapa_corto.get(modulo_key),
                     'activa': True,
-                    'ayuda': 'Reflexiona con honestidad antes de marcar como completada.',
+                    'ayuda': ayuda,
                 },
             )
 
@@ -134,10 +144,12 @@ class Command(BaseCommand):
             nombre='Grupo San Francisco',
             defaults={
                 'descripcion': 'Grupo de pastoreo para formación inicial',
-                'coordinador': admin,
+                'coordinador': coordinator,
                 'horario_reunion': 'Sábados 10:00 AM',
             },
         )
+        grupo.coordinador = coordinator
+        grupo.save(update_fields=['coordinador'])
         grupo.miembros.add(member)
 
         PlanSuscripcion.objects.get_or_create(

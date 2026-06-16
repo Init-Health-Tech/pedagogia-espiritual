@@ -6,6 +6,7 @@ class User(AbstractUser):
     class Role(models.TextChoices):
         ADMIN = 'admin', 'Administrador'
         MODERATOR = 'moderator', 'Moderador'
+        COORDINATOR = 'coordinator', 'Coordinador'
         MEMBER = 'member', 'Miembro'
 
     role = models.CharField(
@@ -30,5 +31,13 @@ class User(AbstractUser):
         return self.role == self.Role.ADMIN or self.is_superuser
 
     @property
+    def is_coordinator(self):
+        return self.role == self.Role.COORDINATOR
+
+    @property
+    def is_formador(self):
+        return self.role in (self.Role.ADMIN, self.Role.MODERATOR, self.Role.COORDINATOR) or self.is_superuser
+
+    @property
     def is_moderator(self):
-        return self.role in (self.Role.ADMIN, self.Role.MODERATOR) or self.is_superuser
+        return self.is_formador

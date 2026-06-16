@@ -12,15 +12,15 @@ export const NAV_ITEMS = [
     children: [
       { label: '¿Qué es la pedagogía espiritual?', href: '#que-es-pedagogia' },
       { label: 'La Santísima Trinidad', href: '#santisima-trinidad' },
-      { label: 'Camino formativo', href: '#camino-formativo' },
+      { label: 'Camino por etapas', href: '#camino-formativo' },
     ],
   },
   {
     label: 'Formación',
     children: [
-      { label: 'Módulos de formación', href: '#modulos' },
+      { label: 'Etapas del camino', href: '#modulos' },
       { label: 'Grupos de pastoreo', href: '#grupos-pastoreo' },
-      { label: 'Ficha pedagógica', href: '#ficha-pedagogica' },
+      { label: 'Diario semanal', href: '#ficha-pedagogica' },
     ],
   },
   {
@@ -42,7 +42,7 @@ export const FOOTER_COLUMNS = [
     title: 'Formación',
     links: [
       { label: 'Pedagogía espiritual', href: '#que-es-pedagogia' },
-      { label: 'Módulos', href: '#modulos' },
+      { label: 'Etapas', href: '#modulos' },
       { label: 'Grupos de pastoreo', href: '#grupos-pastoreo' },
     ],
   },
@@ -51,14 +51,41 @@ export const FOOTER_COLUMNS = [
     links: [
       { label: 'Iniciar sesión', href: '/login', route: true },
       { label: 'Registrarse', href: '/registro', route: true },
-      { label: 'Ficha pedagógica', href: '#ficha-pedagogica' },
+      { label: 'Diario semanal', href: '#ficha-pedagogica' },
     ],
   },
 ]
 
 export const MODULOS_PREVIEW = [
-  { num: 'I', title: 'Búsqueda', desc: 'Inicio del camino de fe y apertura al encuentro con Dios.' },
-  { num: 'II', title: 'Discipulado', desc: 'Formación sólida en la fe y la vida cristiana.' },
-  { num: 'III', title: 'Consagración', desc: 'Entrega profunda y compromiso con el Señor.' },
-  { num: 'IV', title: 'Misión', desc: 'Servicio, testimonio y envío al mundo.' },
+  {
+    num: 'I',
+    title: 'Búsqueda',
+    desc: 'Apertura al encuentro con Dios. Manual interactivo con tips y reflexiones.',
+    imagen: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',
+  },
+  {
+    num: 'II',
+    title: 'Discipulado',
+    desc: 'Profundizar en la fe con guías digitales, no solo documentos.',
+    imagen: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80',
+  },
+  {
+    num: 'III',
+    title: 'Consagración',
+    desc: 'Entrega y compromiso. Tu coordinador acompaña cada paso.',
+    imagen: 'https://images.unsplash.com/photo-1518495973542-4542c06a9323?w=600&q=80',
+  },
+  {
+    num: 'IV',
+    title: 'Misión',
+    desc: 'Servicio y testimonio. El camino continúa en comunidad.',
+    imagen: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
+  },
 ]
+
+export const LANDING_IMAGES = {
+  hero: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
+  comunidad: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80',
+  camino: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
+  oracion: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+}

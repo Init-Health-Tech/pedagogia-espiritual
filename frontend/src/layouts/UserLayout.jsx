@@ -1,40 +1,27 @@
+import {
+  LayoutDashboard,
+  ClipboardList,
+  PlayCircle,
+  BookOpen,
+  Users,
+  MessageCircle,
+} from 'lucide-react'
 import PageTransitionOutlet from '../components/layout/PageTransitionOutlet'
-import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined'
-import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined'
-import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
-import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined'
-import MailOutlinedIcon from '@mui/icons-material/MailOutlined'
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined'
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-import AppShell from '../components/layout/AppShell'
-import { useAuth } from '../context/AuthContext'
+import HubShell from '../components/layout/HubShell'
 
-const navItems = [
-  { to: '/app', icon: <DashboardOutlinedIcon />, label: 'Inicio', end: true },
-  { to: '/app/ficha', icon: <AssignmentOutlinedIcon />, label: 'Ficha pedagógica' },
-  { to: '/app/videos', icon: <PlayCircleOutlinedIcon />, label: 'Videos' },
-  { to: '/app/contenidos', icon: <MenuBookOutlinedIcon />, label: 'Contenidos' },
-  { to: '/app/grupos', icon: <GroupsOutlinedIcon />, label: 'Grupos de pastoreo' },
-  { to: '/app/comunicacion', icon: <MailOutlinedIcon />, label: 'Comunicación' },
-  { to: '/app/perfil', icon: <PersonOutlinedIcon />, label: 'Mi perfil' },
+export const userNavItems = [
+  { to: '/app', icon: LayoutDashboard, label: 'Inicio', shortLabel: 'Inicio', end: true },
+  { to: '/app/ficha', icon: ClipboardList, label: 'Mi camino', shortLabel: 'Camino' },
+  { to: '/app/videos', icon: PlayCircle, label: 'Videos', shortLabel: 'Videos' },
+  { to: '/app/contenidos', icon: BookOpen, label: 'Contenidos', shortLabel: 'Contenidos' },
+  { to: '/app/grupos', icon: Users, label: 'Grupos de pastoreo', shortLabel: 'Grupos' },
+  { to: '/app/comunicacion', icon: MessageCircle, label: 'Comunicación', shortLabel: 'Mensajes' },
 ]
 
 export default function UserLayout() {
-  const { isAdmin } = useAuth()
-  const footerItems = isAdmin
-    ? [{ to: '/admin', icon: <SettingsOutlinedIcon />, label: 'Administración' }]
-    : []
-
   return (
-    <AppShell
-      variant="user"
-      title="Movimiento Franciscano"
-      subtitle="Pedagogía Espiritual — SST"
-      navItems={navItems}
-      footerItems={footerItems}
-    >
+    <HubShell navItems={userNavItems}>
       <PageTransitionOutlet />
-    </AppShell>
+    </HubShell>
   )
 }
