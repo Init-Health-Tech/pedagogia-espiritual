@@ -1,0 +1,21 @@
+[Unit]
+Description=Pedagogía Espiritual API (Gunicorn)
+After=network.target postgresql.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/pedagogia-espiritual/backend
+EnvironmentFile=/var/www/pedagogia-espiritual/backend/.env
+ExecStart=/var/www/pedagogia-espiritual/backend/.venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8000 \
+    --timeout 120 \
+    --access-logfile - \
+    --error-logfile - \
+    config.wsgi:application
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

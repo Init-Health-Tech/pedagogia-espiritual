@@ -98,13 +98,25 @@ Base URL: `http://localhost:8000/api/`
 
 ## Producción
 
-Antes de desplegar:
+Despliegue separado:
 
-1. Cambiar `SECRET_KEY` en `backend/config/settings.py`
-2. Configurar `DEBUG = False` y `ALLOWED_HOSTS`
-3. Usar PostgreSQL en lugar de SQLite
-4. Configurar almacenamiento de archivos (S3, etc.)
-5. Integrar pasarela de pago real (Stripe, Mercado Pago, etc.)
+- **Frontend:** Vercel → `https://pedagogia-espiritual.init.com.mx`
+- **Backend:** VM DigitalOcean → `https://api.pedagogia-espiritual.init.com.mx`
+
+Guía paso a paso: [`deploy/DEPLOY.md`](deploy/DEPLOY.md)
+
+### Resumen rápido
+
+**Vercel:** root directory `frontend`, variable `VITE_API_URL=https://api.pedagogia-espiritual.init.com.mx/api`
+
+**DigitalOcean:** Django + Gunicorn + Nginx + PostgreSQL. Copia `backend/.env.example` a `.env` y configura `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` y la base de datos.
+
+Checklist adicional:
+
+1. Generar `SECRET_KEY` único (no usar el de desarrollo)
+2. `DEBUG=False` en producción
+3. Configurar almacenamiento de archivos en la VM o S3 para uploads
+4. Integrar pasarela de pago real (Stripe, Mercado Pago, etc.)
 
 ## Licencia
 
