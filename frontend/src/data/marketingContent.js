@@ -24,6 +24,10 @@ export const NAV_ITEMS = [
     ],
   },
   {
+    label: 'Itinerario Informativo',
+    href: '#itinerario-informativo',
+  },
+  {
     label: 'Contacto',
     href: '#contacto',
   },

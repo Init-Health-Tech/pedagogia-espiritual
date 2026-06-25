@@ -238,6 +238,12 @@ export default function Landing() {
 
       <SectionDivider />
 
+      <ScrollSection id="itinerario-informativo">
+        <SectionHeading overline="Itinerario Informativo" title="Itinerario Informativo" subtitle="Información sobre el camino formativo y sus etapas." />
+      </ScrollSection>
+
+      <SectionDivider />
+
       <ScrollSection id="contacto" alt>
         <SectionHeading overline="Contacto" title="Escríbenos" subtitle="¿Preguntas sobre el movimiento o la formación?" />
         <Box component="form" className="landing-block landing-block--filled" onSubmit={(e) => e.preventDefault()}>
