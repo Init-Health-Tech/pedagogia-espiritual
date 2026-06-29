@@ -6,7 +6,7 @@ import MarketingFooter from '../components/landing/MarketingFooter'
 import SectionHeading from '../components/landing/SectionHeading'
 import ScrollSection, { SectionDivider, PublicContainer } from '../components/landing/ScrollSection'
 import FormField from '../components/common/FormField'
-import { LANDING_IMAGES, MODULOS_PREVIEW } from '../data/marketingContent'
+import { ITINERARIO_FORMATIVO, LANDING_IMAGES, MODULOS_PREVIEW } from '../data/marketingContent'
 import { colors } from '../theme/muiTheme'
 
 function EditorialCard({ title, children, image }) {
@@ -239,7 +239,18 @@ export default function Landing() {
       <SectionDivider />
 
       <ScrollSection id="itinerario-informativo">
-        <SectionHeading overline="Itinerario Informativo" title="Itinerario Informativo" subtitle="Información sobre el camino formativo y sus etapas." />
+        <SectionHeading
+          overline="Itinerario Informativo"
+          title="Itinerario formativo"
+          subtitle="Diez ejes de formación que integran teología, pedagogía, pastoral y vida franciscana."
+        />
+        <Grid container spacing={2}>
+          {ITINERARIO_FORMATIVO.map((item) => (
+            <Grid key={item.title} size={{ xs: 12, md: 6 }}>
+              <EditorialCard title={item.title}>{item.desc}</EditorialCard>
+            </Grid>
+          ))}
+        </Grid>
       </ScrollSection>
 
       <SectionDivider />

@@ -87,6 +87,49 @@ export const MODULOS_PREVIEW = [
   },
 ]
 
+export const ITINERARIO_FORMATIVO = [
+  {
+    title: 'Formación antropológica',
+    desc: 'Ante los desafíos de la Iglesia en el mundo, el Papa Francisco señala que la raíz está en la antropología asumida. Estudiamos las antropologías hebrea y griega en la reflexión eclesial, con especial énfasis en la hebrea por su integridad.',
+  },
+  {
+    title: 'Formación teológica espiritual',
+    desc: 'Una de las formaciones más urgentes es la teológica espiritual, por la gran ignorancia en torno a la pneumatología. Profundizamos en la acción del Espíritu Santo en el bautizado y en los dones y carismas de las cartas paulinas.',
+  },
+  {
+    title: 'Formación pedagógica – humana – espiritual',
+    desc: 'La médula del proyecto formativo: integrar, como pide el Santo Padre, la formación humana y espiritual mediante la pedagogía espiritual y la reflexión sobre su continua referencia mutua.',
+  },
+  {
+    title: 'Formación teológica – mística',
+    desc: 'Siguiendo a Santo Tomás de Aquino, reflexionamos sobre los dos pilares del camino santo: la gracia de Dios en dones y carismas, y la respuesta teologal que damos en el diario vivir.',
+  },
+  {
+    title: 'Formación pastoral – catequética',
+    desc: 'Como movimiento eclesial en salida, nos formamos en pastoral y catequesis, con la iluminación que la pedagogía espiritual aporta a estas áreas esenciales para la Iglesia.',
+  },
+  {
+    title: 'Formación doctrinal',
+    desc: 'Formamos al pueblo de Dios en sana doctrina eclesial, con misericordia y claridad, cuidando el Depósito de la Fe transmitido por la Sagrada Escritura y la Santa Tradición.',
+  },
+  {
+    title: 'Formación en las Sagradas Escrituras',
+    desc: 'La Sagrada Escritura es la norma normans de la Iglesia. Una sólida formación bíblica orienta los contenidos temáticos del Movimiento de Pedagogía Espiritual.',
+  },
+  {
+    title: 'Formación y praxis en la caridad',
+    desc: 'Formación y praxis directa de caridad hacia las periferias físicas y existenciales: ministerio de escucha, atención psicológica y donación de víveres a los más vulnerables.',
+  },
+  {
+    title: 'Espiritualidad franciscana',
+    desc: 'Acogemos el legado de San Francisco — amor a Cristo, a los pobres, a la Iglesia y a la creación — para que toda praxis formativa y caritativa abrace el sensus fidei y salga al encuentro de quien más lo necesita.',
+  },
+  {
+    title: 'Liturgía',
+    desc: 'Formación litúrgica correcta, sólida y profunda, en línea con los documentos conciliares, para acompañar al pueblo santo y prevenir abusos litúrgicos nacidos de la ignorancia.',
+  },
+]
+
 export const LANDING_IMAGES = {
   hero: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
   comunidad: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80',
