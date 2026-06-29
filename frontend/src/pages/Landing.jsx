@@ -6,7 +6,7 @@ import MarketingFooter from '../components/landing/MarketingFooter'
 import SectionHeading from '../components/landing/SectionHeading'
 import ScrollSection, { SectionDivider, PublicContainer } from '../components/landing/ScrollSection'
 import FormField from '../components/common/FormField'
-import { ITINERARIO_FORMATIVO, JUSTIFICACION_PROYECTO, LANDING_IMAGES, MODULOS_PREVIEW, NUESTRO_EQUIPO, OBJETIVO_PRINCIPAL, OBJETIVOS_SECUNDARIOS } from '../data/marketingContent'
+import { DESARROLLO_SESION, ITINERARIO_FORMATIVO, JUSTIFICACION_PROYECTO, LANDING_IMAGES, MODULOS_PREVIEW, NUESTRO_EQUIPO, OBJETIVO_PRINCIPAL, OBJETIVOS_SECUNDARIOS } from '../data/marketingContent'
 import { colors } from '../theme/muiTheme'
 
 function EditorialCard({ title, children, image }) {
@@ -235,6 +235,45 @@ export default function Landing() {
             <Box key={p.role} className="landing-block" sx={{ textAlign: 'center' }}>
               <Typography variant="overline">{p.role}</Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mt: 0.75 }}>{p.desc}</Typography>
+            </Box>
+          ))}
+        </Stack>
+      </ScrollSection>
+
+      <SectionDivider />
+
+      <ScrollSection id="desarrollo-sesion">
+        <SectionHeading
+          overline="Pedagogía Espiritual"
+          title="Desarrollo de la sesión"
+          subtitle="Ritmo semanal de oración, formación y fraternidad — de 9:00 a 14:00."
+        />
+        <Stack spacing={2}>
+          {DESARROLLO_SESION.map((momento) => (
+            <Box key={momento.time} className="landing-block">
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.5, sm: 2 }} sx={{ mb: 1 }}>
+                <Typography variant="overline" sx={{ minWidth: 48, color: colors.secondary }}>
+                  {momento.time}
+                </Typography>
+                <Typography variant="h3" className="font-display" sx={{ fontSize: '1.15rem' }}>
+                  {momento.title}
+                </Typography>
+              </Stack>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontStyle: 'italic' }}>
+                {momento.summary}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {momento.detail}
+              </Typography>
+              {momento.questions && (
+                <Stack spacing={1} component="ol" sx={{ m: 0, mt: 1.5, pl: 2.5 }}>
+                  {momento.questions.map((pregunta) => (
+                    <Typography key={pregunta} component="li" variant="body2" color="text.secondary">
+                      {pregunta}
+                    </Typography>
+                  ))}
+                </Stack>
+              )}
             </Box>
           ))}
         </Stack>

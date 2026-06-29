@@ -13,6 +13,7 @@ export const NAV_ITEMS = [
     children: [
       { label: '¿Qué es la pedagogía espiritual?', href: '#que-es-pedagogia' },
       { label: 'La Santísima Trinidad', href: '#santisima-trinidad' },
+      { label: 'Desarrollo de la sesión', href: '#desarrollo-sesion' },
       { label: 'Camino por etapas', href: '#camino-formativo' },
     ],
   },
@@ -122,6 +123,73 @@ export const MODULOS_PREVIEW = [
     title: 'Misión',
     desc: 'Servicio y testimonio. El camino continúa en comunidad.',
     imagen: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
+  },
+]
+
+export const DESARROLLO_SESION = [
+  {
+    time: '9:00',
+    title: 'Fraternidad en oración (F.O.)',
+    summary: 'Alabanza, agradecimiento y petición del objetivo del día.',
+    detail:
+      'Momento de oración espontánea de alabanza y agradecimiento a la Santísima Trinidad, con un espacio para presentar a Dios el objetivo central de la reunión.',
+  },
+  {
+    time: '9:30',
+    title: 'Rezo del Santo Rosario',
+    summary: 'Intercesión de nuestra Madre María Santísima.',
+    detail:
+      'Rezamos el misterio correspondiente al día de la reunión. Rogamos por las intenciones del Santo Padre, del Señor Cardenal, de sus obispos y por algún acontecimiento del día.',
+  },
+  {
+    time: '10:00',
+    title: 'Lectura y meditación del Oficio Divino',
+    summary: 'Oficio de Lectura con la Iglesia.',
+    detail:
+      'Leemos y meditamos con la Iglesia el Oficio Divino. Por la dinámica de la reunión, nos centramos en el Oficio de Lectura.',
+  },
+  {
+    time: '10:45',
+    title: 'E.P.F. — Equipos de Pastoreo y Fraternidad',
+    summary: 'Comunión y fraternidad al estilo de las primeras comunidades.',
+    detail:
+      'Recogemos la experiencia de las primeras comunidades narrada en los Hechos de los Apóstoles como signo de comunión y fraternidad. Se comparten siete preguntas clave:',
+    questions: [
+      '¿Cómo atendí mi vida sacramental esta semana: Santa Eucaristía, visitas al Santísimo Sacramento, confesión, etc.?',
+      '¿Cómo atendí mi vida de oración: Oficio de Lectura, Laúdes, hora intermedia, vísperas, completas, Santo Rosario, momentos de oración, meditación y adoración?',
+      '¿Cómo atendí el proceso de estudio en la semana: tema de formación, lectura adicional?',
+      '¿Qué acercamiento tuve a las Sagradas Escrituras: meditación del Evangelio, Lectio Divina, comentario bíblico, etc.?',
+      '¿Qué grado de conciencia espiritual en la conducción de mi alma tuve en la semana? (apertura o dureza del alma ante la voz del Espíritu).',
+      '¿Qué grado de lectura hago de la gracia de Dios en mi vida durante la semana pasada? (apertura del alma ante alguna sanación, liberación o ayuda divina).',
+      '¿Qué grado de pedagogía espiritual logro ver en mi vida durante esta semana? ¿Logro detectar algún avance pedagógico humano–espiritual o no?',
+    ],
+  },
+  {
+    time: '11:15',
+    title: 'Tema',
+    summary: 'Formación según el proceso de la comunidad.',
+    detail: 'El tema será dado según el proceso de la comunidad en torno a los manuales.',
+  },
+  {
+    time: '12:15',
+    title: 'Hora Santa',
+    summary: 'Adoración total al Santísimo.',
+    detail:
+      'Guardamos este espacio de adoración con mucho cuidado evangélico. Se pide con caridad abstenerse del uso de medios electrónicos que puedan distraernos de este encuentro con Jesús Sacramentado.',
+  },
+  {
+    time: '13:15',
+    title: 'Santa Eucaristía',
+    summary: 'Centro de nuestra vida espiritual.',
+    detail:
+      'A una voz con la Iglesia, la celebración eucarística es el centro de nuestra vida espiritual. Exhortamos a todos los miembros a vivir este encuentro con el máximo recogimiento y devoción posible.',
+  },
+  {
+    time: '14:00',
+    title: 'Ágape fraterno',
+    summary: 'Alimento compartido como signo de fraternidad.',
+    detail:
+      'Siguiendo el ejemplo de las primeras comunidades, compartimos semanalmente el alimento como signo de fraternidad y comunión.',
   },
 ]
 
