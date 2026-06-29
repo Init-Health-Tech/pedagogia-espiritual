@@ -6,7 +6,7 @@ import MarketingFooter from '../components/landing/MarketingFooter'
 import SectionHeading from '../components/landing/SectionHeading'
 import ScrollSection, { SectionDivider, PublicContainer } from '../components/landing/ScrollSection'
 import FormField from '../components/common/FormField'
-import { ITINERARIO_FORMATIVO, LANDING_IMAGES, MODULOS_PREVIEW } from '../data/marketingContent'
+import { ITINERARIO_FORMATIVO, JUSTIFICACION_PROYECTO, LANDING_IMAGES, MODULOS_PREVIEW, NUESTRO_EQUIPO, OBJETIVO_PRINCIPAL, OBJETIVOS_SECUNDARIOS } from '../data/marketingContent'
 import { colors } from '../theme/muiTheme'
 
 function EditorialCard({ title, children, image }) {
@@ -74,7 +74,7 @@ export default function Landing() {
 
       <ScrollSection id="quienes-somos" alt>
         <SectionHeading overline="El Movimiento" title="Quiénes somos" subtitle="Comunidad de fe que camina junta — no un curso más, sino un proceso de vida." />
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ mb: 4 }}>
           <Grid size={{ xs: 12, md: 4 }}>
             <EditorialCard title="Misión evangelizadora" image={LANDING_IMAGES.oracion}>
               Anunciar el Evangelio con sencillez, alegría y testimonio de vida.
@@ -91,6 +91,26 @@ export default function Landing() {
             </EditorialCard>
           </Grid>
         </Grid>
+
+        <Box className="landing-block landing-block--filled" sx={{ mb: 4 }}>
+          <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 1 }}>
+            Objetivo principal
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {OBJETIVO_PRINCIPAL}
+          </Typography>
+        </Box>
+
+        <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 2 }}>
+          Objetivos secundarios
+        </Typography>
+        <Stack spacing={1.5} component="ol" sx={{ m: 0, pl: 2.5 }}>
+          {OBJETIVOS_SECUNDARIOS.map((objetivo) => (
+            <Typography key={objetivo} component="li" variant="body1" color="text.secondary" sx={{ pl: 0.5 }}>
+              {objetivo}
+            </Typography>
+          ))}
+        </Stack>
       </ScrollSection>
 
       <SectionDivider />
@@ -98,14 +118,18 @@ export default function Landing() {
       <ScrollSection id="historia">
         <Grid container spacing={4} alignItems="center">
           <Grid size={{ xs: 12, md: 6 }}>
-            <SectionHeading overline="El Movimiento" title="Nuestra historia" subtitle="Un camino de fe que continúa escribiéndose en cada generación." />
-            <Typography variant="body1" color="text.secondary" paragraph>
-              El Movimiento Franciscano — Pedagogía Espiritual de la Santísima Trinidad nace del deseo de ofrecer
-              un proceso formativo humano y espiritual, que permita crecer en la relación con Dios Padre, Hijo y Espíritu Santo.
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Hoy la plataforma digital conecta etapas, diarios y grupos — sin perder el calor de lo personal.
-            </Typography>
+            <SectionHeading
+              overline="El Movimiento"
+              title="¿Por qué lo hacemos?"
+              subtitle="La justificación de un movimiento de formación integral en respuesta a los desafíos de nuestro tiempo."
+            />
+            <Stack spacing={2}>
+              {JUSTIFICACION_PROYECTO.map((parrafo) => (
+                <Typography key={parrafo} variant="body1" color="text.secondary">
+                  {parrafo}
+                </Typography>
+              ))}
+            </Stack>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box
@@ -120,7 +144,45 @@ export default function Landing() {
 
       <SectionDivider />
 
-      <ScrollSection id="espiritualidad" alt>
+      <ScrollSection id="nuestro-equipo" alt>
+        <Grid container spacing={4} alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Box
+              component="img"
+              src={LANDING_IMAGES.comunidad}
+              alt=""
+              sx={{ width: '100%', height: 280, objectFit: 'cover', borderRadius: 2 }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <SectionHeading
+              overline="El Movimiento"
+              title="Nuestro equipo"
+              subtitle="Escucha, caridad y evangelización al servicio del pueblo de Dios."
+            />
+            <Typography variant="body1" color="text.secondary" paragraph>
+              {NUESTRO_EQUIPO.intro}
+            </Typography>
+            <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 1.5 }}>
+              Obras de caridad
+            </Typography>
+            <Stack spacing={1} sx={{ mb: 2 }}>
+              {NUESTRO_EQUIPO.obrasCaridad.map((obra) => (
+                <Typography key={obra} variant="body1" color="text.secondary">
+                  • {obra}
+                </Typography>
+              ))}
+            </Stack>
+            <Typography variant="body1" color="text.secondary">
+              {NUESTRO_EQUIPO.apoyo}
+            </Typography>
+          </Grid>
+        </Grid>
+      </ScrollSection>
+
+      <SectionDivider />
+
+      <ScrollSection id="espiritualidad">
         <SectionHeading overline="El Movimiento" title="Espiritualidad franciscana" subtitle="Paz, sencillez, fraternidad y amor a la creación." />
         <Stack spacing={2.5} sx={{ mb: 4 }}>
           {[

@@ -3,7 +3,8 @@ export const NAV_ITEMS = [
     label: 'El Movimiento',
     children: [
       { label: 'Quiénes somos', href: '#quienes-somos' },
-      { label: 'Nuestra historia', href: '#historia' },
+      { label: '¿Por qué lo hacemos?', href: '#historia' },
+      { label: 'Nuestro equipo', href: '#nuestro-equipo' },
       { label: 'Espiritualidad franciscana', href: '#espiritualidad' },
     ],
   },
@@ -38,7 +39,8 @@ export const FOOTER_COLUMNS = [
     title: 'El Movimiento',
     links: [
       { label: 'Quiénes somos', href: '#quienes-somos' },
-      { label: 'Historia', href: '#historia' },
+      { label: '¿Por qué lo hacemos?', href: '#historia' },
+      { label: 'Nuestro equipo', href: '#nuestro-equipo' },
       { label: 'Espiritualidad', href: '#espiritualidad' },
     ],
   },
@@ -58,6 +60,42 @@ export const FOOTER_COLUMNS = [
       { label: 'Diario semanal', href: '#ficha-pedagogica' },
     ],
   },
+]
+
+export const NUESTRO_EQUIPO = {
+  intro:
+    'Contamos con un equipo especializado de escucha de 30 hermanos, de los cuales 10 somos psicólogos. Realizamos nuestra misión como obra de caridad y, a la vez, como camino de evangelización.',
+  obrasCaridad: [
+    'Atención psicológica gratuita',
+    'Despensa',
+    'Medicamentos',
+  ],
+  apoyo: 'Contamos con un par de doctoras que nos apoyan en este servicio.',
+}
+
+export const JUSTIFICACION_PROYECTO = [
+  'A lo largo de la historia, la humanidad ha experimentado grandes desafíos que han impactado las distintas esferas de la vida — religiosa, política, social y cultural. Sus causas suelen desbordar la comprensión que el ser humano tiene de sí mismo.',
+  'Hoy el Papa Francisco señala dos realidades categóricas: vivimos una «cultura del descarte», marcada por la instrumentalización entre personas para luego desecharse; y una «cultura de cristal», donde muchos jóvenes experimentan una gran fragilidad antropológica que deriva en vacíos existenciales.',
+  'Atendiendo al llamado del Evangelio — «vayan por todo el mundo» — y en sintonía con la Iglesia en salida, surge este movimiento de formación integral para atender no solo las periferias físicas, sino existenciales del pueblo santo de Dios.',
+  'Con humildad de corazón, hemos entendido que en los límites existenciales, en los momentos más vulnerables del pueblo de Dios, es donde mejor se acoge al Evangelio. Recordamos las palabras del apóstol Pablo: «Cuando soy débil, entonces soy fuerte».',
+  'De no atender el área humana de manera pedagógica–espiritual, resulta casi imposible llevar a cabo una praxis evangelizadora acertada y efectiva.',
+  'Dos realidades subyacen como plataforma de este proyecto: por un lado, un pueblo de Dios sufriente, con profundas confusiones antropológicas, que demanda atención a sus urgencias existenciales — vacíos, depresiones, ansiedades, hastíos, falta de sentido; por otro, esas realidades dolorosas se convierten en una gran oportunidad de evangelización.',
+]
+
+export const OBJETIVO_PRINCIPAL =
+  'Promover una formación pedagógica que integre las áreas humano–espiritual para lograr un mejor camino de conversión y santificación en el pueblo santo de Dios, en favor de una mejor praxis evangelizadora en la Iglesia.'
+
+export const OBJETIVOS_SECUNDARIOS = [
+  'Profundizar el conocimiento de las antropologías hebrea y griega en la reflexión de la Iglesia, para precisar mejor un proyecto de evangelización en el pueblo santo de Dios.',
+  'Consolidar una sistematización teológica de los dones y carismas como gracia de Dios, para iluminar las distintas manifestaciones del alma en su expresión humana y su desarrollo espiritual.',
+  'Concientizar sobre la necesidad de elaborar un proyecto pedagógico humano–espiritual personal que integre las cuatro áreas de la antropología hebrea — alma, cuerpo, espíritu y corazón — en pro de la conversión y la evangelización.',
+  'Fomentar el estudio de la teología mística, integrando dones, carismas y vida teologal bajo la reflexión titulada «la ciencia del amor».',
+  'Constituir una sólida formación pastoral–catequética con las enseñanzas centrales del magisterio, para la maduración de la fe y la participación activa en la vida eclesial.',
+  'Establecer una profunda formación doctrinal que refuerce el camino de unidad con las enseñanzas de nuestra Santa Madre Iglesia.',
+  'Implantar una sólida formación bíblica para normar el discernimiento espiritual y la praxis pastoral en la vida comunitaria.',
+  'Solidificar una praxis concreta de caridad integral hacia los hermanos más vulnerables — atención psicológica, espiritual y material — como movimiento e Iglesia en salida.',
+  'Proporcionar formación en espiritualidad franciscana para enriquecernos con las virtudes espirituales de San Francisco.',
+  'Instituir una formación litúrgica apropiada para la vivencia de las celebraciones cultuales en nuestro movimiento.',
 ]
 
 export const MODULOS_PREVIEW = [
