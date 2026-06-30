@@ -10,6 +10,7 @@ import AdminLayout from './layouts/AdminLayout'
 import CoordinatorLayout from './layouts/CoordinatorLayout'
 import Dashboard from './pages/user/Dashboard'
 import FichaPedagogica from './pages/user/FichaPedagogica'
+import FichaEspiritual from './pages/user/FichaEspiritual'
 import Contenidos from './pages/user/Contenidos'
 import Videos from './pages/user/Videos'
 import Grupos from './pages/user/Grupos'
@@ -51,6 +52,7 @@ export default function App() {
       <Route path="/app" element={<PrivateRoute><UserLayout /></PrivateRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="ficha" element={<FichaPedagogica />} />
+        <Route path="ficha-espiritual" element={<FichaEspiritual />} />
         <Route path="contenidos" element={<Contenidos />} />
         <Route path="videos" element={<Videos />} />
         <Route path="grupos" element={<Grupos />} />

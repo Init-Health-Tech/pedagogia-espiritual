@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom'
 import { Box, Grid, Paper, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
-import { ClipboardList, PlayCircle, BookOpen, Users } from 'lucide-react'
+import { ClipboardList, PlayCircle, BookOpen, Users, Heart } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import HubActionCard from '../../components/common/HubActionCard'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
@@ -88,6 +88,64 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
 
       <motion.div variants={staggerItem}>
         <Typography variant="overline" sx={{ display: 'block', mb: 2 }}>Acciones frecuentes</Typography>
+      </motion.div>
+
+      <motion.div variants={staggerItem}>
+        <Box
+          component={RouterLink}
+          to="/app/ficha-espiritual"
+          sx={{
+            display: 'block',
+            mb: 2.5,
+            textDecoration: 'none',
+            color: 'inherit',
+          }}
+        >
+          <Paper
+            className="card-hover"
+            sx={{
+              p: { xs: 2.5, sm: 3 },
+              borderRadius: 4,
+              border: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              transition: 'border-color 0.2s, transform 0.2s',
+              '&:hover': {
+                borderColor: colors.accent,
+                transform: 'scale(1.005)',
+              },
+            }}
+          >
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 2,
+                bgcolor: `${colors.moss}22`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.moss,
+                flexShrink: 0,
+              }}
+            >
+              <Heart size={24} strokeWidth={1.75} />
+            </Box>
+            <Typography
+              variant="h3"
+              className="font-display"
+              sx={{
+                fontWeight: 500,
+                letterSpacing: '0.05em',
+                fontSize: { xs: '1rem', sm: '1.125rem' },
+                color: colors.dark,
+              }}
+            >
+              FICHA PEDAGÓGICA – ESPIRITUAL
+            </Typography>
+          </Paper>
+        </Box>
       </motion.div>
 
       <Grid container spacing={2.5} sx={{ mb: 4 }}>
