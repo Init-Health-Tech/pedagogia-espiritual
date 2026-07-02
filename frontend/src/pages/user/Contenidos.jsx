@@ -8,6 +8,7 @@ import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 import StatusBadge from '../../components/common/StatusBadge'
+import { colors } from '../../theme/muiTheme'
 
 const tipoLabel = { video: 'Video', documento: 'Documento', presentacion: 'Presentación', esquema: 'Esquema', audio: 'Audio' }
 
@@ -39,7 +40,7 @@ export default function Contenidos() {
                 <Card className="card-hover" sx={{ height: '100%' }}>
                   <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                      <BookOpen size={20} color="#6B4C2A" />
+                      <BookOpen size={20} color={colors.primary} />
                       <StatusBadge status="info" label={tipoLabel[c.tipo] || c.tipo} />
                     </Box>
                     <Typography variant="h3" sx={{ fontWeight: 400, mb: 1 }}>{c.titulo}</Typography>

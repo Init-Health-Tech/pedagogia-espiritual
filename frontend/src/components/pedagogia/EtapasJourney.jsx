@@ -24,7 +24,7 @@ export default function EtapasJourney({ modulos = [], etapaActualId, onSelect })
                     left: '50%',
                     right: '-50%',
                     height: 2,
-                    bgcolor: isPast || isCurrent ? mod.color || colors.secondary : colors.border,
+                    bgcolor: isPast || isCurrent ? mod.color || colors.primary : colors.border,
                     zIndex: 0,
                   }}
                 />
@@ -39,8 +39,8 @@ export default function EtapasJourney({ modulos = [], etapaActualId, onSelect })
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: isCurrent ? mod.color || colors.secondary : isPast ? `${mod.color || colors.moss}33` : colors.surface,
-                    border: `2px solid ${isCurrent ? mod.color || colors.secondary : isFuture ? colors.border : mod.color || colors.secondary}`,
+                    bgcolor: isCurrent ? mod.color || colors.primary : isPast ? `${mod.color || colors.moss}33` : colors.surface,
+                    border: `2px solid ${isCurrent ? mod.color || colors.primary : isFuture ? colors.border : mod.color || colors.primary}`,
                     color: isCurrent ? '#fff' : isPast ? mod.color || colors.moss : colors.muted,
                     cursor: onSelect ? 'pointer' : 'default',
                     transition: 'transform 0.2s',

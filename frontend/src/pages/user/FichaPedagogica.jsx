@@ -120,7 +120,7 @@ export default function FichaPedagogica() {
       )}
 
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-        <PenLine size={20} color={colors.secondary} />
+        <PenLine size={20} color={colors.primary} />
         <Typography variant="h3">Diario semanal</Typography>
       </Stack>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -211,7 +211,7 @@ export default function FichaPedagogica() {
       )}
 
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-        <BookOpen size={20} color={colors.secondary} />
+        <BookOpen size={20} color={colors.primary} />
         <Typography variant="h3">Manuales por etapa</Typography>
       </Stack>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -220,7 +220,7 @@ export default function FichaPedagogica() {
 
       <Stack spacing={2}>
         {modulos.map((mod) => (
-          <Card key={mod.id} sx={{ borderLeft: 4, borderColor: mod.color || colors.secondary }}>
+          <Card key={mod.id} sx={{ borderLeft: 4, borderColor: mod.color || colors.primary }}>
             <CardContent>
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={2}>
                 <Box>

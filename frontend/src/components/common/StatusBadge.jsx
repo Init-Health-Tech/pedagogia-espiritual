@@ -4,12 +4,12 @@ import { colors } from '../../theme/muiTheme'
 
 const variants = {
   active: {
-    bg: alpha(colors.moss, 0.125),
-    color: '#2e4228',
+    bg: alpha(colors.moss, 0.15),
+    color: colors.moss,
     label: 'Activo',
   },
   pending: {
-    bg: alpha(colors.accent, 0.125),
+    bg: alpha(colors.accent, 0.2),
     color: colors.earth,
     label: 'Pendiente',
   },
@@ -20,7 +20,7 @@ const variants = {
   },
   info: {
     bg: alpha(colors.sky, 0.15),
-    color: '#3d5a66',
+    color: colors.primary,
     label: 'Info',
   },
 }

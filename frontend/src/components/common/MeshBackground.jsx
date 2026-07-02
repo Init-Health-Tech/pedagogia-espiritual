@@ -23,7 +23,7 @@ export default function MeshBackground({ subtle = false }) {
           width: '50%',
           height: '50%',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${colors.accent}18 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${colors.primary}12 0%, transparent 70%)`,
         }}
       />
       <Box

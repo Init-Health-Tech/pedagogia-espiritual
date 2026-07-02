@@ -60,7 +60,7 @@ export default function FichaEspiritual() {
           to="/app"
           variant="body2"
           sx={{
-            color: colors.secondary,
+            color: colors.primary,
             textDecoration: 'none',
             '&:hover': { textDecoration: 'underline' },
           }}
@@ -142,7 +142,7 @@ export default function FichaEspiritual() {
                       width: i === index ? 20 : 8,
                       height: 8,
                       borderRadius: 4,
-                      bgcolor: i === index ? colors.secondary : colors.border,
+                      bgcolor: i === index ? colors.primary : colors.border,
                       cursor: 'pointer',
                       transition: 'all 0.2s',
                     }}

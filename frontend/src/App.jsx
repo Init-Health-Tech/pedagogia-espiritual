@@ -2,7 +2,12 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { getHomeRoute } from './utils/routes'
 import LoadingScreen from './components/common/LoadingScreen'
-import Landing from './pages/Landing'
+import MarketingLayout from './layouts/MarketingLayout'
+import HomePage from './pages/marketing/HomePage'
+import MovimientoPage from './pages/marketing/MovimientoPage'
+import PedagogiaPage from './pages/marketing/PedagogiaPage'
+import FormacionPage from './pages/marketing/FormacionPage'
+import ItinerarioPage from './pages/marketing/ItinerarioPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import UserLayout from './layouts/UserLayout'
@@ -45,7 +50,13 @@ function PublicRoute({ children }) {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
+      <Route element={<MarketingLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/movimiento" element={<MovimientoPage />} />
+        <Route path="/pedagogia-espiritual" element={<PedagogiaPage />} />
+        <Route path="/formacion" element={<FormacionPage />} />
+        <Route path="/itinerario" element={<ItinerarioPage />} />
+      </Route>
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/registro" element={<PublicRoute><Register /></PublicRoute>} />
 

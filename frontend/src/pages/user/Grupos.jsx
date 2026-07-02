@@ -34,7 +34,7 @@ export default function Grupos() {
             <Grid key={g.id} size={{ xs: 12, sm: 6, lg: 4 }}>
               <Card className="card-hover" sx={{ height: '100%' }}>
                 <CardContent>
-                  <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: `${colors.accent}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                  <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: `${colors.primary}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
                     <Users size={24} color={colors.primary} />
                   </Box>
                   <Typography variant="h3" sx={{ fontWeight: 400, mb: 1 }}>{g.nombre}</Typography>

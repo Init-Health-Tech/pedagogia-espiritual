@@ -1,17 +1,20 @@
 import { createTheme, alpha } from '@mui/material/styles'
 
 const C = {
-  primary: '#6B4C2A',
-  secondary: '#A0784A',
-  accent: '#D4A853',
-  earth: '#8B6914',
-  moss: '#4A6741',
-  sky: '#7BA7BC',
-  light: '#FAF6EF',
-  surface: '#F2EBE0',
-  muted: '#9C8B7A',
-  border: '#E0D5C5',
-  dark: '#2C1F0E',
+  navy: '#030E30',
+  primary: '#030E30',
+  blue: '#123685',
+  secondary: '#704E47',
+  accent: '#C79B6E',
+  cream: '#EBDBB2',
+  light: '#EBDBB2',
+  surface: '#F5ECD8',
+  muted: '#5A5268',
+  border: '#D4C4A0',
+  dark: '#030E30',
+  earth: '#5A3F39',
+  moss: '#3D5244',
+  sky: '#4A6FA5',
 }
 
 export const colors = C
@@ -21,8 +24,8 @@ export const muiTheme = createTheme({
     mode: 'light',
     primary: {
       main: C.primary,
-      light: C.secondary,
-      dark: C.earth,
+      light: C.blue,
+      dark: C.navy,
       contrastText: '#FFFFFF',
     },
     secondary: {
@@ -84,7 +87,7 @@ export const muiTheme = createTheme({
       fontWeight: 500,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: C.secondary,
+      color: C.primary,
     },
     button: { textTransform: 'none', fontWeight: 400, fontSize: '0.875rem', letterSpacing: '0.02em' },
   },
@@ -115,13 +118,13 @@ export const muiTheme = createTheme({
           '&:active': { transform: 'scale(0.98)' },
         },
         containedPrimary: {
-          '&:hover': { backgroundColor: C.earth, boxShadow: 'none' },
+          '&:hover': { backgroundColor: C.blue, boxShadow: 'none' },
         },
         outlined: {
           borderColor: C.border,
           color: C.primary,
           backgroundColor: C.surface,
-          '&:hover': { borderColor: C.secondary, backgroundColor: C.surface },
+          '&:hover': { borderColor: C.primary, backgroundColor: C.surface },
         },
         text: {
           color: C.muted,
@@ -136,11 +139,11 @@ export const muiTheme = createTheme({
           backgroundColor: C.surface,
           border: `1px solid ${C.border}`,
           borderRadius: 16,
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          boxShadow: '0 1px 4px rgba(3, 14, 48, 0.06)',
           transition: 'box-shadow 200ms ease-out, border-color 200ms ease-out, transform 200ms ease-out',
           '&:hover': {
-            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-            borderColor: C.secondary,
+            boxShadow: '0 4px 12px rgba(3, 14, 48, 0.1)',
+            borderColor: C.primary,
           },
         },
       },
@@ -164,13 +167,13 @@ export const muiTheme = createTheme({
             fontSize: '1rem',
             transition: 'border-color 200ms ease-out, box-shadow 200ms ease-out',
             '& fieldset': { borderColor: C.border },
-            '&:hover fieldset': { borderColor: C.secondary },
+            '&:hover fieldset': { borderColor: C.primary },
             '&.Mui-focused fieldset': {
-              borderColor: C.accent,
+              borderColor: C.primary,
               borderWidth: 1,
             },
             '&.Mui-focused': {
-              boxShadow: `0 0 0 3px ${alpha(C.accent, 0.2)}`,
+              boxShadow: `0 0 0 3px ${alpha(C.primary, 0.18)}`,
             },
           },
           '& .MuiFormHelperText-root': {
@@ -185,11 +188,11 @@ export const muiTheme = createTheme({
       styleOverrides: {
         root: { fontWeight: 500, fontSize: '0.875rem', borderRadius: 999 },
         colorSuccess: {
-          backgroundColor: alpha(C.moss, 0.125),
-          color: '#2e4228',
+          backgroundColor: alpha(C.moss, 0.15),
+          color: C.moss,
         },
         colorWarning: {
-          backgroundColor: alpha(C.accent, 0.125),
+          backgroundColor: alpha(C.accent, 0.2),
           color: C.earth,
         },
       },

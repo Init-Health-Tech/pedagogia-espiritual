@@ -10,11 +10,11 @@ export default function HubActionCard({ icon: Icon, title, description, to, onCl
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        '&:hover': { transform: 'scale(1.01)', borderColor: colors.accent },
+        '&:hover': { transform: 'scale(1.01)', borderColor: colors.primary },
       }}
     >
       <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: `${colors.accent}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, color: colors.primary }}>
+        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: `${colors.primary}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, color: colors.primary }}>
           <Icon size={24} strokeWidth={1.75} />
         </Box>
         <Typography variant="h3" gutterBottom sx={{ fontWeight: 400 }}>{title}</Typography>

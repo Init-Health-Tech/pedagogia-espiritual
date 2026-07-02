@@ -8,7 +8,7 @@ import ConfirmDialog from '../../components/common/ConfirmDialog'
 import FormField from '../../components/common/FormField'
 import StatusBadge from '../../components/common/StatusBadge'
 
-const emptyForm = { nombre: '', descripcion: '', orden: 1, color: '#A0784A', manual_url: '', activo: true }
+const emptyForm = { nombre: '', descripcion: '', orden: 1, color: '#030E30', manual_url: '', activo: true }
 
 export default function AdminModulos() {
   const [modulos, setModulos] = useState([])

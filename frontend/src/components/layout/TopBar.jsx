@@ -73,7 +73,7 @@ export default function TopBar({ sectionTitle, notificationCount = 0 }) {
           sx={{ color: 'rgba(255,255,255,0.85)' }}
           onClick={() => navigate(messagesPath)}
         >
-          <Badge badgeContent={notificationCount || null} sx={{ '& .MuiBadge-badge': { bgcolor: colors.accent, color: colors.dark } }} max={99}>
+          <Badge badgeContent={notificationCount || null} sx={{ '& .MuiBadge-badge': { bgcolor: colors.blue, color: '#fff' } }} max={99}>
             <Bell size={20} strokeWidth={1.75} />
           </Badge>
         </IconButton>
@@ -83,7 +83,7 @@ export default function TopBar({ sectionTitle, notificationCount = 0 }) {
           aria-label="Menú de usuario"
           sx={{ p: 0.5 }}
         >
-          <Avatar sx={{ width: 32, height: 32, bgcolor: colors.accent, color: colors.dark, fontSize: '0.875rem' }}>
+          <Avatar sx={{ width: 32, height: 32, bgcolor: colors.blue, color: '#fff', fontSize: '0.875rem' }}>
             {initials}
           </Avatar>
         </IconButton>

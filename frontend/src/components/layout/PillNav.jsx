@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import { DOCK_HEIGHT, colors } from '../../theme/muiTheme'
 
 function NavLink({ item, mobile }) {
@@ -28,17 +29,17 @@ function NavLink({ item, mobile }) {
         minWidth: mobile ? 64 : 80,
         flexShrink: 0,
         transition: 'background-color 200ms ease-out',
-        bgcolor: active ? colors.accent : 'transparent',
-        '&:hover': { bgcolor: active ? colors.accent : 'rgba(107,76,42,0.08)' },
+        bgcolor: active ? colors.primary : 'transparent',
+        '&:hover': { bgcolor: active ? colors.blue : alpha(colors.primary, 0.08) },
       }}
     >
-      <Icon size={20} strokeWidth={1.75} color={active ? colors.dark : colors.muted} />
+      <Icon size={20} strokeWidth={1.75} color={active ? '#fff' : colors.muted} />
       <Typography
         variant="caption"
         sx={{
           fontSize: mobile ? '0.6875rem' : '0.75rem',
           fontWeight: active ? 600 : 400,
-          color: active ? colors.dark : colors.muted,
+          color: active ? '#fff' : colors.muted,
           lineHeight: 1.2,
           textAlign: 'center',
           maxWidth: 72,

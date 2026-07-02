@@ -1,17 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Source+Sans+3:wght@300;400;500&display=swap');
 
 :root {
-  --color-primary: #6B4C2A;
-  --color-secondary: #A0784A;
-  --color-accent: #D4A853;
-  --color-earth: #8B6914;
-  --color-moss: #4A6741;
-  --color-sky: #7BA7BC;
-  --color-light: #FAF6EF;
-  --color-surface: #F2EBE0;
-  --color-muted: #9C8B7A;
-  --color-border: #E0D5C5;
-  --color-dark: #2C1F0E;
+  --color-navy: #030E30;
+  --color-primary: #030E30;
+  --color-blue: #123685;
+  --color-secondary: #704E47;
+  --color-accent: #C79B6E;
+  --color-earth: #5A3F39;
+  --color-moss: #3D5244;
+  --color-sky: #4A6FA5;
+  --color-light: #EBDBB2;
+  --color-surface: #F5ECD8;
+  --color-muted: #5A5268;
+  --color-border: #D4C4A0;
+  --color-dark: #030E30;
 
   --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --font-body: 'Source Sans 3', system-ui, sans-serif;
@@ -53,7 +55,7 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-secondary);
+  color: var(--color-primary);
 }
 
 .quote-text {
@@ -68,7 +70,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .card-hover:hover {
-  border-color: var(--color-secondary) !important;
+  border-color: var(--color-primary) !important;
 }
 
 .landing-btn {
@@ -109,7 +111,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .landing-hero-content {
-  box-shadow: 0 8px 32px rgba(44, 31, 14, 0.06);
+  box-shadow: 0 8px 32px rgba(3, 14, 48, 0.08);
 }
 
 .landing-card-with-image {

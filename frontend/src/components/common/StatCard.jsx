@@ -20,7 +20,7 @@ export default function StatCard({ label, value, sublabel, accent }) {
             left: 0,
             right: 0,
             height: 3,
-            background: `linear-gradient(90deg, ${colors.secondary}, ${colors.accent})`,
+            background: `linear-gradient(90deg, ${colors.primary}, ${colors.blue})`,
             opacity: 0,
             transition: 'opacity 0.3s ease',
           },

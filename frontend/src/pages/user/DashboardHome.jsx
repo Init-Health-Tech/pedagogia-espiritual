@@ -79,7 +79,7 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
                 <Typography variant="overline">Tu progreso</Typography>
                 <Typography variant="body1">Diario semanal y etapas de formación</Typography>
               </Box>
-              <Typography variant="h3" sx={{ color: colors.accent, fontWeight: 500 }}>{progreso}%</Typography>
+              <Typography variant="h3" sx={{ color: colors.primary, fontWeight: 500 }}>{progreso}%</Typography>
             </Stack>
             <AnimatedProgress value={progreso} />
           </Paper>
@@ -112,7 +112,7 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
               gap: 2,
               transition: 'border-color 0.2s, transform 0.2s',
               '&:hover': {
-                borderColor: colors.accent,
+                borderColor: colors.primary,
                 transform: 'scale(1.005)',
               },
             }}
@@ -165,7 +165,7 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
             <Box sx={{ p: 3, textAlign: 'center' }}>
               <Typography variant="body1" color="text.secondary">
                 Aún no hay actividad reciente.{' '}
-                <Box component={RouterLink} to="/app/ficha" sx={{ color: colors.secondary, textDecoration: 'none', fontWeight: 500 }}>
+                <Box component={RouterLink} to="/app/ficha" sx={{ color: colors.primary, textDecoration: 'none', fontWeight: 500 }}>
                   Comienza tu ficha pedagógica
                 </Box>
               </Typography>
@@ -183,7 +183,7 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
                   borderTop: i > 0 ? `1px solid ${colors.border}` : 'none',
                 }}
               >
-                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.accent, flexShrink: 0 }} />
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.primary, flexShrink: 0 }} />
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography variant="body1">{item.texto}</Typography>
                   <Typography variant="body2" color="text.secondary">{item.tiempo}</Typography>

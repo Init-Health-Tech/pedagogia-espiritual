@@ -42,14 +42,14 @@ function SectionContent({ seccion }) {
 
   if (seccion.tipo === 'tip') {
     return (
-      <Card sx={{ bgcolor: `${colors.accent}18`, border: `1px solid ${colors.accent}55`, boxShadow: 'none' }}>
+      <Card sx={{ bgcolor: `${colors.primary}10`, border: `1px solid ${colors.primary}33`, boxShadow: 'none' }}>
         <CardContent>
           <Stack direction="row" spacing={1.5} alignItems="flex-start">
-            <Box sx={{ color: colors.earth, mt: 0.25 }}>
+            <Box sx={{ color: colors.primary, mt: 0.25 }}>
               <Lightbulb size={22} />
             </Box>
             <Box>
-              <Typography variant="overline" sx={{ color: colors.earth }}>{seccion.titulo}</Typography>
+              <Typography variant="overline" sx={{ color: colors.primary }}>{seccion.titulo}</Typography>
               <Typography variant="body1" sx={{ mt: 1, lineHeight: 1.8 }}>{seccion.contenido}</Typography>
             </Box>
           </Stack>
@@ -61,7 +61,7 @@ function SectionContent({ seccion }) {
   if (seccion.tipo === 'reflexion') {
     return (
       <Box sx={{ textAlign: 'center', py: 2 }}>
-        <Sparkles size={28} color={colors.secondary} style={{ marginBottom: 12 }} />
+        <Sparkles size={28} color={colors.primary} style={{ marginBottom: 12 }} />
         <Typography variant="h3" className="font-display" sx={{ fontSize: '1.35rem', mb: 2 }}>
           {seccion.pregunta}
         </Typography>
@@ -182,7 +182,7 @@ export default function ModuloManual({ modulo, onClose }) {
                 width: i === index ? 20 : 8,
                 height: 8,
                 borderRadius: 4,
-                bgcolor: i === index ? colors.secondary : colors.border,
+                bgcolor: i === index ? colors.primary : colors.border,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}

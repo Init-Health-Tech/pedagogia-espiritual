@@ -10,7 +10,7 @@ function TauIllustration() {
       sx={{ width: 64, height: 64, mx: 'auto', mb: 2, display: 'block', opacity: 0.5 }}
     >
       <circle cx="40" cy="36" r="28" stroke={colors.border} strokeWidth="1.5" fill="none" />
-      <path d="M40 18v36M28 30h24" stroke={colors.secondary} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path d="M40 18v36M28 30h24" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" fill="none" />
     </Box>
   )
 }

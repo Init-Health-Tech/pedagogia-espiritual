@@ -86,7 +86,7 @@ export default function CoordinatorSeguimiento() {
                     onClick={() => abrirFicha(f)}
                     sx={{
                       cursor: 'pointer',
-                      border: selected?.id === f.id ? `2px solid ${colors.secondary}` : `1px solid ${colors.border}`,
+                      border: selected?.id === f.id ? `2px solid ${colors.primary}` : `1px solid ${colors.border}`,
                       transition: 'border-color 0.2s',
                     }}
                   >

@@ -14,7 +14,7 @@ export default function AnimatedProgress({ value, sx }) {
           bgcolor: colors.border,
           '& .MuiLinearProgress-bar': {
             borderRadius: 4,
-            bgcolor: colors.accent,
+            bgcolor: colors.primary,
             transition: 'transform 1s cubic-bezier(0.22, 1, 0.36, 1) !important',
           },
           ...sx,

@@ -1,37 +1,38 @@
 export const NAV_ITEMS = [
   {
     label: 'El Movimiento',
+    route: '/movimiento',
     children: [
-      { label: 'Quiénes somos', href: '#quienes-somos' },
-      { label: '¿Por qué lo hacemos?', href: '#historia' },
-      { label: 'Nuestro equipo', href: '#nuestro-equipo' },
-      { label: 'Espiritualidad franciscana', href: '#espiritualidad' },
+      { label: 'Quiénes somos', href: '/movimiento#quienes-somos' },
+      { label: '¿Por qué lo hacemos?', href: '/movimiento#historia' },
+      { label: 'Nuestro equipo', href: '/movimiento#nuestro-equipo' },
+      { label: 'Espiritualidad franciscana', href: '/movimiento#espiritualidad' },
     ],
   },
   {
     label: 'Pedagogía Espiritual',
+    route: '/pedagogia-espiritual',
     children: [
-      { label: '¿Qué es la pedagogía espiritual?', href: '#que-es-pedagogia' },
-      { label: 'La Santísima Trinidad', href: '#santisima-trinidad' },
-      { label: 'Desarrollo de la sesión', href: '#desarrollo-sesion' },
-      { label: 'Camino por etapas', href: '#camino-formativo' },
+      { label: '¿Qué es la pedagogía espiritual?', href: '/pedagogia-espiritual#que-es-pedagogia' },
+      { label: 'La Santísima Trinidad', href: '/pedagogia-espiritual#santisima-trinidad' },
+      { label: 'Desarrollo de la sesión', href: '/pedagogia-espiritual#desarrollo-sesion' },
     ],
   },
   {
     label: 'Formación',
+    route: '/formacion',
     children: [
-      { label: 'Etapas del camino', href: '#modulos' },
-      { label: 'Grupos de pastoreo', href: '#grupos-pastoreo' },
-      { label: 'Diario semanal', href: '#ficha-pedagogica' },
+      { label: 'Etapas del camino', href: '/formacion#modulos' },
+      { label: 'Grupos de pastoreo', href: '/formacion#grupos-pastoreo' },
+      { label: 'Diario semanal', href: '/formacion#ficha-pedagogica' },
     ],
   },
   {
-    label: 'Itinerario Informativo',
-    href: '#itinerario-informativo',
-  },
-  {
-    label: 'Contacto',
-    href: '#contacto',
+    label: 'Itinerario formativo',
+    route: '/itinerario',
+    children: [
+      { label: 'Diez ejes de formación', href: '/itinerario#itinerario-formativo' },
+    ],
   },
 ]
 
@@ -39,18 +40,26 @@ export const FOOTER_COLUMNS = [
   {
     title: 'El Movimiento',
     links: [
-      { label: 'Quiénes somos', href: '#quienes-somos' },
-      { label: '¿Por qué lo hacemos?', href: '#historia' },
-      { label: 'Nuestro equipo', href: '#nuestro-equipo' },
-      { label: 'Espiritualidad', href: '#espiritualidad' },
+      { label: 'Quiénes somos', href: '/movimiento#quienes-somos' },
+      { label: '¿Por qué lo hacemos?', href: '/movimiento#historia' },
+      { label: 'Nuestro equipo', href: '/movimiento#nuestro-equipo' },
+      { label: 'Espiritualidad', href: '/movimiento#espiritualidad' },
+    ],
+  },
+  {
+    title: 'Pedagogía Espiritual',
+    links: [
+      { label: '¿Qué es la pedagogía?', href: '/pedagogia-espiritual#que-es-pedagogia' },
+      { label: 'La Santísima Trinidad', href: '/pedagogia-espiritual#santisima-trinidad' },
+      { label: 'Desarrollo de la sesión', href: '/pedagogia-espiritual#desarrollo-sesion' },
     ],
   },
   {
     title: 'Formación',
     links: [
-      { label: 'Pedagogía espiritual', href: '#que-es-pedagogia' },
-      { label: 'Etapas', href: '#modulos' },
-      { label: 'Grupos de pastoreo', href: '#grupos-pastoreo' },
+      { label: 'Etapas del camino', href: '/formacion#modulos' },
+      { label: 'Grupos de pastoreo', href: '/formacion#grupos-pastoreo' },
+      { label: 'Diario semanal', href: '/formacion#ficha-pedagogica' },
     ],
   },
   {
@@ -58,7 +67,7 @@ export const FOOTER_COLUMNS = [
     links: [
       { label: 'Iniciar sesión', href: '/login', route: true },
       { label: 'Registrarse', href: '/registro', route: true },
-      { label: 'Diario semanal', href: '#ficha-pedagogica' },
+      { label: 'Itinerario formativo', href: '/itinerario' },
     ],
   },
 ]
@@ -83,20 +92,53 @@ export const JUSTIFICACION_PROYECTO = [
   'Dos realidades subyacen como plataforma de este proyecto: por un lado, un pueblo de Dios sufriente, con profundas confusiones antropológicas, que demanda atención a sus urgencias existenciales — vacíos, depresiones, ansiedades, hastíos, falta de sentido; por otro, esas realidades dolorosas se convierten en una gran oportunidad de evangelización.',
 ]
 
-export const OBJETIVO_PRINCIPAL =
-  'Promover una formación pedagógica que integre las áreas humano–espiritual para lograr un mejor camino de conversión y santificación en el pueblo santo de Dios, en favor de una mejor praxis evangelizadora en la Iglesia.'
+export const MISION =
+  'Ofrecer una formación pedagógica integral que, desde una sólida fundamentación bíblica, teológica, doctrinal y humano–espiritual, acompañe el proceso de conversión y santificación del Pueblo Santo de Dios, formando evangelizadores comprometidos con la vivencia del Evangelio, la comunión eclesial y el servicio caritativo.'
 
-export const OBJETIVOS_SECUNDARIOS = [
-  'Profundizar el conocimiento de las antropologías hebrea y griega en la reflexión de la Iglesia, para precisar mejor un proyecto de evangelización en el pueblo santo de Dios.',
-  'Consolidar una sistematización teológica de los dones y carismas como gracia de Dios, para iluminar las distintas manifestaciones del alma en su expresión humana y su desarrollo espiritual.',
-  'Concientizar sobre la necesidad de elaborar un proyecto pedagógico humano–espiritual personal que integre las cuatro áreas de la antropología hebrea — alma, cuerpo, espíritu y corazón — en pro de la conversión y la evangelización.',
-  'Fomentar el estudio de la teología mística, integrando dones, carismas y vida teologal bajo la reflexión titulada «la ciencia del amor».',
-  'Constituir una sólida formación pastoral–catequética con las enseñanzas centrales del magisterio, para la maduración de la fe y la participación activa en la vida eclesial.',
-  'Establecer una profunda formación doctrinal que refuerce el camino de unidad con las enseñanzas de nuestra Santa Madre Iglesia.',
-  'Implantar una sólida formación bíblica para normar el discernimiento espiritual y la praxis pastoral en la vida comunitaria.',
-  'Solidificar una praxis concreta de caridad integral hacia los hermanos más vulnerables — atención psicológica, espiritual y material — como movimiento e Iglesia en salida.',
-  'Proporcionar formación en espiritualidad franciscana para enriquecernos con las virtudes espirituales de San Francisco.',
-  'Instituir una formación litúrgica apropiada para la vivencia de las celebraciones cultuales en nuestro movimiento.',
+export const VISION =
+  'Consolidarnos como una comunidad formativa de excelencia al servicio de la Iglesia, reconocida por la integración de la antropología cristiana, la espiritualidad, la formación doctrinal y la acción pastoral, formando hombres y mujeres capaces de responder a los desafíos de la nueva evangelización con madurez humana, profundidad espiritual y compromiso misionero.'
+
+export const VALORES = [
+  {
+    name: 'Fe',
+    description: 'Vivir una relación profunda con Dios que oriente todas las dimensiones de la vida y la misión evangelizadora.',
+  },
+  {
+    name: 'Caridad',
+    description: 'Servir con amor a los hermanos, especialmente a los más vulnerables, mediante una atención integral humana, espiritual y material.',
+  },
+  {
+    name: 'Comunión eclesial',
+    description: 'Permanecer unidos al Magisterio y a la vida de la Iglesia, promoviendo la participación activa en la comunidad cristiana.',
+  },
+  {
+    name: 'Conversión permanente',
+    description: 'Buscar continuamente la santificación y el crecimiento espiritual mediante un proceso constante de transformación personal.',
+  },
+  {
+    name: 'Formación integral',
+    description: 'Desarrollar armónicamente las dimensiones humana, espiritual, intelectual, pastoral y comunitaria de cada persona.',
+  },
+  {
+    name: 'Discernimiento',
+    description: 'Actuar con sabiduría a la luz de la Sagrada Escritura, la oración y la acción del Espíritu Santo para responder a la voluntad de Dios.',
+  },
+  {
+    name: 'Servicio',
+    description: 'Poner los dones y carismas al servicio de la Iglesia y del prójimo con humildad, responsabilidad y generosidad.',
+  },
+  {
+    name: 'Fraternidad',
+    description: 'Construir relaciones basadas en el respeto, la acogida, la solidaridad y el amor mutuo, inspirados en el ejemplo de San Francisco.',
+  },
+  {
+    name: 'Fidelidad',
+    description: 'Mantener una adhesión firme al Evangelio, a la doctrina de la Iglesia y a la vocación recibida.',
+  },
+  {
+    name: 'Esperanza',
+    description: 'Confiar en la acción de Dios y transmitir un mensaje de renovación, reconciliación y salvación para todas las personas.',
+  },
 ]
 
 export const MODULOS_PREVIEW = [
@@ -237,8 +279,8 @@ export const ITINERARIO_FORMATIVO = [
 ]
 
 export const LANDING_IMAGES = {
-  hero: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
-  comunidad: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80',
-  camino: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
+  hero: 'https://images.unsplash.com/photo-1551418557-567e915fe7aa?w=1200&q=80',
+  comunidad: 'https://images.unsplash.com/photo-1687563100716-17408eb4fb93?w=800&q=80',
+  camino: 'https://images.unsplash.com/photo-1756541178978-fe09dc8d4bda?w=800&q=80',
   oracion: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
 }
