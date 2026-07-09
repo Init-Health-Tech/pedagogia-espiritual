@@ -1,15 +1,5 @@
 export const NAV_ITEMS = [
   {
-    label: 'El Movimiento',
-    route: '/movimiento',
-    children: [
-      { label: 'Quiénes somos', href: '/movimiento#quienes-somos' },
-      { label: '¿Por qué lo hacemos?', href: '/movimiento#historia' },
-      { label: 'Nuestro equipo', href: '/movimiento#nuestro-equipo' },
-      { label: 'Espiritualidad franciscana', href: '/movimiento#espiritualidad' },
-    ],
-  },
-  {
     label: 'Pedagogía Espiritual',
     route: '/pedagogia-espiritual',
     children: [
@@ -40,10 +30,9 @@ export const FOOTER_COLUMNS = [
   {
     title: 'El Movimiento',
     links: [
-      { label: 'Quiénes somos', href: '/movimiento#quienes-somos' },
-      { label: '¿Por qué lo hacemos?', href: '/movimiento#historia' },
-      { label: 'Nuestro equipo', href: '/movimiento#nuestro-equipo' },
-      { label: 'Espiritualidad', href: '/movimiento#espiritualidad' },
+      { label: 'Quiénes somos', href: '/#quienes-somos' },
+      { label: '¿Por qué lo hacemos?', href: '/#historia' },
+      { label: 'Nuestro equipo', href: '/#nuestro-equipo' },
     ],
   },
   {
@@ -104,8 +93,8 @@ export const VALORES = [
     description: 'Vivir una relación profunda con Dios que oriente todas las dimensiones de la vida y la misión evangelizadora.',
   },
   {
-    name: 'Caridad',
-    description: 'Servir con amor a los hermanos, especialmente a los más vulnerables, mediante una atención integral humana, espiritual y material.',
+    name: 'Caridad y servicio',
+    description: 'Amar y servir al prójimo con generosidad, especialmente a los más vulnerables, mediante una atención integral humana, espiritual y material, siguiendo el ejemplo de Cristo.',
   },
   {
     name: 'Comunión eclesial',
@@ -124,16 +113,8 @@ export const VALORES = [
     description: 'Actuar con sabiduría a la luz de la Sagrada Escritura, la oración y la acción del Espíritu Santo para responder a la voluntad de Dios.',
   },
   {
-    name: 'Servicio',
-    description: 'Poner los dones y carismas al servicio de la Iglesia y del prójimo con humildad, responsabilidad y generosidad.',
-  },
-  {
     name: 'Fraternidad',
     description: 'Construir relaciones basadas en el respeto, la acogida, la solidaridad y el amor mutuo, inspirados en el ejemplo de San Francisco.',
-  },
-  {
-    name: 'Fidelidad',
-    description: 'Mantener una adhesión firme al Evangelio, a la doctrina de la Iglesia y a la vocación recibida.',
   },
   {
     name: 'Esperanza',

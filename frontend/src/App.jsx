@@ -4,7 +4,7 @@ import { getHomeRoute } from './utils/routes'
 import LoadingScreen from './components/common/LoadingScreen'
 import MarketingLayout from './layouts/MarketingLayout'
 import HomePage from './pages/marketing/HomePage'
-import MovimientoPage from './pages/marketing/MovimientoPage'
+import ContactPage from './pages/marketing/ContactPage'
 import PedagogiaPage from './pages/marketing/PedagogiaPage'
 import FormacionPage from './pages/marketing/FormacionPage'
 import ItinerarioPage from './pages/marketing/ItinerarioPage'
@@ -52,7 +52,8 @@ export default function App() {
     <Routes>
       <Route element={<MarketingLayout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/movimiento" element={<MovimientoPage />} />
+        <Route path="/movimiento" element={<Navigate to="/" replace />} />
+        <Route path="/contacto" element={<ContactPage />} />
         <Route path="/pedagogia-espiritual" element={<PedagogiaPage />} />
         <Route path="/formacion" element={<FormacionPage />} />
         <Route path="/itinerario" element={<ItinerarioPage />} />

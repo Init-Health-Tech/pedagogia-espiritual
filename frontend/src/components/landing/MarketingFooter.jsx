@@ -21,19 +21,31 @@ export default function MarketingFooter() {
         zIndex: 1,
       }}
     >
-      <Container maxWidth={false} sx={{ maxWidth: 760, mx: 'auto', px: 3 }}>
+      <Container maxWidth={false} sx={{ maxWidth: 1100, mx: 'auto', px: 3 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            gap: { xs: 2, md: 3 },
+            flexDirection: { xs: 'column', md: 'row' },
+            mb: 4,
+          }}
+        >
+          <Box component={RouterLink} to="/" sx={{ display: 'inline-block', textDecoration: 'none', flexShrink: 0 }}>
+            <TorLogo size="sm" />
+          </Box>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ lineHeight: 1.7, whiteSpace: { md: 'nowrap' } }}
+          >
+            Pedagogía Espiritual de la Santísima Trinidad. Formación integral en la fe, la fraternidad y el servicio.
+          </Typography>
+        </Box>
+
         <Grid container spacing={4} sx={{ mb: 4 }}>
-          <Grid size={{ xs: 12, md: 5 }}>
-            <Box component={RouterLink} to="/" sx={{ display: 'inline-block', mb: 2, textDecoration: 'none' }}>
-              <TorLogo size="sm" />
-            </Box>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 320, lineHeight: 1.7 }}>
-              Pedagogía Espiritual de la Santísima Trinidad. Formación integral en la fe,
-              la fraternidad y el servicio.
-            </Typography>
-          </Grid>
           {FOOTER_COLUMNS.map((col) => (
-            <Grid key={col.title} size={{ xs: 6, sm: 4, md: 2.33 }}>
+            <Grid key={col.title} size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant="overline" sx={{ display: 'block', mb: 1.5 }}>{col.title}</Typography>
               <Stack spacing={1}>
                 {col.links.map((link) =>

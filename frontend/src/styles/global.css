@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Source+Sans+3:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
 :root {
   --color-navy: #030E30;
@@ -15,8 +15,8 @@
   --color-border: #D4C4A0;
   --color-dark: #030E30;
 
-  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-body: 'Source Sans 3', system-ui, sans-serif;
+  --font-display: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
   --transition-fast: 180ms ease-out;
   --radius-card: 8px;
   --radius-button: 6px;
@@ -32,6 +32,25 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.story-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100svh;
+}
+
 body {
   font-family: var(--font-body);
   font-size: 16px;
@@ -39,7 +58,7 @@ body {
   color: var(--color-dark);
   background-color: var(--color-light);
   -webkit-font-smoothing: antialiased;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -61,7 +80,7 @@ h1, h2, h3, h4, h5, h6,
 .quote-text {
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--color-muted);
 }
 

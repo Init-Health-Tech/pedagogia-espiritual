@@ -17,6 +17,9 @@ const C = {
   sky: '#4A6FA5',
 }
 
+const FONT_DISPLAY = '"Libre Baskerville", Georgia, serif'
+const FONT_BODY = '"Inter", system-ui, sans-serif'
+
 export const colors = C
 
 export const muiTheme = createTheme({
@@ -48,9 +51,9 @@ export const muiTheme = createTheme({
     info: { main: C.sky },
   },
   typography: {
-    fontFamily: '"Source Sans 3", system-ui, sans-serif',
+    fontFamily: FONT_BODY,
     h1: {
-      fontFamily: '"Cormorant Garamond", Georgia, serif',
+      fontFamily: FONT_DISPLAY,
       fontWeight: 400,
       fontSize: '2rem',
       letterSpacing: '0.01em',
@@ -58,7 +61,7 @@ export const muiTheme = createTheme({
       lineHeight: 1.2,
     },
     h2: {
-      fontFamily: '"Cormorant Garamond", Georgia, serif',
+      fontFamily: FONT_DISPLAY,
       fontWeight: 400,
       fontSize: '1.75rem',
       letterSpacing: '0.01em',
@@ -66,30 +69,30 @@ export const muiTheme = createTheme({
       lineHeight: 1.25,
     },
     h3: {
-      fontFamily: '"Cormorant Garamond", Georgia, serif',
+      fontFamily: FONT_DISPLAY,
       fontWeight: 400,
       fontSize: '1.375rem',
       color: C.dark,
       lineHeight: 1.3,
     },
     h4: {
-      fontFamily: '"Cormorant Garamond", Georgia, serif',
+      fontFamily: FONT_DISPLAY,
       fontWeight: 400,
       fontSize: '1.125rem',
     },
     subtitle1: { fontWeight: 400, fontSize: '1rem' },
-    subtitle2: { fontWeight: 300, fontSize: '1rem', color: C.muted },
-    body1: { fontSize: '1rem', lineHeight: 1.75, fontWeight: 300 },
-    body2: { fontSize: '1rem', lineHeight: 1.75, color: C.muted, fontWeight: 300 },
+    subtitle2: { fontWeight: 400, fontSize: '1rem', color: C.muted },
+    body1: { fontSize: '1rem', lineHeight: 1.75, fontWeight: 400 },
+    body2: { fontSize: '1rem', lineHeight: 1.75, color: C.muted, fontWeight: 400 },
     overline: {
-      fontFamily: '"Source Sans 3", sans-serif',
+      fontFamily: FONT_BODY,
       fontSize: '0.6875rem',
       fontWeight: 500,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
       color: C.primary,
     },
-    button: { textTransform: 'none', fontWeight: 400, fontSize: '0.875rem', letterSpacing: '0.02em' },
+    button: { textTransform: 'none', fontWeight: 500, fontSize: '0.875rem', letterSpacing: '0.02em' },
   },
   shape: { borderRadius: 12 },
   breakpoints: {
@@ -100,10 +103,10 @@ export const muiTheme = createTheme({
       styleOverrides: {
         body: {
           backgroundColor: C.light,
-          fontFamily: '"Source Sans 3", system-ui, sans-serif',
+          fontFamily: FONT_BODY,
           fontSize: '16px',
           lineHeight: 1.75,
-          fontWeight: 300,
+          fontWeight: 400,
         },
       },
     },

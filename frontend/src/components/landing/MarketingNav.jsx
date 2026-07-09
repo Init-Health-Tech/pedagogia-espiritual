@@ -218,6 +218,9 @@ export default function MarketingNav() {
           {NAV_ITEMS.map((item) => (
             <MobileNavGroup key={item.label} item={item} onNavigate={() => setDrawerOpen(false)} />
           ))}
+          <ListItemButton component={RouterLink} to="/contacto" onClick={() => setDrawerOpen(false)} sx={{ py: 1.25 }}>
+            <ListItemText primary="Contacto" primaryTypographyProps={{ fontSize: '0.9375rem', fontWeight: 600 }} />
+          </ListItemButton>
         </List>
         <Stack spacing={1} sx={{ p: 2, mt: 'auto', borderTop: `1px solid ${colors.border}` }}>
           <Button component={RouterLink} to="/login" fullWidth variant="text" className="landing-btn" onClick={() => setDrawerOpen(false)}>Iniciar sesión</Button>

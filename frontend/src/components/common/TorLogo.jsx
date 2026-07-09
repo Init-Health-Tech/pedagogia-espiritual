@@ -28,7 +28,7 @@ export default function TorLogo({ size = 'sm', showText = true, light = false })
             variant="caption"
             sx={{
               display: 'block',
-              fontFamily: '"Source Sans 3", sans-serif',
+              fontFamily: '"Inter", sans-serif',
               fontWeight: 500,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',

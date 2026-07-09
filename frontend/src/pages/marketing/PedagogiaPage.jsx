@@ -1,11 +1,11 @@
 import { alpha } from '@mui/material/styles'
 import { Box, Stack, Typography } from '@mui/material'
-import ContactSection from '../../components/landing/ContactSection'
 import SectionHeading from '../../components/landing/SectionHeading'
-import ScrollSection, { SectionDivider } from '../../components/landing/ScrollSection'
+import ScrollSection from '../../components/landing/ScrollSection'
+import Reveal from '../../components/landing/motion/Reveal'
+import RevealStagger, { RevealStaggerItem } from '../../components/landing/motion/RevealStagger'
 import { DESARROLLO_SESION } from '../../data/marketingContent'
 import { colors } from '../../theme/muiTheme'
-import { HEADER_HEIGHT } from '../../utils/marketingNav'
 
 const PEDAGOGIA_PILARES = [
   {
@@ -148,7 +148,8 @@ function SesionTimelineItem({ momento, index, isLast }) {
   const accent = SESSION_ACCENTS[index % SESSION_ACCENTS.length]
 
   return (
-    <Box sx={{ display: 'flex', gap: { xs: 2, md: 3 }, position: 'relative' }}>
+    <Reveal y={24} delay={index * 0.04}>
+      <Box sx={{ display: 'flex', gap: { xs: 2, md: 3 }, position: 'relative' }}>
       <Stack alignItems="center" sx={{ width: { xs: 52, md: 60 }, flexShrink: 0, pt: 0.5 }}>
         <Typography
           variant="overline"
@@ -241,91 +242,94 @@ function SesionTimelineItem({ momento, index, isLast }) {
           )}
         </Box>
       </Box>
-    </Box>
+      </Box>
+    </Reveal>
   )
 }
 
 export default function PedagogiaPage() {
   return (
-    <Box sx={{ pt: `${HEADER_HEIGHT + 32}px` }}>
-      <ScrollSection id="que-es-pedagogia" alt>
+    <>
+      <ScrollSection id="que-es-pedagogia" alt lead size="full">
         <SectionHeading overline="Pedagogía Espiritual" title="¿Qué es la pedagogía espiritual?" subtitle="Acompañamiento personal y progresivo — medido por quienes caminan contigo." />
-        <Box
-          className="landing-block"
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 0,
-            p: 0,
-            overflow: 'hidden',
-          }}
-        >
-          {PEDAGOGIA_PILARES.map((item, index) => (
-            <Box
-              key={item.title}
-              sx={{
-                px: { xs: 1.5, sm: 2.5, md: 3 },
-                py: { xs: 2, md: 2.5 },
-                borderTop: `3px solid ${item.accent}`,
-                borderRight: index < 2 ? `1px solid ${colors.border}` : 'none',
-              }}
-            >
-              <Typography variant="h3" className="font-display" sx={{ fontSize: { xs: '1rem', md: '1.125rem' }, mb: 1 }}>
-                {item.title}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ lineHeight: 1.65, fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' } }}
+        <Reveal delay={0.08} y={22} scale={0.99}>
+          <Box
+            className="landing-block"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 0,
+              p: 0,
+              overflow: 'hidden',
+            }}
+          >
+            {PEDAGOGIA_PILARES.map((item, index) => (
+              <Box
+                key={item.title}
+                sx={{
+                  px: { xs: 1.5, sm: 2.5, md: 3 },
+                  py: { xs: 2, md: 2.5 },
+                  borderTop: `3px solid ${item.accent}`,
+                  borderRight: index < 2 ? `1px solid ${colors.border}` : 'none',
+                }}
               >
-                {item.desc}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
+                <Typography variant="h3" className="font-display" sx={{ fontSize: { xs: '1rem', md: '1.125rem' }, mb: 1 }}>
+                  {item.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ lineHeight: 1.7, fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' } }}
+                >
+                  {item.desc}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Reveal>
       </ScrollSection>
 
-      <SectionDivider />
-
-      <ScrollSection id="santisima-trinidad">
+      <ScrollSection id="santisima-trinidad" size="full">
         <SectionHeading overline="Pedagogía Espiritual" title="La Santísima Trinidad" subtitle="Dios es comunión de amor entre Padre, Hijo y Espíritu Santo." />
-        <TrinidadTriangle />
+        <Reveal delay={0.1} y={20}>
+          <TrinidadTriangle />
+        </Reveal>
       </ScrollSection>
 
-      <SectionDivider />
-
-      <ScrollSection id="desarrollo-sesion" alt>
+      <ScrollSection id="desarrollo-sesion" alt size="content">
         <SectionHeading
           overline="Pedagogía Espiritual"
           title="Desarrollo de la sesión"
           subtitle="Ritmo semanal de oración, formación y fraternidad — de 9:00 a 14:00."
         />
 
-        <Box
-          sx={{
-            mt: 1,
-            mb: 4,
-            p: { xs: 2, md: 2.5 },
-            borderRadius: 2,
-            bgcolor: colors.dark,
-            color: colors.cream,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 2,
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant="body2" sx={{ color: 'rgba(235, 219, 178, 0.9)' }}>
-            Inicio · 9:00
-          </Typography>
-          <Typography variant="body2" sx={{ color: colors.accent, fontWeight: 600 }}>
-            Jornada semanal
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(235, 219, 178, 0.9)' }}>
-            Cierre · 14:00
-          </Typography>
-        </Box>
+        <Reveal y={18}>
+          <Box
+            sx={{
+              mt: 1,
+              mb: 4,
+              p: { xs: 2, md: 2.5 },
+              borderRadius: 2,
+              bgcolor: colors.dark,
+              color: colors.cream,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 2,
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Typography variant="body2" sx={{ color: 'rgba(235, 219, 178, 0.9)' }}>
+              Inicio · 9:00
+            </Typography>
+            <Typography variant="body2" sx={{ color: colors.accent, fontWeight: 600 }}>
+              Jornada semanal
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(235, 219, 178, 0.9)' }}>
+              Cierre · 14:00
+            </Typography>
+          </Box>
+        </Reveal>
 
         <Stack spacing={0}>
           {DESARROLLO_SESION.map((momento, index) => (
@@ -338,9 +342,6 @@ export default function PedagogiaPage() {
           ))}
         </Stack>
       </ScrollSection>
-
-      <SectionDivider />
-      <ContactSection />
-    </Box>
+    </>
   )
 }
