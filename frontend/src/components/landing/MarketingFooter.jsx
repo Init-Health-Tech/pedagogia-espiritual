@@ -21,7 +21,7 @@ export default function MarketingFooter() {
         zIndex: 1,
       }}
     >
-      <Container maxWidth={false} sx={{ maxWidth: 1100, mx: 'auto', px: 3 }}>
+      <Container maxWidth={false} sx={{ maxWidth: 900, mx: 'auto', px: { xs: 3, md: 4, lg: 6 } }}>
         <Box
           sx={{
             display: 'flex',

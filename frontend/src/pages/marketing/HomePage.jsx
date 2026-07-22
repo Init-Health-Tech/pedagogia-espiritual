@@ -74,7 +74,7 @@ export default function HomePage() {
 
       <MovimientoSections />
 
-      <ScrollSection alt size="content" contentMaxWidth={900} sx={{ pt: { xs: 3.5, md: 4.5 } }}>
+      <ScrollSection alt size="content" contentMaxWidth={800} sx={{ pt: { xs: 3.5, md: 4.5 }, px: { xs: 3, md: 4, lg: 6 } }}>
         <SectionHeading
           overline="Explora"
           title="Sigue conociendo"

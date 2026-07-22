@@ -1,20 +1,22 @@
 import { createTheme, alpha } from '@mui/material/styles'
 
 const C = {
+  // Azules (se mantienen donde ya están: nav, botones, bloques oscuros)
   navy: '#030E30',
   primary: '#030E30',
   blue: '#123685',
-  secondary: '#704E47',
-  accent: '#C79B6E',
-  cream: '#EBDBB2',
-  light: '#EBDBB2',
-  surface: '#F5ECD8',
-  muted: '#5A5268',
-  border: '#D4C4A0',
   dark: '#030E30',
-  earth: '#5A3F39',
-  moss: '#3D5244',
   sky: '#4A6FA5',
+  // Capa cálida / cremosa (paleta anterior + tonos dados)
+  secondary: '#6B4C2A',
+  accent: '#D4A853',
+  cream: '#EBDBB2',
+  light: '#FAF6EF',
+  surface: '#F2EBE0',
+  muted: '#9C8B7A',
+  border: '#E0D5C5',
+  earth: '#8B6914',
+  moss: '#4A6741',
 }
 
 const FONT_DISPLAY = '"Libre Baskerville", Georgia, serif'

@@ -102,8 +102,8 @@ export default function MovimientoSections() {
         id="quienes-somos"
         alt
         size="content"
-        contentMaxWidth={{ xs: 720, md: 1100 }}
-        sx={{ pt: { xs: 3.5, md: 4.5 }, pb: { xs: 5, md: 6 } }}
+        contentMaxWidth={{ xs: 720, md: 820 }}
+        sx={{ pt: { xs: 3.5, md: 4.5 }, pb: { xs: 5, md: 6 }, px: { xs: 3, md: 4, lg: 6 } }}
       >
         <SectionHeading
           overline="El Movimiento"
@@ -186,7 +186,7 @@ export default function MovimientoSections() {
         </RevealStagger>
       </ScrollSection>
 
-      <ScrollSection id="historia" size="content" contentMaxWidth={{ xs: 720, md: 1100 }} sx={{ justifyContent: 'flex-start' }}>
+      <ScrollSection id="historia" size="content" contentMaxWidth={{ xs: 720, md: 820 }} sx={{ justifyContent: 'flex-start', px: { xs: 3, md: 4, lg: 6 } }}>
         <StickyStory
           overline="El Movimiento"
           title="¿Por qué lo hacemos?"
@@ -201,8 +201,8 @@ export default function MovimientoSections() {
         id="nuestro-equipo"
         alt
         size="content"
-        contentMaxWidth={{ xs: 720, md: 1100 }}
-        sx={{ pb: { xs: 3.5, md: 4.5 } }}
+        contentMaxWidth={{ xs: 720, md: 820 }}
+        sx={{ pb: { xs: 3.5, md: 4.5 }, px: { xs: 3, md: 4, lg: 6 } }}
       >
         <SectionHeading
           overline="El Movimiento"

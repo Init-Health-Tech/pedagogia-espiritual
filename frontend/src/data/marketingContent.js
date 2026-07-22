@@ -153,6 +153,7 @@ export const DESARROLLO_SESION = [
   {
     time: '9:00',
     title: 'Fraternidad en oración (F.O.)',
+    shortTitle: 'Oración (F.O.)',
     summary: 'Alabanza, agradecimiento y petición del objetivo del día.',
     detail:
       'Momento de oración espontánea de alabanza y agradecimiento a la Santísima Trinidad, con un espacio para presentar a Dios el objetivo central de la reunión.',
@@ -160,6 +161,7 @@ export const DESARROLLO_SESION = [
   {
     time: '9:30',
     title: 'Rezo del Santo Rosario',
+    shortTitle: 'Santo Rosario',
     summary: 'Intercesión de nuestra Madre María Santísima.',
     detail:
       'Rezamos el misterio correspondiente al día de la reunión. Rogamos por las intenciones del Santo Padre, del Señor Cardenal, de sus obispos y por algún acontecimiento del día.',
@@ -167,6 +169,7 @@ export const DESARROLLO_SESION = [
   {
     time: '10:00',
     title: 'Lectura y meditación del Oficio Divino',
+    shortTitle: 'Oficio Divino',
     summary: 'Oficio de Lectura con la Iglesia.',
     detail:
       'Leemos y meditamos con la Iglesia el Oficio Divino. Por la dinámica de la reunión, nos centramos en el Oficio de Lectura.',
@@ -174,6 +177,7 @@ export const DESARROLLO_SESION = [
   {
     time: '10:45',
     title: 'E.P.F. — Equipos de Pastoreo y Fraternidad',
+    shortTitle: 'E.P.F.',
     summary: 'Comunión y fraternidad al estilo de las primeras comunidades.',
     detail:
       'Recogemos la experiencia de las primeras comunidades narrada en los Hechos de los Apóstoles como signo de comunión y fraternidad. Se comparten siete preguntas clave:',
@@ -190,12 +194,14 @@ export const DESARROLLO_SESION = [
   {
     time: '11:15',
     title: 'Tema',
+    shortTitle: 'Tema',
     summary: 'Formación según el proceso de la comunidad.',
     detail: 'El tema será dado según el proceso de la comunidad en torno a los manuales.',
   },
   {
     time: '12:15',
     title: 'Hora Santa',
+    shortTitle: 'Hora Santa',
     summary: 'Adoración total al Santísimo.',
     detail:
       'Guardamos este espacio de adoración con mucho cuidado evangélico. Se pide con caridad abstenerse del uso de medios electrónicos que puedan distraernos de este encuentro con Jesús Sacramentado.',
@@ -203,6 +209,7 @@ export const DESARROLLO_SESION = [
   {
     time: '13:15',
     title: 'Santa Eucaristía',
+    shortTitle: 'Eucaristía',
     summary: 'Centro de nuestra vida espiritual.',
     detail:
       'A una voz con la Iglesia, la celebración eucarística es el centro de nuestra vida espiritual. Exhortamos a todos los miembros a vivir este encuentro con el máximo recogimiento y devoción posible.',
@@ -210,6 +217,7 @@ export const DESARROLLO_SESION = [
   {
     time: '14:00',
     title: 'Ágape fraterno',
+    shortTitle: 'Ágape',
     summary: 'Alimento compartido como signo de fraternidad.',
     detail:
       'Siguiendo el ejemplo de las primeras comunidades, compartimos semanalmente el alimento como signo de fraternidad y comunión.',
@@ -219,42 +227,52 @@ export const DESARROLLO_SESION = [
 export const ITINERARIO_FORMATIVO = [
   {
     title: 'Formación antropológica',
+    shortTitle: 'Antropología',
     desc: 'Ante los desafíos de la Iglesia en el mundo, el Papa Francisco señala que la raíz está en la antropología asumida. Estudiamos las antropologías hebrea y griega en la reflexión eclesial, con especial énfasis en la hebrea por su integridad.',
   },
   {
     title: 'Formación teológica espiritual',
+    shortTitle: 'Teología espiritual',
     desc: 'Una de las formaciones más urgentes es la teológica espiritual, por la gran ignorancia en torno a la pneumatología. Profundizamos en la acción del Espíritu Santo en el bautizado y en los dones y carismas de las cartas paulinas.',
   },
   {
     title: 'Formación pedagógica – humana – espiritual',
+    shortTitle: 'Pedagogía integral',
     desc: 'La médula del proyecto formativo: integrar, como pide el Santo Padre, la formación humana y espiritual mediante la pedagogía espiritual y la reflexión sobre su continua referencia mutua.',
   },
   {
     title: 'Formación teológica – mística',
+    shortTitle: 'Teología mística',
     desc: 'Siguiendo a Santo Tomás de Aquino, reflexionamos sobre los dos pilares del camino santo: la gracia de Dios en dones y carismas, y la respuesta teologal que damos en el diario vivir.',
   },
   {
     title: 'Formación pastoral – catequética',
+    shortTitle: 'Pastoral',
     desc: 'Como movimiento eclesial en salida, nos formamos en pastoral y catequesis, con la iluminación que la pedagogía espiritual aporta a estas áreas esenciales para la Iglesia.',
   },
   {
     title: 'Formación doctrinal',
+    shortTitle: 'Doctrina',
     desc: 'Formamos al pueblo de Dios en sana doctrina eclesial, con misericordia y claridad, cuidando el Depósito de la Fe transmitido por la Sagrada Escritura y la Santa Tradición.',
   },
   {
     title: 'Formación en las Sagradas Escrituras',
+    shortTitle: 'Sagradas Escrituras',
     desc: 'La Sagrada Escritura es la norma normans de la Iglesia. Una sólida formación bíblica orienta los contenidos temáticos del Movimiento de Pedagogía Espiritual.',
   },
   {
     title: 'Formación y praxis en la caridad',
+    shortTitle: 'Caridad',
     desc: 'Formación y praxis directa de caridad hacia las periferias físicas y existenciales: ministerio de escucha, atención psicológica y donación de víveres a los más vulnerables.',
   },
   {
     title: 'Espiritualidad franciscana',
+    shortTitle: 'Espiritualidad franciscana',
     desc: 'Acogemos el legado de San Francisco — amor a Cristo, a los pobres, a la Iglesia y a la creación — para que toda praxis formativa y caritativa abrace el sensus fidei y salga al encuentro de quien más lo necesita.',
   },
   {
     title: 'Liturgía',
+    shortTitle: 'Liturgia',
     desc: 'Formación litúrgica correcta, sólida y profunda, en línea con los documentos conciliares, para acompañar al pueblo santo y prevenir abusos litúrgicos nacidos de la ignorancia.',
   },
 ]

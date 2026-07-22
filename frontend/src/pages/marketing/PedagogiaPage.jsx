@@ -1,10 +1,13 @@
+import { useMemo } from 'react'
 import { alpha } from '@mui/material/styles'
 import { Box, Stack, Typography } from '@mui/material'
+import ItinerarioProgressNav from '../../components/landing/itinerario/ItinerarioProgressNav'
 import SectionHeading from '../../components/landing/SectionHeading'
 import ScrollSection from '../../components/landing/ScrollSection'
 import Reveal from '../../components/landing/motion/Reveal'
-import RevealStagger, { RevealStaggerItem } from '../../components/landing/motion/RevealStagger'
 import { DESARROLLO_SESION } from '../../data/marketingContent'
+import useSectionSpy, { sesionSectionId } from '../../hooks/useSectionSpy'
+import { HEADER_HEIGHT } from '../../utils/marketingNav'
 import { colors } from '../../theme/muiTheme'
 
 const PEDAGOGIA_PILARES = [
@@ -144,110 +147,131 @@ function TrinidadTriangle() {
 
 const SESSION_ACCENTS = [colors.primary, colors.blue, colors.secondary, colors.accent, colors.moss]
 
-function SesionTimelineItem({ momento, index, isLast }) {
+function SesionTimelineItem({ momento, index, isLast, sectionId }) {
   const accent = SESSION_ACCENTS[index % SESSION_ACCENTS.length]
 
   return (
-    <Reveal y={24} delay={index * 0.04}>
-      <Box sx={{ display: 'flex', gap: { xs: 2, md: 3 }, position: 'relative' }}>
-      <Stack alignItems="center" sx={{ width: { xs: 52, md: 60 }, flexShrink: 0, pt: 0.5 }}>
-        <Typography
-          variant="overline"
-          sx={{
-            fontWeight: 700,
-            fontSize: '0.7rem',
-            letterSpacing: '0.06em',
-            color: accent,
-            lineHeight: 1.2,
-            textAlign: 'center',
-          }}
-        >
-          {momento.time}
-        </Typography>
-        <Box
-          sx={{
-            width: 14,
-            height: 14,
-            borderRadius: '50%',
-            bgcolor: accent,
-            my: 1,
-            zIndex: 1,
-            boxShadow: `0 0 0 4px ${colors.light}`,
-          }}
-        />
-        {!isLast && (
-          <Box
-            sx={{
-              width: 2,
-              flex: 1,
-              minHeight: 32,
-              bgcolor: colors.border,
-            }}
-          />
-        )}
-      </Stack>
-
-      <Box sx={{ flex: 1, pb: isLast ? 0 : { xs: 3, md: 4 } }}>
-        <Box
-          className="card-hover"
-          sx={{
-            p: { xs: 2, md: 2.5 },
-            borderRadius: 2,
-            border: `1px solid ${colors.border}`,
-            bgcolor: index % 2 === 0 ? colors.surface : 'rgba(255,255,255,0.5)',
-            borderLeft: `4px solid ${accent}`,
-          }}
-        >
-          <Typography
-            variant="h3"
-            className="font-display"
-            sx={{ fontSize: { xs: '1.125rem', md: '1.25rem' }, mb: 0.75, color: colors.dark }}
-          >
-            {momento.title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.25, fontStyle: 'italic', lineHeight: 1.6 }}>
-            {momento.summary}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-            {momento.detail}
-          </Typography>
-          {momento.questions && (
-            <Stack
-              spacing={1}
-              component="ol"
+    <Box
+      id={sectionId}
+      component="article"
+      aria-labelledby={`${sectionId}-title`}
+      sx={{ scrollMarginTop: `calc(${HEADER_HEIGHT}px + 30svh)` }}
+    >
+      <Reveal y={24} delay={index * 0.04}>
+        <Box sx={{ display: 'flex', gap: { xs: 2, md: 3 }, position: 'relative' }}>
+          <Stack alignItems="center" sx={{ width: { xs: 52, md: 60 }, flexShrink: 0, pt: 0.5 }}>
+            <Typography
+              variant="overline"
               sx={{
-                m: 0,
-                mt: 2,
-                pl: 0,
-                pt: 1.5,
-                borderTop: `1px solid ${colors.border}`,
-                listStyle: 'none',
+                fontWeight: 700,
+                fontSize: '0.7rem',
+                letterSpacing: '0.06em',
+                color: accent,
+                lineHeight: 1.2,
+                textAlign: 'center',
               }}
             >
-              {momento.questions.map((pregunta, qIndex) => (
-                <Typography
-                  key={pregunta}
-                  component="li"
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ lineHeight: 1.65, listStyle: 'none' }}
+              {momento.time}
+            </Typography>
+            <Box
+              sx={{
+                width: 14,
+                height: 14,
+                borderRadius: '50%',
+                bgcolor: accent,
+                my: 1,
+                zIndex: 1,
+                boxShadow: `0 0 0 4px ${colors.light}`,
+              }}
+            />
+            {!isLast && (
+              <Box
+                sx={{
+                  width: 2,
+                  flex: 1,
+                  minHeight: 32,
+                  bgcolor: colors.border,
+                }}
+              />
+            )}
+          </Stack>
+
+          <Box sx={{ flex: 1, pb: isLast ? 0 : { xs: 3, md: 4 } }}>
+            <Box
+              className="card-hover"
+              sx={{
+                p: { xs: 2, md: 2.5 },
+                borderRadius: 2,
+                border: `1px solid ${colors.border}`,
+                bgcolor: index % 2 === 0 ? colors.surface : 'rgba(255,255,255,0.5)',
+                borderLeft: `4px solid ${accent}`,
+              }}
+            >
+              <Typography
+                id={`${sectionId}-title`}
+                variant="h3"
+                className="font-display"
+                sx={{ fontSize: { xs: '1.125rem', md: '1.25rem' }, mb: 0.75, color: colors.dark }}
+              >
+                {momento.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1.25, fontStyle: 'italic', lineHeight: 1.6 }}>
+                {momento.summary}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                {momento.detail}
+              </Typography>
+              {momento.questions && (
+                <Stack
+                  spacing={1}
+                  component="ol"
+                  sx={{
+                    m: 0,
+                    mt: 2,
+                    pl: 0,
+                    pt: 1.5,
+                    borderTop: `1px solid ${colors.border}`,
+                    listStyle: 'none',
+                  }}
                 >
-                  <Box component="span" sx={{ fontWeight: 600, color: colors.accent, mr: 0.75 }}>
-                    {qIndex + 1}.
-                  </Box>
-                  {pregunta}
-                </Typography>
-              ))}
-            </Stack>
-          )}
+                  {momento.questions.map((pregunta, qIndex) => (
+                    <Typography
+                      key={pregunta}
+                      component="li"
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ lineHeight: 1.65, listStyle: 'none' }}
+                    >
+                      <Box component="span" sx={{ fontWeight: 600, color: colors.accent, mr: 0.75 }}>
+                        {qIndex + 1}.
+                      </Box>
+                      {pregunta}
+                    </Typography>
+                  ))}
+                </Stack>
+              )}
+            </Box>
+          </Box>
         </Box>
-      </Box>
-      </Box>
-    </Reveal>
+      </Reveal>
+    </Box>
   )
 }
 
 export default function PedagogiaPage() {
+  const steps = useMemo(
+    () =>
+      DESARROLLO_SESION.map((momento, index) => ({
+        id: sesionSectionId(index),
+        num: momento.time,
+        shortTitle: momento.shortTitle ?? momento.title,
+      })),
+    [],
+  )
+
+  const sectionIds = useMemo(() => steps.map((step) => step.id), [steps])
+  const { activeId, scrollToSection } = useSectionSpy(sectionIds)
+
   return (
     <>
       <ScrollSection id="que-es-pedagogia" alt lead size="full">
@@ -296,7 +320,7 @@ export default function PedagogiaPage() {
         </Reveal>
       </ScrollSection>
 
-      <ScrollSection id="desarrollo-sesion" alt size="content">
+      <ScrollSection id="desarrollo-sesion" alt size="content" contentMaxWidth={{ xs: 720, lg: 1180 }}>
         <SectionHeading
           overline="Pedagogía Espiritual"
           title="Desarrollo de la sesión"
@@ -331,16 +355,27 @@ export default function PedagogiaPage() {
           </Box>
         </Reveal>
 
-        <Stack spacing={0}>
-          {DESARROLLO_SESION.map((momento, index) => (
-            <SesionTimelineItem
-              key={momento.time}
-              momento={momento}
-              index={index}
-              isLast={index === DESARROLLO_SESION.length - 1}
-            />
-          ))}
-        </Stack>
+        <Box sx={{ display: { lg: 'flex' }, gap: { lg: 4 }, alignItems: 'flex-start' }}>
+          <ItinerarioProgressNav
+            steps={steps}
+            activeId={activeId}
+            onSelect={scrollToSection}
+            label="Horario"
+            ariaLabel="Progreso del desarrollo de la sesión"
+          />
+
+          <Stack spacing={0} sx={{ flex: 1, minWidth: 0 }}>
+            {DESARROLLO_SESION.map((momento, index) => (
+              <SesionTimelineItem
+                key={momento.time}
+                momento={momento}
+                index={index}
+                isLast={index === DESARROLLO_SESION.length - 1}
+                sectionId={steps[index].id}
+              />
+            ))}
+          </Stack>
+        </Box>
       </ScrollSection>
     </>
   )
