@@ -1,17 +1,50 @@
 from rest_framework import serializers
 
 from accounts.serializers import UserSerializer
+from groups.models import GrupoPastoreo
 from .models import Anuncio, Mensaje
 
 
 class AnuncioSerializer(serializers.ModelSerializer):
-    autor_nombre = serializers.CharField(source='autor.get_full_name', read_only=True)
-    grupo_nombre = serializers.CharField(source='grupo.nombre', read_only=True)
+    autor_nombre = serializers.SerializerMethodField()
+    autor_rol = serializers.CharField(source='autor.role', read_only=True)
+    grupos = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=GrupoPastoreo.objects.filter(activo=True),
+        required=False,
+    )
+    grupos_nombres = serializers.SerializerMethodField()
 
     class Meta:
         model = Anuncio
-        fields = '__all__'
+        fields = (
+            'id', 'titulo', 'contenido', 'autor', 'autor_nombre', 'autor_rol',
+            'es_global', 'grupos', 'grupos_nombres', 'importante', 'created_at',
+        )
         read_only_fields = ('autor', 'created_at')
+
+    def get_autor_nombre(self, obj):
+        if not obj.autor:
+            return 'Sin autor'
+        name = f'{obj.autor.first_name} {obj.autor.last_name}'.strip()
+        return name or obj.autor.username
+
+    def get_grupos_nombres(self, obj):
+        return list(obj.grupos.values_list('nombre', flat=True))
+
+    def validate(self, attrs):
+        es_global = attrs.get(
+            'es_global',
+            getattr(self.instance, 'es_global', True) if self.instance else True,
+        )
+        grupos = attrs.get('grupos', None)
+        if self.instance and grupos is None:
+            grupos = list(self.instance.grupos.all())
+        if not es_global and not grupos:
+            raise serializers.ValidationError({
+                'grupos': 'Selecciona al menos un grupo o marca el aviso para todos los grupos.',
+            })
+        return attrs
 
 
 class MensajeSerializer(serializers.ModelSerializer):

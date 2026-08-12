@@ -10,12 +10,13 @@ class EsquemaGrupoInline(admin.TabularInline):
 
 @admin.register(GrupoPastoreo)
 class GrupoPastoreoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'coordinador', 'activo', 'created_at')
+    list_display = ('nombre', 'activo', 'created_at')
     list_filter = ('activo',)
-    filter_horizontal = ('miembros', 'contenidos')
+    filter_horizontal = ('miembros', 'coordinadores', 'contenidos')
     inlines = [EsquemaGrupoInline]
 
 
 @admin.register(EsquemaGrupo)
 class EsquemaGrupoAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'grupo', 'fecha_sesion', 'orden')
+    list_filter = ('grupo',)

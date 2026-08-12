@@ -8,7 +8,9 @@ from .serializers import EsquemaGrupoSerializer, GrupoPastoreoListSerializer, Gr
 
 
 class GrupoPastoreoViewSet(viewsets.ModelViewSet):
-    queryset = GrupoPastoreo.objects.prefetch_related('miembros', 'contenidos', 'esquemas')
+    queryset = GrupoPastoreo.objects.prefetch_related(
+        'miembros', 'contenidos', 'esquemas', 'coordinadores',
+    )
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
@@ -25,7 +27,7 @@ class GrupoPastoreoViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_moderator:
             return self.queryset
-        return self.queryset.filter(miembros=user, activo=True)
+        return self.queryset.filter(miembros=user, activo=True).distinct()
 
     @action(detail=False, methods=['get'])
     def mis_grupos(self, request):

@@ -39,7 +39,14 @@ export default function Grupos() {
                   </Box>
                   <Typography variant="h3" sx={{ fontWeight: 400, mb: 1 }}>{g.nombre}</Typography>
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>{g.descripcion}</Typography>
-                  <Typography variant="body1" sx={{ mb: 0.5 }}><strong>Coordinador:</strong> {g.coordinador_nombre || 'Por asignar'}</Typography>
+                  <Typography variant="body1" sx={{ mb: 0.5 }}>
+                    <strong>
+                      {(g.coordinadores_nombres || []).length === 1 ? 'Coordinador' : 'Coordinadores'}:
+                    </strong>{' '}
+                    {(g.coordinadores_nombres || []).length
+                      ? g.coordinadores_nombres.join(', ')
+                      : 'Por asignar'}
+                  </Typography>
                   <Typography variant="body1" sx={{ mb: 2 }}><strong>Reunión:</strong> {g.horario_reunion || 'Horario por confirmar'}</Typography>
                   <StatusBadge status="active" label={`${g.total_miembros} miembros`} />
                 </CardContent>

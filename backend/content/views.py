@@ -1,10 +1,10 @@
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts.permissions import IsModeratorOrAdmin
 from payments.models import Suscripcion
-from .models import CategoriaContenido, Contenido
+from .models import CategoriaContenido, Contenido, ContenidoVista
 from .serializers import CategoriaContenidoSerializer, ContenidoSerializer
 
 
@@ -42,15 +42,42 @@ class ContenidoViewSet(viewsets.ModelViewSet):
             qs = self.queryset
         return qs
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        user = self.request.user
+        if user.is_authenticated:
+            qs = self.get_queryset()
+            context['viewed_ids'] = set(
+                ContenidoVista.objects.filter(
+                    usuario=user,
+                    contenido_id__in=qs.values_list('id', flat=True),
+                ).values_list('contenido_id', flat=True)
+            )
+        return context
+
     def perform_create(self, serializer):
         serializer.save(creado_por=self.request.user)
 
     @action(detail=False, methods=['get'])
     def videos(self, request):
         qs = self.get_queryset().filter(tipo=Contenido.Tipo.VIDEO)
-        return Response(ContenidoSerializer(qs, many=True).data)
+        return Response(self.get_serializer(qs, many=True).data)
 
     @action(detail=False, methods=['get'])
     def presentaciones(self, request):
         qs = self.get_queryset().filter(tipo=Contenido.Tipo.PRESENTACION)
-        return Response(ContenidoSerializer(qs, many=True).data)
+        return Response(self.get_serializer(qs, many=True).data)
+
+    @action(detail=True, methods=['post'])
+    def marcar_visto(self, request, pk=None):
+        contenido = self.get_object()
+        vista, created = ContenidoVista.objects.get_or_create(
+            usuario=request.user,
+            contenido=contenido,
+        )
+        if not created:
+            vista.save()
+        return Response(
+            {'visto': True, 'visto_en': vista.visto_en},
+            status=status.HTTP_200_OK,
+        )

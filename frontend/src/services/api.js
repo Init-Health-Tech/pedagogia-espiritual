@@ -70,17 +70,23 @@ export const contentAPI = {
   create: (data) => api.post('/content/', data),
   update: (id, data) => api.patch(`/content/${id}/`, data),
   delete: (id) => api.delete(`/content/${id}/`),
+  marcarVisto: (id) => api.post(`/content/${id}/marcar_visto/`),
 }
 
 export const groupsAPI = {
   misGrupos: () => api.get('/groups/mis_grupos/'),
   list: () => api.get('/groups/'),
+  get: (id) => api.get(`/groups/${id}/`),
   esquemas: (grupoId) => api.get('/groups/esquemas/', { params: { grupo: grupoId } }),
   create: (data) => api.post('/groups/', data),
+  update: (id, data) => api.patch(`/groups/${id}/`, data),
 }
 
 export const paymentsAPI = {
   planes: () => api.get('/payments/planes/'),
+  createPlan: (data) => api.post('/payments/planes/', data),
+  updatePlan: (id, data) => api.patch(`/payments/planes/${id}/`, data),
+  deletePlan: (id) => api.delete(`/payments/planes/${id}/`),
   suscripciones: () => api.get('/payments/suscripciones/'),
   miSuscripcion: () => api.get('/payments/suscripciones/mi_suscripcion/'),
   pagos: () => api.get('/payments/pagos/'),
@@ -89,6 +95,8 @@ export const paymentsAPI = {
 
 export const communicationsAPI = {
   anuncios: () => api.get('/communications/anuncios/'),
+  createAnuncio: (data) => api.post('/communications/anuncios/', data),
+  deleteAnuncio: (id) => api.delete(`/communications/anuncios/${id}/`),
   mensajesRecibidos: () => api.get('/communications/mensajes/recibidos/'),
   mensajesEnviados: () => api.get('/communications/mensajes/enviados/'),
   enviarMensaje: (data) => api.post('/communications/mensajes/', data),
@@ -98,6 +106,8 @@ export const communicationsAPI = {
 
 export const adminAPI = {
   users: () => api.get('/accounts/users/'),
+  getUser: (id) => api.get(`/accounts/users/${id}/`),
+  userProgreso: (id) => api.get(`/accounts/users/${id}/progreso/`),
   createUser: (data) => api.post('/accounts/users/', data),
   updateUser: (id, data) => api.patch(`/accounts/users/${id}/`, data),
   toggleActive: (id) => api.post(`/accounts/users/${id}/toggle_active/`),

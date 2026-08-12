@@ -1,18 +1,28 @@
-from datetime import date
+from datetime import date, datetime, time
+from calendar import monthrange
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from communications.models import Anuncio
 from content.models import CategoriaContenido, Contenido
 from groups.models import GrupoPastoreo
 from pedagogia.models import Modulo, PreguntaChecklist
 from pedagogia.manual_demo import MANUAL_BUSQUEDA, PREGUNTAS_DIARIO
-from payments.models import PlanSuscripcion
+from payments.models import Pago, PlanSuscripcion, Suscripcion
 
 User = get_user_model()
 
 PREGUNTAS_DEFAULT = []  # legacy; usamos PREGUNTAS_DIARIO
+
+
+def add_months(d, months):
+    month = d.month - 1 + months
+    year = d.year + month // 12
+    month = month % 12 + 1
+    day = min(d.day, monthrange(year, month)[1])
+    return date(year, month, day)
 
 
 class Command(BaseCommand):
@@ -123,8 +133,11 @@ class Command(BaseCommand):
         contenidos_demo = [
             ('Introducción a la Pedagogía Espiritual', Contenido.Tipo.VIDEO, True),
             ('La Santísima Trinidad en nuestra vida', Contenido.Tipo.PRESENTACION, True),
-            ('Esquema: Camino de conversión', Contenido.Tipo.ESQUEMA, False),
-            ('Documento: Regla de vida franciscana', Contenido.Tipo.DOCUMENTO, True),
+            ('Camino de conversión', Contenido.Tipo.ESQUEMA, False),
+            ('Regla de vida franciscana', Contenido.Tipo.DOCUMENTO, True),
+            ('Oración franciscana guiada', Contenido.Tipo.VIDEO, True),
+            ('Etapas del camino', Contenido.Tipo.PRESENTACION, True),
+            ('Guía de la sesión semanal', Contenido.Tipo.DOCUMENTO, True),
         ]
         for titulo, tipo, publico in contenidos_demo:
             Contenido.objects.get_or_create(
@@ -136,7 +149,11 @@ class Command(BaseCommand):
                     'es_publico': publico,
                     'requiere_suscripcion': not publico,
                     'creado_por': admin,
-                    'url_externa': 'https://www.youtube.com/embed/dQw4w9WgXcQ' if tipo == Contenido.Tipo.VIDEO else '',
+                    'url_externa': (
+                        'https://www.youtube.com/embed/dQw4w9WgXcQ'
+                        if tipo == Contenido.Tipo.VIDEO
+                        else 'https://www.vatican.va/'
+                    ),
                 },
             )
 
@@ -144,15 +161,13 @@ class Command(BaseCommand):
             nombre='Grupo San Francisco',
             defaults={
                 'descripcion': 'Grupo de pastoreo para formación inicial',
-                'coordinador': coordinator,
                 'horario_reunion': 'Sábados 10:00 AM',
             },
         )
-        grupo.coordinador = coordinator
-        grupo.save(update_fields=['coordinador'])
+        grupo.coordinadores.set([coordinator])
         grupo.miembros.add(member)
 
-        PlanSuscripcion.objects.get_or_create(
+        plan_anual, _ = PlanSuscripcion.objects.get_or_create(
             nombre='Membresía Anual',
             defaults={
                 'descripcion': 'Acceso completo a contenidos y plataforma',
@@ -160,6 +175,82 @@ class Command(BaseCommand):
                 'duracion_meses': 12,
             },
         )
+        plan_semestral, _ = PlanSuscripcion.objects.get_or_create(
+            nombre='Membresía Semestral',
+            defaults={
+                'descripcion': 'Acceso por seis meses',
+                'precio': 280.00,
+                'duracion_meses': 6,
+            },
+        )
+
+        miembro2, created = User.objects.get_or_create(
+            username='miembro2',
+            defaults={
+                'email': 'ana@mfst.org',
+                'first_name': 'Ana',
+                'last_name': 'García',
+                'role': User.Role.MEMBER,
+                'date_joined_movement': date(2024, 6, 1),
+            },
+        )
+        if created:
+            self.stdout.write(self.style.SUCCESS('Usuario miembro2 creado (miembro2 / miembro123)'))
+        miembro2.set_password('miembro123')
+        miembro2.role = User.Role.MEMBER
+        miembro2.save()
+
+        miembro3, created = User.objects.get_or_create(
+            username='miembro3',
+            defaults={
+                'email': 'carlos@mfst.org',
+                'first_name': 'Carlos',
+                'last_name': 'Ruiz',
+                'role': User.Role.MEMBER,
+                'date_joined_movement': date(2025, 2, 10),
+            },
+        )
+        if created:
+            self.stdout.write(self.style.SUCCESS('Usuario miembro3 creado (miembro3 / miembro123)'))
+        miembro3.set_password('miembro123')
+        miembro3.role = User.Role.MEMBER
+        miembro3.save()
+
+        demos_pago = [
+            (member, plan_anual, date(2025, 8, 15)),
+            (miembro2, plan_semestral, date(2026, 2, 1)),
+            (miembro3, plan_anual, date(2026, 1, 20)),
+        ]
+        for usuario, plan, fecha_pago in demos_pago:
+            fecha_fin = add_months(fecha_pago, plan.duracion_meses)
+            sub, _ = Suscripcion.objects.get_or_create(
+                usuario=usuario,
+                plan=plan,
+                defaults={
+                    'estado': Suscripcion.Estado.ACTIVA,
+                    'fecha_inicio': fecha_pago,
+                    'fecha_fin': fecha_fin,
+                },
+            )
+            if sub.estado != Suscripcion.Estado.ACTIVA:
+                sub.estado = Suscripcion.Estado.ACTIVA
+                sub.fecha_inicio = fecha_pago
+                sub.fecha_fin = fecha_fin
+                sub.save()
+            pago_dt = timezone.make_aware(datetime.combine(fecha_pago, time(10, 0)))
+            Pago.objects.get_or_create(
+                referencia=f'DEMO-{usuario.username.upper()}',
+                defaults={
+                    'usuario': usuario,
+                    'suscripcion': sub,
+                    'monto': plan.precio,
+                    'metodo': Pago.Metodo.TRANSFERENCIA,
+                    'estado': Pago.Estado.COMPLETADO,
+                    'fecha_pago': pago_dt,
+                    'notas': 'Pago de demostración',
+                    'registrado_por': admin,
+                },
+            )
 
         Anuncio.objects.get_or_create(
             titulo='Bienvenidos al Movimiento Franciscano',

@@ -127,7 +127,7 @@ export default function TopBar({ sectionTitle, notificationCount = 0 }) {
           </MenuItem>
         )}
         {isAdmin && !isAdminArea && (
-          <MenuItem onClick={() => { setAnchor(null); navigate('/admin') }}>
+          <MenuItem onClick={() => { setAnchor(null); navigate('/admin/usuarios') }}>
             <ListItemIcon><Shield size={18} /></ListItemIcon>
             <ListItemText primary="Administración" primaryTypographyProps={{ fontSize: '1rem' }} />
           </MenuItem>

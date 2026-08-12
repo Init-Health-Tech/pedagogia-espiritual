@@ -7,12 +7,10 @@ from content.models import Contenido
 class GrupoPastoreo(models.Model):
     nombre = models.CharField(max_length=150)
     descripcion = models.TextField(blank=True)
-    coordinador = models.ForeignKey(
+    coordinadores = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
         related_name='grupos_coordinados',
+        blank=True,
     )
     miembros = models.ManyToManyField(
         settings.AUTH_USER_MODEL,

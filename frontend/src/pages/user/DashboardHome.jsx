@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom'
 import { Box, Grid, Paper, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
-import { ClipboardList, PlayCircle, BookOpen, Users, Heart } from 'lucide-react'
+import { ClipboardList, BookOpen, Users, Heart } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import HubActionCard from '../../components/common/HubActionCard'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
@@ -23,15 +23,9 @@ const quickActions = [
     to: '/app/ficha',
   },
   {
-    icon: PlayCircle,
-    title: 'Videos formativos',
-    description: 'Clases y reflexiones en video para tu formación.',
-    to: '/app/videos',
-  },
-  {
     icon: BookOpen,
-    title: 'Biblioteca',
-    description: 'Manuales y materiales de cada módulo.',
+    title: 'Contenidos',
+    description: 'Videos, manuales y materiales de cada módulo.',
     to: '/app/contenidos',
   },
   {

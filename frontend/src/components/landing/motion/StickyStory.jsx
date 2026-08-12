@@ -20,7 +20,7 @@ export default function StickyStory({
     <Box
       id={id}
       sx={{
-        minHeight: { xs: 'auto', md: `max(100svh, ${paragraphs.length * 42}vh)` },
+        minHeight: { xs: 'auto', md: 'auto' },
       }}
     >
       <Grid container spacing={{ xs: 4, md: 6 }}>
@@ -60,26 +60,50 @@ export default function StickyStory({
         </Grid>
 
         <Grid size={{ xs: 12, md: 7 }}>
-          {paragraphs.map((parrafo, index) => (
-            <Reveal key={parrafo} delay={index * 0.04} y={24}>
-              <Box
-                sx={{
-                  minHeight: { xs: 'auto', md: index < paragraphs.length - 1 ? '38vh' : '24vh' },
-                  display: 'flex',
-                  alignItems: 'center',
-                  py: { xs: 1.5, md: 3 },
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  sx={{ lineHeight: 1.85, fontSize: { xs: '1rem', md: '1.0625rem' }, textAlign: { md: 'justify' } }}
+          <Box
+            component="ul"
+            sx={{
+              m: 0,
+              p: 0,
+              listStyle: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: { xs: 2, md: 2.5 },
+            }}
+          >
+            {paragraphs.map((parrafo, index) => (
+              <Reveal key={parrafo} delay={index * 0.04} y={24}>
+                <Box
+                  component="li"
+                  sx={{
+                    display: 'flex',
+                    gap: 1.5,
+                    alignItems: 'flex-start',
+                    py: { xs: 0.5, md: 1 },
+                  }}
                 >
-                  {parrafo}
-                </Typography>
-              </Box>
-            </Reveal>
-          ))}
+                  <Box
+                    aria-hidden
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: colors.accent,
+                      mt: '0.7em',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ lineHeight: 1.85, fontSize: { xs: '1rem', md: '1.0625rem' }, textAlign: { md: 'justify' } }}
+                  >
+                    {parrafo}
+                  </Typography>
+                </Box>
+              </Reveal>
+            ))}
+          </Box>
         </Grid>
       </Grid>
     </Box>

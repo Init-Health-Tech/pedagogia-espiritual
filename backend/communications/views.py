@@ -9,7 +9,7 @@ from .serializers import AnuncioSerializer, MensajeSerializer
 
 
 class AnuncioViewSet(viewsets.ModelViewSet):
-    queryset = Anuncio.objects.select_related('autor', 'grupo')
+    queryset = Anuncio.objects.select_related('autor').prefetch_related('grupos')
     serializer_class = AnuncioSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -20,13 +20,17 @@ class AnuncioViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        if user.is_moderator:
+            return self.queryset
         grupos_ids = user.grupos_pastoreo.values_list('id', flat=True)
         return self.queryset.filter(
-            Q(es_global=True) | Q(grupo__in=grupos_ids) | Q(grupo__isnull=True, es_global=True)
+            Q(es_global=True) | Q(grupos__in=grupos_ids)
         ).distinct()
 
     def perform_create(self, serializer):
-        serializer.save(autor=self.request.user)
+        anuncio = serializer.save(autor=self.request.user)
+        if anuncio.es_global:
+            anuncio.grupos.clear()
 
 
 class MensajeViewSet(viewsets.ModelViewSet):

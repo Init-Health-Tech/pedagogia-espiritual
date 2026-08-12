@@ -2,6 +2,7 @@ import { Box, Grid, Typography } from '@mui/material'
 import SectionHeading from './SectionHeading'
 import ScrollSection from './ScrollSection'
 import StickyStory from './motion/StickyStory'
+import HistoriaFranciscanaSection from './HistoriaFranciscanaSection'
 import Reveal from './motion/Reveal'
 import RevealStagger, { RevealStaggerItem } from './motion/RevealStagger'
 import {
@@ -196,6 +197,8 @@ export default function MovimientoSections() {
           paragraphs={JUSTIFICACION_PROYECTO}
         />
       </ScrollSection>
+
+      <HistoriaFranciscanaSection />
 
       <ScrollSection
         id="nuestro-equipo"

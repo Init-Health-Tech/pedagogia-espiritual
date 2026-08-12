@@ -13,13 +13,15 @@ class Anuncio(models.Model):
         null=True,
         related_name='anuncios',
     )
-    es_global = models.BooleanField(default=True)
-    grupo = models.ForeignKey(
+    es_global = models.BooleanField(
+        default=True,
+        help_text='Si es verdadero, el aviso llega a todos los grupos.',
+    )
+    grupos = models.ManyToManyField(
         GrupoPastoreo,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
         related_name='anuncios',
+        blank=True,
+        help_text='Grupos destinatarios cuando no es global.',
     )
     importante = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -12,9 +12,9 @@ export const NAV_ITEMS = [
     label: 'Formación',
     route: '/formacion',
     children: [
+      { label: '¿Por qué con nosotros?', href: '/formacion#porque-con-nosotros' },
       { label: 'Etapas del camino', href: '/formacion#modulos' },
-      { label: 'Grupos de pastoreo', href: '/formacion#grupos-pastoreo' },
-      { label: 'Diario semanal', href: '/formacion#ficha-pedagogica' },
+      { label: 'Avisos y calendario', href: '/formacion#avisos' },
     ],
   },
   {
@@ -32,6 +32,7 @@ export const FOOTER_COLUMNS = [
     links: [
       { label: 'Quiénes somos', href: '/#quienes-somos' },
       { label: '¿Por qué lo hacemos?', href: '/#historia' },
+      { label: 'Historia franciscana', href: '/#historia-franciscana' },
       { label: 'Nuestro equipo', href: '/#nuestro-equipo' },
     ],
   },
@@ -46,9 +47,9 @@ export const FOOTER_COLUMNS = [
   {
     title: 'Formación',
     links: [
+      { label: '¿Por qué con nosotros?', href: '/formacion#porque-con-nosotros' },
       { label: 'Etapas del camino', href: '/formacion#modulos' },
-      { label: 'Grupos de pastoreo', href: '/formacion#grupos-pastoreo' },
-      { label: 'Diario semanal', href: '/formacion#ficha-pedagogica' },
+      { label: 'Avisos y calendario', href: '/formacion#avisos' },
     ],
   },
   {
@@ -73,12 +74,12 @@ export const NUESTRO_EQUIPO = {
 }
 
 export const JUSTIFICACION_PROYECTO = [
-  'A lo largo de la historia, la humanidad ha experimentado grandes desafíos que han impactado las distintas esferas de la vida — religiosa, política, social y cultural. Sus causas suelen desbordar la comprensión que el ser humano tiene de sí mismo.',
-  'Hoy el Papa Francisco señala dos realidades categóricas: vivimos una «cultura del descarte», marcada por la instrumentalización entre personas para luego desecharse; y una «cultura de cristal», donde muchos jóvenes experimentan una gran fragilidad antropológica que deriva en vacíos existenciales.',
-  'Atendiendo al llamado del Evangelio — «vayan por todo el mundo» — y en sintonía con la Iglesia en salida, surge este movimiento de formación integral para atender no solo las periferias físicas, sino existenciales del pueblo santo de Dios.',
-  'Con humildad de corazón, hemos entendido que en los límites existenciales, en los momentos más vulnerables del pueblo de Dios, es donde mejor se acoge al Evangelio. Recordamos las palabras del apóstol Pablo: «Cuando soy débil, entonces soy fuerte».',
-  'De no atender el área humana de manera pedagógica–espiritual, resulta casi imposible llevar a cabo una praxis evangelizadora acertada y efectiva.',
-  'Dos realidades subyacen como plataforma de este proyecto: por un lado, un pueblo de Dios sufriente, con profundas confusiones antropológicas, que demanda atención a sus urgencias existenciales — vacíos, depresiones, ansiedades, hastíos, falta de sentido; por otro, esas realidades dolorosas se convierten en una gran oportunidad de evangelización.',
+  'La humanidad enfrenta grandes desafíos históricos que afectan lo religioso, político, social y cultural, cuyas causas superan la comprensión que el ser humano tiene de sí mismo.',
+  'El Papa Francisco identifica dos realidades actuales: la «cultura del descarte» (instrumentalización y desecho de personas) y la «cultura de cristal» (fragilidad antropológica en jóvenes que genera vacíos existenciales).',
+  'Siguiendo el llamado evangélico y el espíritu de la Iglesia en salida, surge un movimiento de formación integral orientado a las periferias existenciales, no solo físicas.',
+  'Se reconoce que es en los límites y momentos de vulnerabilidad donde mejor se acoge el Evangelio, en línea con la frase de San Pablo: «Cuando soy débil, entonces soy fuerte».',
+  'Sin atender el área humana desde lo pedagógico-espiritual, no es posible una evangelización efectiva.',
+  'El proyecto se sostiene en dos realidades: un pueblo de Dios que sufre confusiones antropológicas (vacíos, depresión, ansiedad, falta de sentido) y, al mismo tiempo, esas realidades dolorosas como una oportunidad de evangelización.',
 ]
 
 export const MISION =
@@ -146,6 +147,90 @@ export const MODULOS_PREVIEW = [
     title: 'Misión',
     desc: 'Servicio y testimonio. El camino continúa en comunidad.',
     imagen: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
+  },
+]
+
+/** Avisos y eventos públicos de Formación (fechas YYYY-MM-DD). */
+export const AVISOS_EVENTOS = [
+  {
+    date: '2026-08-08',
+    time: '9:00 – 14:00',
+    title: 'Sesión semanal de Pedagogía Espiritual',
+    description: 'Jornada completa de oración, formación y fraternidad. Te esperamos con el corazón abierto.',
+    place: 'Casa de formación',
+    type: 'formacion',
+  },
+  {
+    date: '2026-08-15',
+    time: '9:00 – 14:00',
+    title: 'Sesión semanal · Solemnidad de la Asunción',
+    description: 'Celebramos a María Santísima en el ritmo habitual de la sesión semanal.',
+    place: 'Casa de formación',
+    type: 'oracion',
+  },
+  {
+    date: '2026-08-22',
+    time: '9:00 – 14:00',
+    title: 'Sesión semanal de Pedagogía Espiritual',
+    description: 'Oración, E.P.F., tema formativo, Hora Santa y Eucaristía.',
+    place: 'Casa de formación',
+    type: 'formacion',
+  },
+  {
+    date: '2026-08-29',
+    time: '10:00 – 13:00',
+    title: 'Obra de caridad · Despensa comunitaria',
+    description: 'Servicio a familias vulnerables: entrega de víveres y escucha fraterna.',
+    place: 'Centro de caridad',
+    type: 'caridad',
+  },
+  {
+    date: '2026-09-05',
+    time: '9:00 – 14:00',
+    title: 'Sesión semanal de Pedagogía Espiritual',
+    description: 'Retomamos el camino formativo del mes con la comunidad.',
+    place: 'Casa de formación',
+    type: 'formacion',
+  },
+  {
+    date: '2026-09-12',
+    time: '17:00 – 20:00',
+    title: 'Retiro de escucha y silencio',
+    description: 'Espacio contemplativo para renovar el corazón y discernir el siguiente paso en el camino.',
+    place: 'Casa de retiro',
+    type: 'oracion',
+  },
+  {
+    date: '2026-09-19',
+    time: '9:00 – 14:00',
+    title: 'Sesión semanal de Pedagogía Espiritual',
+    description: 'Formación integral: oración, estudio y comunión fraterna.',
+    place: 'Casa de formación',
+    type: 'formacion',
+  },
+  {
+    date: '2026-09-26',
+    time: '14:00 – 17:00',
+    title: 'Ágape de bienvenida a nuevos hermanos',
+    description: 'Encuentro fraterno para quienes inician el camino de formación.',
+    place: 'Casa de formación',
+    type: 'comunidad',
+  },
+  {
+    date: '2026-10-04',
+    time: '10:00 – 13:00',
+    title: 'Fiesta de San Francisco de Asís',
+    description: 'Celebración del Poverello: Eucaristía, acción de gracias y renovación del compromiso franciscano.',
+    place: 'Capilla de la comunidad',
+    type: 'celebracion',
+  },
+  {
+    date: '2026-10-10',
+    time: '9:00 – 14:00',
+    title: 'Sesión semanal de Pedagogía Espiritual',
+    description: 'Continuamos el itinerario formativo en el espíritu de Asís.',
+    place: 'Casa de formación',
+    type: 'formacion',
   },
 ]
 
@@ -276,6 +361,75 @@ export const ITINERARIO_FORMATIVO = [
     desc: 'Formación litúrgica correcta, sólida y profunda, en línea con los documentos conciliares, para acompañar al pueblo santo y prevenir abusos litúrgicos nacidos de la ignorancia.',
   },
 ]
+
+export const HISTORIA_FRANCISCANA = {
+  chapters: [
+    {
+      title: 'Orígenes con San Francisco de Asís (siglo XIII)',
+      paragraphs: [
+        'Francisco de Bernardone (1182–1226) nace en Asís, Italia, hijo de un próspero comerciante de telas.',
+        'Tras una conversión marcada por experiencias como el abrazo al leproso y la voz del crucifijo de San Damián («Francisco, ve y repara mi casa»), renuncia a su herencia y abraza la pobreza radical.',
+        'En 1209 obtiene la aprobación oral del Papa Inocencio III para su forma de vida, dando origen a la Orden de Hermanos Menores (Primera Orden).',
+      ],
+    },
+    {
+      title: 'Nacimiento de las tres Órdenes',
+      paragraphs: [
+        'Primera Orden: los frailes (Hermanos Menores), fundada por el propio Francisco.',
+        'Segunda Orden: las Clarisas, fundada junto a Santa Clara de Asís en 1212, para mujeres consagradas a la vida contemplativa.',
+        'Tercera Orden: pensada para laicos —hombres y mujeres casados o solteros que no podían dejar sus obligaciones familiares o civiles— que deseaban vivir el espíritu franciscano en medio del mundo. Se le atribuye una «Regla» hacia 1221, conocida como el Memoriale propositi.',
+      ],
+    },
+    {
+      title: 'De la Tercera Orden Seglar a la Tercera Orden Regular (TOR)',
+      paragraphs: [
+        'Con el tiempo, algunos grupos de terciarios comenzaron a vivir en comunidad, con votos públicos y vida común, dando origen a la Tercera Orden Regular (frente a la Tercera Orden Seglar, que permanece laical y sin votos religiosos formales).',
+        'La TOR fue aprobada formalmente por el Papa Nicolás IV en 1289 mediante la bula Supra Montem, que le dio una regla propia.',
+        'A lo largo de los siglos, distintas congregaciones y ramas (masculinas y femeninas) adoptaron esta regla, dando lugar a múltiples institutos religiosos que hoy se reconocen bajo la familia de la TOR.',
+      ],
+    },
+    {
+      title: 'Consolidación y expansión (siglos XIV–XX)',
+      paragraphs: [
+        'La TOR se expandió por Europa y luego por América tras la evangelización.',
+        'En 1927, el Papa Pío XI aprobó una regla renovada específica para los religiosos de la TOR (bula Rerum Conditio), separándola definitivamente en su forma jurídica de la Orden Franciscana Seglar.',
+        'En el siglo XX, tras el Concilio Vaticano II, muchas congregaciones de la TOR renovaron sus constituciones y regla de vida conforme al espíritu conciliar, manteniendo el carisma original de fraternidad, minoridad y penitencia.',
+      ],
+    },
+  ],
+  identidad: [
+    {
+      title: 'Carisma',
+      desc: 'Vida fraterna, penitencia (conversión continua), minoridad (humildad) y servicio a los pobres.',
+    },
+    {
+      title: 'Espiritualidad',
+      desc: 'Seguimiento radical del Evangelio «sine glossa» (sin glosas), tal como lo entendió Francisco.',
+    },
+    {
+      title: 'Figuras clave',
+      desc: 'San Francisco, Santa Clara, y santos y beatos propios de la tradición TOR — por ejemplo, San Elzeario y Santa Delfina como terciarios laicos históricos, o figuras fundadoras de congregaciones TOR según cada rama.',
+    },
+  ],
+  timeline: [
+    { year: '1182', text: 'Nace Francisco de Bernardone en Asís, Italia.' },
+    { year: '1206', text: 'Conversión de Francisco; renuncia públicamente a la herencia de su padre y comienza su vida de penitencia.' },
+    { year: '1208–1209', text: 'Se le unen los primeros compañeros; nace la fraternidad de los Hermanos Menores.' },
+    { year: '1209', text: 'El Papa Inocencio III aprueba oralmente la forma de vida de Francisco (origen de la Primera Orden).' },
+    { year: '1212', text: 'Santa Clara de Asís se une al movimiento franciscano; nace la Segunda Orden (Clarisas).' },
+    { year: '1221', text: 'Se redacta el Memoriale propositi, considerado la primera regla para los laicos penitentes que darán origen a la Tercera Orden.' },
+    { year: '1223', text: 'El Papa Honorio III aprueba definitivamente (por bula) la Regla de los Hermanos Menores.' },
+    { year: '1226', text: 'Muere San Francisco de Asís en la Porciúncula (3 de octubre).' },
+    { year: '1228', text: 'Francisco es canonizado por el Papa Gregorio IX.' },
+    { year: 'Siglo XIII', text: 'Grupos de terciarios comienzan a adoptar vida común y votos públicos, distinguiéndose de los terciarios seglares; germen de la Tercera Orden Regular (TOR).' },
+    { year: '1289', text: 'El Papa Nicolás IV aprueba formalmente la regla de la Tercera Orden mediante la bula Supra Montem.' },
+    { year: 'XIV–XVI', text: 'Expansión de la TOR por Europa; surgen distintas congregaciones y fraternidades que adoptan esta regla.' },
+    { year: 'S. XVI+', text: 'Expansión franciscana (incluida la TOR) hacia América tras la evangelización del Nuevo Mundo.' },
+    { year: '1927', text: 'El Papa Pío XI aprueba una regla renovada específica para los religiosos de la TOR mediante la bula Rerum Conditio, consolidando su identidad jurídica propia frente a la Orden Franciscana Seglar.' },
+    { year: '1962–1965', text: 'Concilio Vaticano II; impulsa la renovación de constituciones y vida religiosa en las congregaciones de la TOR conforme al espíritu conciliar.' },
+    { year: 'XX–XXI', text: 'Consolidación de las distintas ramas y congregaciones de la Tercera Orden Regular a nivel mundial, manteniendo el carisma de fraternidad, minoridad y penitencia.' },
+  ],
+}
 
 export const LANDING_IMAGES = {
   hero: 'https://images.unsplash.com/photo-1551418557-567e915fe7aa?w=1200&q=80',

@@ -7,6 +7,7 @@ from .models import Anuncio, Mensaje
 class AnuncioAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'autor', 'es_global', 'importante', 'created_at')
     list_filter = ('es_global', 'importante')
+    filter_horizontal = ('grupos',)
 
 
 @admin.register(Mensaje)

@@ -1,5 +1,4 @@
 import {
-  LayoutDashboard,
   Users,
   BookOpen,
   ListChecks,
@@ -12,7 +11,6 @@ import PageTransitionOutlet from '../components/layout/PageTransitionOutlet'
 import HubShell from '../components/layout/HubShell'
 
 export const adminNavItems = [
-  { to: '/admin', icon: LayoutDashboard, label: 'Panel', shortLabel: 'Panel', end: true },
   { to: '/admin/usuarios', icon: Users, label: 'Usuarios y accesos', shortLabel: 'Usuarios' },
   { to: '/admin/modulos', icon: BookOpen, label: 'Módulos', shortLabel: 'Módulos' },
   { to: '/admin/preguntas', icon: ListChecks, label: 'Checklist', shortLabel: 'Checklist' },

@@ -9,6 +9,30 @@ from .serializers import RegisterSerializer, UserAdminSerializer, UserSerializer
 
 User = get_user_model()
 
+TIPOS_CONTENIDO = ('documento', 'presentacion', 'video')
+
+
+def _stats_por_tipo(contenidos):
+    por_tipo = {}
+    for tipo in TIPOS_CONTENIDO:
+        items = [c for c in contenidos if c['tipo'] == tipo]
+        total = len(items)
+        vistos = sum(1 for c in items if c.get('visto'))
+        por_tipo[tipo] = {
+            'total': total,
+            'vistos': vistos,
+            'percent': 0 if total == 0 else round((vistos / total) * 100),
+        }
+    relevant = [c for c in contenidos if c['tipo'] in TIPOS_CONTENIDO]
+    total = len(relevant)
+    vistos = sum(1 for c in relevant if c.get('visto'))
+    return {
+        'total': total,
+        'vistos': vistos,
+        'percent': 0 if total == 0 else round((vistos / total) * 100),
+        'por_tipo': por_tipo,
+    }
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -42,3 +66,53 @@ class UserViewSet(viewsets.ModelViewSet):
         user.is_active_member = not user.is_active_member
         user.save(update_fields=['is_active_member'])
         return Response(UserAdminSerializer(user).data)
+
+    @action(detail=True, methods=['get'])
+    def progreso(self, request, pk=None):
+        """Progreso pedagógico y de contenidos de un usuario (vista admin)."""
+        from content.models import Contenido, ContenidoVista
+        from content.serializers import ContenidoSerializer
+        from pedagogia.models import FichaPedagogica
+        from pedagogia.serializers import FichaPedagogicaSerializer
+
+        usuario = self.get_object()
+
+        ficha = (
+            FichaPedagogica.objects
+            .filter(usuario=usuario)
+            .select_related('usuario', 'modulo_actual')
+            .prefetch_related('avances', 'respuestas_checklist__pregunta')
+            .first()
+        )
+
+        contenidos_qs = Contenido.objects.filter(tipo__in=TIPOS_CONTENIDO).select_related(
+            'categoria', 'creado_por'
+        )
+        viewed_ids = set(
+            ContenidoVista.objects.filter(
+                usuario=usuario,
+                contenido_id__in=contenidos_qs.values_list('id', flat=True),
+            ).values_list('contenido_id', flat=True)
+        )
+        vistas_fechas = dict(
+            ContenidoVista.objects.filter(
+                usuario=usuario,
+                contenido_id__in=viewed_ids,
+            ).values_list('contenido_id', 'visto_en')
+        )
+
+        contenidos_data = ContenidoSerializer(
+            contenidos_qs,
+            many=True,
+            context={'request': request, 'viewed_ids': viewed_ids},
+        ).data
+        for item in contenidos_data:
+            visto_en = vistas_fechas.get(item['id'])
+            item['visto_en'] = visto_en.isoformat() if visto_en else None
+
+        return Response({
+            'usuario': UserAdminSerializer(usuario).data,
+            'ficha': FichaPedagogicaSerializer(ficha).data if ficha else None,
+            'contenidos': contenidos_data,
+            'resumen_contenidos': _stats_por_tipo(contenidos_data),
+        })

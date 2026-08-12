@@ -17,13 +17,12 @@ import Dashboard from './pages/user/Dashboard'
 import FichaPedagogica from './pages/user/FichaPedagogica'
 import FichaEspiritual from './pages/user/FichaEspiritual'
 import Contenidos from './pages/user/Contenidos'
-import Videos from './pages/user/Videos'
 import Grupos from './pages/user/Grupos'
 import Comunicacion from './pages/user/Comunicacion'
 import Perfil from './pages/user/Perfil'
 import CoordinatorSeguimiento from './pages/coordinator/Seguimiento'
-import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminUsuarios from './pages/admin/AdminUsuarios'
+import AdminUsuarioProgreso from './pages/admin/AdminUsuarioProgreso'
 import AdminContenidos from './pages/admin/AdminContenidos'
 import AdminPagos from './pages/admin/AdminPagos'
 import AdminGrupos from './pages/admin/AdminGrupos'
@@ -66,7 +65,6 @@ export default function App() {
         <Route path="ficha" element={<FichaPedagogica />} />
         <Route path="ficha-espiritual" element={<FichaEspiritual />} />
         <Route path="contenidos" element={<Contenidos />} />
-        <Route path="videos" element={<Videos />} />
         <Route path="grupos" element={<Grupos />} />
         <Route path="comunicacion" element={<Comunicacion />} />
         <Route path="perfil" element={<Perfil />} />
@@ -78,8 +76,9 @@ export default function App() {
       </Route>
 
       <Route path="/admin" element={<PrivateRoute adminOnly><AdminLayout /></PrivateRoute>}>
-        <Route index element={<AdminDashboard />} />
+        <Route index element={<Navigate to="/admin/usuarios" replace />} />
         <Route path="usuarios" element={<AdminUsuarios />} />
+        <Route path="usuarios/:userId" element={<AdminUsuarioProgreso />} />
         <Route path="contenidos" element={<AdminContenidos />} />
         <Route path="pagos" element={<AdminPagos />} />
         <Route path="grupos" element={<AdminGrupos />} />

@@ -58,3 +58,27 @@ class Contenido(models.Model):
 
     def __str__(self):
         return self.titulo
+
+
+class ContenidoVista(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='contenidos_vistos',
+    )
+    contenido = models.ForeignKey(
+        Contenido,
+        on_delete=models.CASCADE,
+        related_name='vistas',
+    )
+    visto_en = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['usuario', 'contenido'], name='unique_contenido_vista'),
+        ]
+        verbose_name = 'Vista de contenido'
+        verbose_name_plural = 'Vistas de contenido'
+
+    def __str__(self):
+        return f'{self.usuario} · {self.contenido}'
