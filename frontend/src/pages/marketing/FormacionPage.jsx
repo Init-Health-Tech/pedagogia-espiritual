@@ -39,6 +39,124 @@ const PORQUE_CON_NOSOTROS = [
   },
 ]
 
+const ETAPA_ACCENTS = [colors.primary, colors.blue, colors.secondary, colors.accent]
+
+function EtapasStepper() {
+  return (
+    <Box
+      id="modulos"
+      component="ol"
+      sx={{
+        listStyle: 'none',
+        m: 0,
+        p: 0,
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        alignItems: { xs: 'stretch', md: 'flex-start' },
+        width: '100%',
+      }}
+    >
+      {MODULOS_PREVIEW.map((etapa, index) => {
+        const isLast = index === MODULOS_PREVIEW.length - 1
+        const accent = ETAPA_ACCENTS[index % ETAPA_ACCENTS.length]
+
+        return (
+          <Box
+            key={etapa.num}
+            component="li"
+            sx={{
+              position: 'relative',
+              flex: { md: 1 },
+              display: 'flex',
+              flexDirection: { xs: 'row', md: 'column' },
+              gap: { xs: 2, md: 0 },
+              minWidth: 0,
+            }}
+          >
+            {!isLast && (
+              <Box
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  bgcolor: colors.border,
+                  top: { xs: 36, md: 18 },
+                  left: { xs: 17, md: '50%' },
+                  width: { xs: 2, md: '100%' },
+                  height: { xs: 'calc(100% - 18px)', md: 2 },
+                  zIndex: 0,
+                }}
+              />
+            )}
+
+            <Box
+              sx={{
+                position: 'relative',
+                zIndex: 1,
+                width: { xs: 36, md: '100%' },
+                display: 'flex',
+                justifyContent: { xs: 'flex-start', md: 'center' },
+                mb: { md: 2 },
+                flexShrink: 0,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  bgcolor: accent,
+                  color: '#fff',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  boxShadow: `0 0 0 4px ${colors.light}`,
+                }}
+              >
+                {etapa.num}
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                flex: 1,
+                pb: { xs: isLast ? 0 : 3.5, md: 0 },
+                px: { md: 1.25 },
+                textAlign: { md: 'center' },
+                minWidth: 0,
+              }}
+            >
+              <Box
+                component="img"
+                src={etapa.imagen}
+                alt=""
+                sx={{
+                  width: '100%',
+                  height: { xs: 140, md: 120 },
+                  objectFit: 'cover',
+                  borderRadius: 2,
+                  mb: 1.5,
+                  display: 'block',
+                  border: `1px solid ${colors.border}`,
+                }}
+              />
+              <Typography variant="overline" sx={{ color: accent }}>
+                Etapa {etapa.num}
+              </Typography>
+              <Typography variant="h3" sx={{ fontSize: { xs: '1.15rem', md: '1.2rem' }, my: 0.5 }}>
+                {etapa.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7, fontSize: '0.9875rem' }}>
+                {etapa.desc}
+              </Typography>
+            </Box>
+          </Box>
+        )
+      })}
+    </Box>
+  )
+}
+
 export default function FormacionPage() {
   return (
     <>
@@ -70,9 +188,9 @@ export default function FormacionPage() {
                 mx: 'auto',
               }}
             >
-              Si sientes el llamado a crecer en la fe sin prisas, en un ambiente sereno y fraterno, este movimiento
-              franciscano te ofrece un hogar espiritual: formación sólida, vida de oración y un acompañamiento que
-              te mira como persona, no como un número en una lista.
+              Si sientes el llamado a crecer en la fe, en un ambiente sereno y fraterno, este movimiento franciscano te
+              ofrece un hogar espiritual: formación sólida, vida de oración y un acompañamiento que te mira como
+              persona, no como un número en una lista.
             </Typography>
           </Box>
         </Reveal>
@@ -131,15 +249,29 @@ export default function FormacionPage() {
             justifyContent="center"
             alignItems="center"
           >
-            <Button component={RouterLink} to="/registro" variant="contained" className="landing-btn">
+            <Button
+              component={RouterLink}
+              to="/registro"
+              variant="contained"
+              color="secondary"
+              className="landing-btn"
+            >
               Quiero comenzar
             </Button>
             <Button
               component={RouterLink}
               to="/login"
-              variant="text"
+              variant="outlined"
               className="landing-btn"
-              sx={{ color: colors.primary }}
+              sx={{
+                color: colors.primary,
+                borderColor: colors.border,
+                bgcolor: 'transparent',
+                '&:hover': {
+                  borderColor: colors.primary,
+                  bgcolor: 'rgba(3, 14, 48, 0.04)',
+                },
+              }}
             >
               Ya tengo cuenta
             </Button>
@@ -147,24 +279,15 @@ export default function FormacionPage() {
         </Reveal>
       </ScrollSection>
 
-      <ScrollSection id="camino-formativo" size="full">
-        <SectionHeading overline="Formación" title="Camino por etapas" subtitle="Cuatro etapas con manuales digitales interactivos. Avanzas con tu coordinador." />
-        <RevealStagger>
-          <Grid container spacing={2} id="modulos">
-            {MODULOS_PREVIEW.map((m) => (
-              <Grid key={m.num} size={{ xs: 12, sm: 6 }}>
-                <RevealStaggerItem>
-                  <Box className="landing-block card-hover landing-etapa-card">
-                    <Box component="img" src={m.imagen} alt="" className="landing-etapa-image" />
-                    <Typography variant="overline">Etapa {m.num}</Typography>
-                    <Typography variant="h3" className="font-display" sx={{ fontSize: '1.25rem', my: 0.5 }}>{m.title}</Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1rem', lineHeight: 1.75 }}>{m.desc}</Typography>
-                  </Box>
-                </RevealStaggerItem>
-              </Grid>
-            ))}
-          </Grid>
-        </RevealStagger>
+      <ScrollSection id="camino-formativo" size="content" contentMaxWidth={{ xs: 720, md: 1100 }}>
+        <SectionHeading
+          overline="Formación"
+          title="Camino por etapas"
+          subtitle="Cuatro etapas con manuales digitales interactivos. Avanzas con tu coordinador."
+        />
+        <Reveal y={18}>
+          <EtapasStepper />
+        </Reveal>
       </ScrollSection>
 
       <ScrollSection id="avisos" alt size="content" contentMaxWidth={{ xs: 720, md: 900 }}>

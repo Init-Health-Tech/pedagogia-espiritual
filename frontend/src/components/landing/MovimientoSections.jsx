@@ -1,14 +1,25 @@
-import { Box, Grid, Typography } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
+import { Box, Button, Grid, Stack, Typography } from '@mui/material'
+import {
+  BookOpen,
+  Church,
+  Compass,
+  HandHeart,
+  Heart,
+  RefreshCw,
+  Sparkles,
+  Users,
+} from 'lucide-react'
 import SectionHeading from './SectionHeading'
 import ScrollSection from './ScrollSection'
 import StickyStory from './motion/StickyStory'
-import HistoriaFranciscanaSection from './HistoriaFranciscanaSection'
 import Reveal from './motion/Reveal'
 import RevealStagger, { RevealStaggerItem } from './motion/RevealStagger'
 import {
   JUSTIFICACION_PROYECTO,
   LANDING_IMAGES,
   MISION,
+  MODULOS_PREVIEW,
   NUESTRO_EQUIPO,
   VALORES,
   VISION,
@@ -16,6 +27,7 @@ import {
 import { colors } from '../../theme/muiTheme'
 
 const VALUE_ACCENTS = [colors.primary, colors.blue, colors.secondary, colors.accent, colors.moss]
+const VALUE_ICONS = [Heart, HandHeart, Church, RefreshCw, BookOpen, Compass, Users, Sparkles]
 
 function EquipoStat({ value, label, accent }) {
   return (
@@ -48,12 +60,12 @@ function EquipoStat({ value, label, accent }) {
 
 function ValorCard({ valor, index }) {
   const accent = VALUE_ACCENTS[index % VALUE_ACCENTS.length]
+  const Icon = VALUE_ICONS[index % VALUE_ICONS.length]
 
   return (
     <Box
       className="card-hover"
       sx={{
-        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
@@ -63,33 +75,36 @@ function ValorCard({ valor, index }) {
         borderRadius: 2,
         border: `1px solid ${colors.border}`,
         bgcolor: index % 2 === 0 ? colors.surface : 'rgba(255,255,255,0.45)',
-        overflow: 'hidden',
-        transition: 'border-color 0.2s, box-shadow 0.2s',
+        transition: 'border-color 0.2s',
         '&:hover': { borderColor: accent },
       }}
     >
-      <Typography
-        aria-hidden
+      <Box
         sx={{
-          position: 'absolute',
-          top: -8,
-          right: 8,
-          fontSize: '4.5rem',
-          lineHeight: 1,
-          fontFamily: '"Libre Baskerville", Georgia, serif',
-          fontWeight: 700,
-          color: accent,
-          opacity: 0.12,
-          userSelect: 'none',
+          width: 42,
+          height: 42,
+          borderRadius: 2,
+          bgcolor: `${accent}14`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mb: 1.5,
         }}
       >
-        {String(index + 1).padStart(2, '0')}
-      </Typography>
-      <Box sx={{ width: 32, height: 3, bgcolor: accent, borderRadius: 1, mb: 1.5 }} />
-      <Typography variant="h3" className="font-display" sx={{ fontSize: '1.125rem', mb: 1, color: colors.dark, width: '100%', textAlign: 'left' }}>
+        <Icon size={21} color={accent} strokeWidth={1.8} />
+      </Box>
+      <Typography
+        variant="h3"
+        className="font-display"
+        sx={{ fontSize: '1.125rem', mb: 1, color: colors.dark, textAlign: 'left' }}
+      >
         {valor.name}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7, fontSize: '0.9375rem', width: '100%', textAlign: 'justify' }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ lineHeight: 1.7, fontSize: '0.9375rem', textAlign: 'left' }}
+      >
         {valor.description}
       </Typography>
     </Box>
@@ -100,152 +115,163 @@ export default function MovimientoSections() {
   return (
     <>
       <ScrollSection
-        id="quienes-somos"
-        alt
+        id="historia"
         size="content"
-        contentMaxWidth={{ xs: 720, md: 820 }}
-        sx={{ pt: { xs: 3.5, md: 4.5 }, pb: { xs: 5, md: 6 }, px: { xs: 3, md: 4, lg: 6 } }}
+        contentMaxWidth={{ xs: 720, md: 900 }}
+        sx={{ justifyContent: 'flex-start', px: { xs: 3, md: 4, lg: 6 } }}
       >
-        <SectionHeading
-          overline="El Movimiento"
-          title="Quiénes somos"
-          subtitle="Comunidad de fe que camina junta — no un curso más, sino un proceso de vida."
-        />
-
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'column' },
-            gap: 3,
-            mb: 5,
-          }}
-        >
-          <Reveal delay={0.05} y={24} sx={{ width: '100%', display: 'flex' }}>
-            <Box
-              className="landing-block"
-              sx={{
-                flex: 1,
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                borderTop: `4px solid ${colors.primary}`,
-                bgcolor: colors.dark,
-                color: colors.cream,
-                '& .section-overline': { color: colors.accent },
-              }}
-            >
-              <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 1.5 }}>
-                Misión
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'rgba(235, 219, 178, 0.92)', lineHeight: 1.8, fontSize: '1.0625rem', textAlign: 'justify' }}>
-                {MISION}
-              </Typography>
-            </Box>
-          </Reveal>
-          <Reveal delay={0.12} y={24} sx={{ width: '100%', display: 'flex' }}>
-            <Box
-              className="landing-block landing-block--filled"
-              sx={{
-                flex: 1,
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                borderTop: `4px solid ${colors.accent}`,
-              }}
-            >
-              <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 1.5 }}>
-                Visión
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, fontSize: '1.0625rem', textAlign: 'justify' }}>
-                {VISION}
-              </Typography>
-            </Box>
-          </Reveal>
-        </Box>
-
-        <Reveal y={18}>
-          <Box sx={{ mb: 2.5 }}>
-            <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 0.5 }}>
-              Nuestros valores
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 640, fontSize: '1.0625rem', lineHeight: 1.8 }}>
-              Ocho principios que orientan nuestra formación, nuestra comunidad y nuestra misión evangelizadora.
-            </Typography>
-          </Box>
-        </Reveal>
-
-        <RevealStagger sx={{ width: '100%' }}>
-          <Grid container spacing={2} sx={{ alignItems: 'stretch' }}>
-            {VALORES.map((valor, index) => (
-              <Grid key={valor.name} size={{ xs: 12, sm: 6, lg: 4 }} sx={{ display: 'flex' }}>
-                <RevealStaggerItem sx={{ width: '100%', display: 'flex' }}>
-                  <ValorCard valor={valor} index={index} />
-                </RevealStaggerItem>
-              </Grid>
-            ))}
-          </Grid>
-        </RevealStagger>
-      </ScrollSection>
-
-      <ScrollSection id="historia" size="content" contentMaxWidth={{ xs: 720, md: 820 }} sx={{ justifyContent: 'flex-start', px: { xs: 3, md: 4, lg: 6 } }}>
         <StickyStory
-          overline="El Movimiento"
+          overline="Esto es para ti"
           title="¿Por qué lo hacemos?"
-          subtitle="La justificación de un movimiento de formación integral en respuesta a los desafíos de nuestro tiempo."
+          subtitle="Porque los vacíos, la ansiedad y la falta de sentido también pueden convertirse en el inicio de un camino nuevo."
           imageSrc={LANDING_IMAGES.camino}
           imageAlt="Basílica de San Francisco de Asís con olivos"
           paragraphs={JUSTIFICACION_PROYECTO}
         />
       </ScrollSection>
 
-      <HistoriaFranciscanaSection />
+      <ScrollSection
+        id="quienes-somos"
+        alt
+        size="content"
+        contentMaxWidth={{ xs: 720, md: 860 }}
+        sx={{ px: { xs: 3, md: 4, lg: 6 } }}
+      >
+        <SectionHeading
+          overline="El Movimiento"
+          title="Quiénes somos"
+          subtitle="Una comunidad franciscana que acompaña procesos reales de vida, fe y conversión."
+        />
+        <Reveal y={20}>
+          <Box
+            className="landing-block landing-block--filled"
+            sx={{ maxWidth: 760, mx: 'auto', borderTop: `4px solid ${colors.primary}` }}
+          >
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ lineHeight: 1.9, fontSize: '1.0625rem', textAlign: { md: 'center' } }}
+            >
+              No ofrecemos un curso aislado. Caminamos contigo mediante formación estructurada,
+              acompañamiento cercano y vida comunitaria, integrando la dimensión humana y espiritual
+              para que la fe vuelva a tocar la vida cotidiana.
+            </Typography>
+          </Box>
+        </Reveal>
+      </ScrollSection>
+
+      <ScrollSection
+        id="como-lo-hacemos"
+        size="content"
+        contentMaxWidth={{ xs: 720, md: 980 }}
+        sx={{ px: { xs: 3, md: 4, lg: 6 } }}
+      >
+        <SectionHeading
+          overline="Cómo lo hacemos"
+          title="Un camino formativo en cuatro etapas"
+          subtitle="Avanzas a tu ritmo con manuales digitales, diario semanal y el acompañamiento de quienes ya recorrieron el camino."
+        />
+        <RevealStagger>
+          <Grid container spacing={2}>
+            {MODULOS_PREVIEW.map((modulo) => (
+              <Grid key={modulo.num} size={{ xs: 12, sm: 6, lg: 3 }} sx={{ display: 'flex' }}>
+                <RevealStaggerItem sx={{ width: '100%', display: 'flex' }}>
+                  <Box className="landing-block card-hover landing-etapa-card" sx={{ flex: 1 }}>
+                    <Box component="img" src={modulo.imagen} alt="" className="landing-etapa-image" />
+                    <Typography variant="overline">Etapa {modulo.num}</Typography>
+                    <Typography
+                      variant="h3"
+                      className="font-display"
+                      sx={{ fontSize: '1.2rem', my: 0.5 }}
+                    >
+                      {modulo.title}
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.9375rem', lineHeight: 1.7 }}>
+                      {modulo.desc}
+                    </Typography>
+                  </Box>
+                </RevealStaggerItem>
+              </Grid>
+            ))}
+          </Grid>
+        </RevealStagger>
+
+        <Reveal delay={0.08} y={18}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            justifyContent="space-between"
+            alignItems={{ md: 'center' }}
+            sx={{
+              mt: 3,
+              p: { xs: 2.5, md: 3 },
+              borderRadius: 2,
+              bgcolor: colors.dark,
+              color: colors.cream,
+            }}
+          >
+            <Box>
+              <Typography className="font-display" sx={{ fontSize: '1.2rem', mb: 0.5 }}>
+                Formación continua, no contenido suelto
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(235,219,178,0.9)', lineHeight: 1.7 }}>
+                Al registrarte podrás elegir el plan de formación que mejor se adapte a tu camino.
+              </Typography>
+            </Box>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} sx={{ flexShrink: 0 }}>
+              <Button
+                component={RouterLink}
+                to="/formacion#modulos"
+                variant="contained"
+                sx={{
+                  bgcolor: colors.cream,
+                  color: colors.dark,
+                  '&:hover': { bgcolor: '#F5EBD4' },
+                }}
+              >
+                Conoce las etapas
+              </Button>
+              <Button component={RouterLink} to="/registro" variant="contained" color="secondary">
+                Empieza tu formación
+              </Button>
+            </Stack>
+          </Stack>
+        </Reveal>
+      </ScrollSection>
 
       <ScrollSection
         id="nuestro-equipo"
         alt
         size="content"
-        contentMaxWidth={{ xs: 720, md: 820 }}
-        sx={{ pb: { xs: 3.5, md: 4.5 }, px: { xs: 3, md: 4, lg: 6 } }}
+        contentMaxWidth={{ xs: 720, md: 860 }}
+        sx={{ px: { xs: 3, md: 4, lg: 6 } }}
       >
         <SectionHeading
-          overline="El Movimiento"
+          overline="Confianza y acompañamiento"
           title="Nuestro equipo"
-          subtitle="Escucha, caridad y evangelización al servicio del pueblo de Dios."
+          subtitle="Personas preparadas para escuchar, acompañar y servir con una mirada humana y espiritual."
         />
 
         <RevealStagger sx={{ width: '100%' }}>
           <Grid container spacing={2} sx={{ mb: 3, alignItems: { md: 'stretch' } }}>
-            <Grid
-              size={{ xs: 12, md: 7 }}
-              sx={{ order: { xs: 2, md: 1 }, display: 'flex' }}
-            >
+            <Grid size={{ xs: 12, md: 7 }} sx={{ order: { xs: 2, md: 1 }, display: 'flex' }}>
               <RevealStaggerItem sx={{ width: '100%', display: 'flex' }}>
                 <Box
                   className="landing-block landing-block--filled"
-                  sx={{
-                    flex: 1,
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: { md: '100%' },
-                  }}
+                  sx={{ flex: 1, display: 'flex', alignItems: 'center' }}
                 >
                   <Typography
                     variant="body1"
                     color="text.secondary"
-                    sx={{ lineHeight: 1.8, fontSize: '1.0625rem', textAlign: { md: 'justify' }, width: '100%' }}
+                    sx={{ lineHeight: 1.8, fontSize: '1.0625rem', textAlign: { md: 'justify' } }}
                   >
                     {NUESTRO_EQUIPO.intro}
                   </Typography>
                 </Box>
               </RevealStaggerItem>
             </Grid>
-
-            <Grid
-              size={{ xs: 12, md: 5 }}
-              sx={{ order: { xs: 1, md: 2 }, display: 'flex' }}
-            >
-              <Grid container spacing={2} sx={{ width: '100%', height: { md: '100%' } }}>
+            <Grid size={{ xs: 12, md: 5 }} sx={{ order: { xs: 1, md: 2 }, display: 'flex' }}>
+              <Grid container spacing={2} sx={{ width: '100%' }}>
                 <Grid size={{ xs: 6, md: 12 }} sx={{ display: 'flex' }}>
                   <RevealStaggerItem sx={{ width: '100%', display: 'flex' }}>
                     <EquipoStat value="30" label="Hermanos dedicados a la escucha" accent={colors.primary} />
@@ -266,9 +292,8 @@ export default function MovimientoSections() {
             Obras de caridad
           </Typography>
         </Reveal>
-
         <RevealStagger sx={{ width: '100%' }}>
-          <Grid container spacing={2} sx={{ mb: 3, alignItems: 'stretch' }}>
+          <Grid container spacing={2} sx={{ mb: 3 }}>
             {NUESTRO_EQUIPO.obrasCaridad.map((obra, index) => (
               <Grid key={obra} size={{ xs: 12, sm: 4 }} sx={{ display: 'flex' }}>
                 <RevealStaggerItem sx={{ width: '100%', display: 'flex' }}>
@@ -276,19 +301,15 @@ export default function MovimientoSections() {
                     className="card-hover"
                     sx={{
                       flex: 1,
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
                       p: 1.5,
                       borderRadius: 2,
                       border: `1px solid ${colors.border}`,
                       borderTop: `3px solid ${VALUE_ACCENTS[index % VALUE_ACCENTS.length]}`,
-                      bgcolor: index % 2 === 0 ? colors.surface : 'rgba(255,255,255,0.5)',
+                      bgcolor: colors.surface,
                       textAlign: 'center',
                     }}
                   >
-                    <Typography variant="h3" className="font-display" sx={{ fontSize: '1.05rem', color: colors.dark, lineHeight: 1.4 }}>
+                    <Typography variant="h3" className="font-display" sx={{ fontSize: '1.05rem' }}>
                       {obra}
                     </Typography>
                   </Box>
@@ -297,14 +318,12 @@ export default function MovimientoSections() {
             ))}
           </Grid>
         </RevealStagger>
-
-        <Reveal delay={0.08} y={20} scale={0.99}>
+        <Reveal delay={0.08} y={18}>
           <Box
             sx={{
               p: 2.5,
               borderRadius: 2,
               bgcolor: colors.dark,
-              color: colors.cream,
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
               gap: 2,
@@ -315,19 +334,76 @@ export default function MovimientoSections() {
               component="img"
               src={LANDING_IMAGES.comunidad}
               alt="Comunidad en oración y servicio"
-              sx={{
-                width: { xs: '100%', md: 200 },
-                height: { xs: 160, md: 120 },
-                objectFit: 'cover',
-                borderRadius: 1.5,
-                flexShrink: 0,
-              }}
+              sx={{ width: { xs: '100%', md: 200 }, height: { xs: 160, md: 120 }, objectFit: 'cover', borderRadius: 1.5 }}
             />
-            <Typography variant="body2" sx={{ color: 'rgba(235, 219, 178, 0.92)', lineHeight: 1.75, fontSize: '1rem' }}>
+            <Typography variant="body2" sx={{ color: 'rgba(235,219,178,0.92)', lineHeight: 1.75 }}>
               {NUESTRO_EQUIPO.apoyo}
             </Typography>
           </Box>
         </Reveal>
+      </ScrollSection>
+
+      <ScrollSection
+        id="mision-vision"
+        size="content"
+        contentMaxWidth={{ xs: 720, md: 860 }}
+        sx={{ px: { xs: 3, md: 4, lg: 6 } }}
+      >
+        <SectionHeading
+          overline="Nuestra identidad"
+          title="Misión y visión"
+          subtitle="Lo que orienta nuestro servicio y la comunidad que queremos construir."
+        />
+        <Stack spacing={3}>
+          <Reveal delay={0.05} y={20}>
+            <Box
+              className="landing-block"
+              sx={{ borderTop: `4px solid ${colors.primary}`, bgcolor: colors.dark, color: colors.cream }}
+            >
+              <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 1.5, color: colors.accent }}>
+                Misión
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'rgba(235,219,178,0.92)', lineHeight: 1.8, textAlign: 'justify' }}>
+                {MISION}
+              </Typography>
+            </Box>
+          </Reveal>
+          <Reveal delay={0.1} y={20}>
+            <Box className="landing-block landing-block--filled" sx={{ borderTop: `4px solid ${colors.accent}` }}>
+              <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 1.5 }}>
+                Visión
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, textAlign: 'justify' }}>
+                {VISION}
+              </Typography>
+            </Box>
+          </Reveal>
+        </Stack>
+      </ScrollSection>
+
+      <ScrollSection
+        id="valores"
+        alt
+        size="content"
+        contentMaxWidth={{ xs: 720, md: 980 }}
+        sx={{ px: { xs: 3, md: 4, lg: 6 } }}
+      >
+        <SectionHeading
+          overline="Lo que nos sostiene"
+          title="Nuestros valores"
+          subtitle="Ocho principios que orientan nuestra formación, nuestra comunidad y nuestra misión."
+        />
+        <RevealStagger sx={{ width: '100%' }}>
+          <Grid container spacing={2}>
+            {VALORES.map((valor, index) => (
+              <Grid key={valor.name} size={{ xs: 12, sm: 6, lg: 3 }} sx={{ display: 'flex' }}>
+                <RevealStaggerItem sx={{ width: '100%', display: 'flex' }}>
+                  <ValorCard valor={valor} index={index} />
+                </RevealStaggerItem>
+              </Grid>
+            ))}
+          </Grid>
+        </RevealStagger>
       </ScrollSection>
     </>
   )

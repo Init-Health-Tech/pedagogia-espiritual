@@ -172,9 +172,24 @@ export default function MarketingNav() {
 
           {!isMobile && (
             <Stack direction="row" alignItems="center" sx={{ flex: 1, ml: 1 }}>
-              {NAV_ITEMS.map((item) => (
-                <NavDropdown key={item.label} item={item} />
-              ))}
+              <Button component={RouterLink} to="/" color="inherit" sx={navLinkSx}>
+                Inicio
+              </Button>
+              {NAV_ITEMS.map((item) =>
+                item.children?.length ? (
+                  <NavDropdown key={item.label} item={item} />
+                ) : (
+                  <Button
+                    key={item.label}
+                    component={RouterLink}
+                    to={item.route}
+                    color="inherit"
+                    sx={navLinkSx}
+                  >
+                    {item.label}
+                  </Button>
+                ),
+              )}
             </Stack>
           )}
 

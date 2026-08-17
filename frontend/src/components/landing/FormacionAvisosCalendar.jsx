@@ -113,13 +113,11 @@ export default function FormacionAvisosCalendar() {
 
   const selectedEvents = eventsByDay.get(selectedKey) || []
   const selectedDate = parseKey(selectedKey)
-
-  const upcoming = useMemo(() => {
-    return [...AVISOS_EVENTOS]
-      .filter((event) => parseKey(event.date) >= today)
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(0, 4)
-  }, [today])
+  const selectedLabel = selectedDate.toLocaleDateString('es-MX', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
 
   const goMonth = (delta) => {
     setCursor((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1))
@@ -293,30 +291,27 @@ export default function FormacionAvisosCalendar() {
 
       <Box>
         <Typography variant="overline" className="section-overline" display="block" sx={{ mb: 1 }}>
-          {selectedEvents.length ? 'Avisos del día' : 'Próximos avisos'}
+          Avisos del día
         </Typography>
-        <Typography className="font-display" sx={{ fontSize: '1.25rem', mb: 2, color: colors.dark }}>
-          {selectedEvents.length
-            ? selectedDate.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })
-            : 'Lo que viene en el camino'}
+        <Typography
+          className="font-display"
+          sx={{ fontSize: '1.25rem', mb: 2, color: colors.dark, textTransform: 'capitalize' }}
+        >
+          {selectedLabel}
         </Typography>
 
         <Stack spacing={1.5}>
-          {(selectedEvents.length ? selectedEvents : upcoming).map((event) => (
-            <EventCard
-              key={`${event.date}-${event.title}`}
-              event={event}
-              active={selectedEvents.length > 0}
-            />
-          ))}
-          {!selectedEvents.length && !upcoming.length && (
+          {selectedEvents.length > 0 ? (
+            selectedEvents.map((event) => (
+              <EventCard
+                key={`${event.date}-${event.title}`}
+                event={event}
+                active
+              />
+            ))
+          ) : (
             <Typography color="text.secondary" sx={{ lineHeight: 1.75 }}>
-              No hay avisos próximos por ahora. Vuelve pronto.
-            </Typography>
-          )}
-          {selectedEvents.length === 0 && upcoming.length > 0 && (
-            <Typography variant="body2" color="text.secondary" sx={{ pt: 0.5, fontSize: '0.9rem' }}>
-              Selecciona un día con punto en el calendario para ver el detalle.
+              Sin eventos
             </Typography>
           )}
         </Stack>

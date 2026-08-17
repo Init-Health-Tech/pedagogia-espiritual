@@ -8,6 +8,7 @@ import ContactPage from './pages/marketing/ContactPage'
 import PedagogiaPage from './pages/marketing/PedagogiaPage'
 import FormacionPage from './pages/marketing/FormacionPage'
 import ItinerarioPage from './pages/marketing/ItinerarioPage'
+import NuestraHistoriaPage from './pages/marketing/NuestraHistoriaPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import UserLayout from './layouts/UserLayout'
@@ -51,6 +52,7 @@ export default function App() {
     <Routes>
       <Route element={<MarketingLayout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/nuestra-historia" element={<NuestraHistoriaPage />} />
         <Route path="/movimiento" element={<Navigate to="/" replace />} />
         <Route path="/contacto" element={<ContactPage />} />
         <Route path="/pedagogia-espiritual" element={<PedagogiaPage />} />

@@ -1,10 +1,13 @@
 export const NAV_ITEMS = [
   {
+    label: 'Nuestra Historia',
+    route: '/nuestra-historia',
+  },
+  {
     label: 'Pedagogía Espiritual',
     route: '/pedagogia-espiritual',
     children: [
       { label: '¿Qué es la pedagogía espiritual?', href: '/pedagogia-espiritual#que-es-pedagogia' },
-      { label: 'La Santísima Trinidad', href: '/pedagogia-espiritual#santisima-trinidad' },
       { label: 'Desarrollo de la sesión', href: '/pedagogia-espiritual#desarrollo-sesion' },
     ],
   },
@@ -32,7 +35,7 @@ export const FOOTER_COLUMNS = [
     links: [
       { label: 'Quiénes somos', href: '/#quienes-somos' },
       { label: '¿Por qué lo hacemos?', href: '/#historia' },
-      { label: 'Historia franciscana', href: '/#historia-franciscana' },
+      { label: 'Nuestra Historia', href: '/nuestra-historia' },
       { label: 'Nuestro equipo', href: '/#nuestro-equipo' },
     ],
   },
@@ -40,7 +43,6 @@ export const FOOTER_COLUMNS = [
     title: 'Pedagogía Espiritual',
     links: [
       { label: '¿Qué es la pedagogía?', href: '/pedagogia-espiritual#que-es-pedagogia' },
-      { label: 'La Santísima Trinidad', href: '/pedagogia-espiritual#santisima-trinidad' },
       { label: 'Desarrollo de la sesión', href: '/pedagogia-espiritual#desarrollo-sesion' },
     ],
   },
@@ -366,6 +368,7 @@ export const HISTORIA_FRANCISCANA = {
   chapters: [
     {
       title: 'Orígenes con San Francisco de Asís (siglo XIII)',
+      summary: 'Francisco de Asís dejó atrás una vida cómoda para abrazar el Evangelio con radicalidad. Su conversión dio origen a una fraternidad basada en la pobreza, la sencillez y el servicio.',
       paragraphs: [
         'Francisco de Bernardone (1182–1226) nace en Asís, Italia, hijo de un próspero comerciante de telas.',
         'Tras una conversión marcada por experiencias como el abrazo al leproso y la voz del crucifijo de San Damián («Francisco, ve y repara mi casa»), renuncia a su herencia y abraza la pobreza radical.',
@@ -374,6 +377,7 @@ export const HISTORIA_FRANCISCANA = {
     },
     {
       title: 'Nacimiento de las tres Órdenes',
+      summary: 'El carisma franciscano tomó tres formas: los Hermanos Menores, las Clarisas y una Tercera Orden para quienes querían vivirlo sin abandonar sus responsabilidades en el mundo.',
       paragraphs: [
         'Primera Orden: los frailes (Hermanos Menores), fundada por el propio Francisco.',
         'Segunda Orden: las Clarisas, fundada junto a Santa Clara de Asís en 1212, para mujeres consagradas a la vida contemplativa.',
@@ -382,6 +386,7 @@ export const HISTORIA_FRANCISCANA = {
     },
     {
       title: 'De la Tercera Orden Seglar a la Tercera Orden Regular (TOR)',
+      summary: 'Algunos terciarios comenzaron a compartir vida, misión y votos. Así nació la Tercera Orden Regular, reconocida como una nueva expresión de la familia franciscana.',
       paragraphs: [
         'Con el tiempo, algunos grupos de terciarios comenzaron a vivir en comunidad, con votos públicos y vida común, dando origen a la Tercera Orden Regular (frente a la Tercera Orden Seglar, que permanece laical y sin votos religiosos formales).',
         'La TOR fue aprobada formalmente por el Papa Nicolás IV en 1289 mediante la bula Supra Montem, que le dio una regla propia.',
@@ -390,6 +395,7 @@ export const HISTORIA_FRANCISCANA = {
     },
     {
       title: 'Consolidación y expansión (siglos XIV–XX)',
+      summary: 'La TOR se extendió por Europa y América, renovando su forma de vida sin perder el carisma original de fraternidad, minoridad, penitencia y servicio.',
       paragraphs: [
         'La TOR se expandió por Europa y luego por América tras la evangelización.',
         'En 1927, el Papa Pío XI aprobó una regla renovada específica para los religiosos de la TOR (bula Rerum Conditio), separándola definitivamente en su forma jurídica de la Orden Franciscana Seglar.',
@@ -397,20 +403,34 @@ export const HISTORIA_FRANCISCANA = {
       ],
     },
   ],
-  identidad: [
-    {
-      title: 'Carisma',
-      desc: 'Vida fraterna, penitencia (conversión continua), minoridad (humildad) y servicio a los pobres.',
+  identidad: {
+    carisma: {
+      description: 'Vida fraterna, penitencia (conversión continua), minoridad (humildad) y servicio a los pobres.',
+      today: 'Se traduce en nuestras obras de caridad: atención psicológica gratuita, despensa y medicamentos para quien lo necesita.',
     },
-    {
-      title: 'Espiritualidad',
-      desc: 'Seguimiento radical del Evangelio «sine glossa» (sin glosas), tal como lo entendió Francisco.',
+    espiritualidad: {
+      quote: 'El Evangelio, sin glosas',
+      description: 'Seguimiento radical del Evangelio tal como lo entendió Francisco: sin condiciones, sin atajos.',
+      today: 'Lo cultivamos en un itinerario de oración, formación y vida comunitaria que lleva la fe a decisiones concretas de cada día.',
     },
-    {
-      title: 'Figuras clave',
-      desc: 'San Francisco, Santa Clara, y santos y beatos propios de la tradición TOR — por ejemplo, San Elzeario y Santa Delfina como terciarios laicos históricos, o figuras fundadoras de congregaciones TOR según cada rama.',
-    },
-  ],
+    figuras: [
+      {
+        name: 'San Francisco de Asís',
+        initials: 'SF',
+        description: 'Fundador y ejemplo de conversión radical.',
+      },
+      {
+        name: 'Santa Clara de Asís',
+        initials: 'SC',
+        description: 'Fundadora de la Segunda Orden y testimonio de vida contemplativa.',
+      },
+      {
+        name: 'San Elzeario y Santa Delfina',
+        initials: 'E+D',
+        description: 'Terciarios laicos: santidad vivida en el matrimonio.',
+      },
+    ],
+  },
   timeline: [
     { year: '1182', text: 'Nace Francisco de Bernardone en Asís, Italia.' },
     { year: '1206', text: 'Conversión de Francisco; renuncia públicamente a la herencia de su padre y comienza su vida de penitencia.' },
@@ -428,6 +448,38 @@ export const HISTORIA_FRANCISCANA = {
     { year: '1927', text: 'El Papa Pío XI aprueba una regla renovada específica para los religiosos de la TOR mediante la bula Rerum Conditio, consolidando su identidad jurídica propia frente a la Orden Franciscana Seglar.' },
     { year: '1962–1965', text: 'Concilio Vaticano II; impulsa la renovación de constituciones y vida religiosa en las congregaciones de la TOR conforme al espíritu conciliar.' },
     { year: 'XX–XXI', text: 'Consolidación de las distintas ramas y congregaciones de la Tercera Orden Regular a nivel mundial, manteniendo el carisma de fraternidad, minoridad y penitencia.' },
+  ],
+  timelineGroups: [
+    {
+      year: '1182–1209',
+      title: 'Una vida transformada',
+      text: 'Francisco nace en Asís, vive una profunda conversión y reúne a sus primeros compañeros. En 1209, Inocencio III aprueba oralmente su forma de vida.',
+      detail: '1206 · Renuncia a su herencia y comienza una vida de penitencia.',
+    },
+    {
+      year: '1212–1221',
+      title: 'Nace la familia franciscana',
+      text: 'Con Santa Clara surge la Segunda Orden. Poco después, el Memoriale propositi ofrece una forma de vida a los laicos penitentes.',
+      detail: '1221 · La Tercera Orden abre el carisma a quienes viven en medio del mundo.',
+    },
+    {
+      year: '1226–1289',
+      title: 'El legado toma forma',
+      text: 'Tras la muerte y canonización de Francisco, comunidades de terciarios adoptan vida común y votos públicos.',
+      detail: '1289 · La bula Supra Montem reconoce formalmente la regla de la Tercera Orden.',
+    },
+    {
+      year: 'Siglos XIV–XX',
+      title: 'Expansión y consolidación',
+      text: 'La TOR se extiende por Europa y América mediante congregaciones y fraternidades diversas.',
+      detail: '1927 · Rerum Conditio consolida su identidad jurídica propia.',
+    },
+    {
+      year: 'Siglos XX–XXI',
+      title: 'Un carisma siempre vivo',
+      text: 'La renovación conciliar impulsa nuevas maneras de vivir la fraternidad, la minoridad y el servicio en el mundo contemporáneo.',
+      detail: 'Hoy · Distintas ramas continúan compartiendo una misma raíz franciscana.',
+    },
   ],
 }
 

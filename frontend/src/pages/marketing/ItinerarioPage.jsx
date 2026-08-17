@@ -112,7 +112,7 @@ export default function ItinerarioPage() {
       <SectionHeading
         overline="Formación"
         title="Itinerario formativo"
-        subtitle="Diez ejes de formación que integran teología, pedagogía, pastoral y vida franciscana."
+        subtitle="Diez ejes temáticos que integran teología, pedagogía, pastoral y vida franciscana."
       />
 
       <Reveal y={18}>
@@ -128,7 +128,7 @@ export default function ItinerarioPage() {
           }}
         >
           <Typography variant="body1" sx={{ color: 'rgba(235, 219, 178, 0.9)', maxWidth: 720, mx: 'auto', lineHeight: 1.8, fontSize: '1.0625rem' }}>
-            Un camino progresivo de diez etapas que articula la formación integral del movimiento — desde la antropología hasta la liturgia.
+            Diez ejes de formación que se entretejen a lo largo de tu recorrido por las cuatro etapas — desde la antropología hasta la liturgia, cada tema aporta una pieza a tu formación integral.
           </Typography>
         </Box>
       </Reveal>
