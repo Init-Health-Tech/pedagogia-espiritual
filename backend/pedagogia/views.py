@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from accounts.permissions import IsModeratorOrAdmin
 from .models import AvanceEspiritual, FichaPedagogica, Modulo, PreguntaChecklist, RespuestaChecklist
+from .signals import asegurar_ficha
 from .serializers import (
     AvanceEspiritualSerializer,
     FichaPedagogicaSerializer,
@@ -74,18 +75,24 @@ class FichaPedagogicaViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def mi_ficha(self, request):
-        ficha, _ = FichaPedagogica.objects.get_or_create(usuario=request.user)
+        ficha = asegurar_ficha(request.user)
         return Response(FichaPedagogicaSerializer(ficha).data)
 
     @action(detail=False, methods=['post'])
     def responder_checklist(self, request):
         ser = ResponderChecklistSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        ficha, _ = FichaPedagogica.objects.get_or_create(usuario=request.user)
+        ficha = asegurar_ficha(request.user)
         pregunta = PreguntaChecklist.objects.get(
             pk=ser.validated_data['pregunta_id'],
             activa=True,
         )
+        disp = ficha.disponibilidad_semana(pregunta.semana or pregunta.orden)
+        if not disp['disponible']:
+            return Response(
+                {'detail': 'Esta semana del diario aún no está disponible.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         respuesta, _ = RespuestaChecklist.objects.get_or_create(
             ficha=ficha,
             pregunta=pregunta,

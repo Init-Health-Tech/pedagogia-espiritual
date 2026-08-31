@@ -58,6 +58,7 @@ class FichaPedagogicaSerializer(serializers.ModelSerializer):
         items = []
         for p in preguntas:
             r = respuestas.get(p.id)
+            disp = obj.disponibilidad_semana(p.semana or p.orden)
             items.append({
                 'pregunta_id': p.id,
                 'orden': p.orden,
@@ -69,6 +70,7 @@ class FichaPedagogicaSerializer(serializers.ModelSerializer):
                 'completada': (r.completada if r else False) or bool(r and r.nota and len(r.nota.strip()) >= 15),
                 'nota': r.nota if r else '',
                 'respuesta_id': r.id if r else None,
+                **disp,
             })
         return items
 

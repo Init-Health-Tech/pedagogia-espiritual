@@ -1,9 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
+  Alert,
+  Box,
   Button,
   Card,
   CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   MenuItem,
   Stack,
   Table,
@@ -21,12 +27,90 @@ import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import StatusBadge from '../../components/common/StatusBadge'
+import FormField from '../../components/common/FormField'
 
 const ROLE_LABELS = {
   admin: 'Administrador',
   coordinator: 'Coordinador',
   moderator: 'Moderador',
   member: 'Miembro',
+}
+
+const EMPTY_FORM = {
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  role: 'member',
+}
+
+function UserFormFields({ form, setForm }) {
+  return (
+    <>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <FormField label="Nombre" required>
+          <TextField
+            value={form.first_name}
+            onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+            required
+            fullWidth
+            hiddenLabel
+          />
+        </FormField>
+        <FormField label="Apellido" required>
+          <TextField
+            value={form.last_name}
+            onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+            required
+            fullWidth
+            hiddenLabel
+          />
+        </FormField>
+      </Stack>
+      <FormField label="Correo electrónico" required>
+        <TextField
+          type="email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          required
+          fullWidth
+          hiddenLabel
+        />
+      </FormField>
+      <FormField label="Teléfono">
+        <TextField
+          value={form.phone}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          fullWidth
+          hiddenLabel
+        />
+      </FormField>
+      <FormField label="Rol" required helper="Por ahora solo Miembro o Coordinador">
+        <TextField
+          select
+          value={form.role}
+          onChange={(e) => setForm({ ...form, role: e.target.value })}
+          required
+          fullWidth
+          hiddenLabel
+        >
+          <MenuItem value="member">Miembro</MenuItem>
+          <MenuItem value="coordinator">Coordinador</MenuItem>
+        </TextField>
+      </FormField>
+    </>
+  )
+}
+
+function parseApiError(err) {
+  const data = err.response?.data
+  if (!data) return 'No se pudo guardar. Inténtalo de nuevo.'
+  if (typeof data === 'string') return data
+  if (data.detail) return typeof data.detail === 'string' ? data.detail : 'No se pudo guardar.'
+  const first = Object.values(data)[0]
+  if (Array.isArray(first)) return first[0]
+  if (typeof first === 'string') return first
+  return 'Revisa los datos e inténtalo de nuevo.'
 }
 
 export default function AdminUsuarios() {
@@ -38,6 +122,13 @@ export default function AdminUsuarios() {
   const [ordenNombre, setOrdenNombre] = useState('az')
   const [filtroRol, setFiltroRol] = useState('todos')
   const [filtroEstado, setFiltroEstado] = useState('todos')
+
+  const [mode, setMode] = useState(null)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState('')
+  const [createdCreds, setCreatedCreds] = useState(null)
 
   const load = () => adminAPI.users().then((r) => setUsers(r.data.results || r.data))
 
@@ -70,6 +161,68 @@ export default function AdminUsuarios() {
     load()
   }
 
+  const abrirNuevo = () => {
+    setMode('create')
+    setEditing(null)
+    setForm(EMPTY_FORM)
+    setFormError('')
+  }
+
+  const abrirEditar = (u) => {
+    if (u.role === 'admin') return
+    setMode('edit')
+    setEditing(u)
+    setForm({
+      first_name: u.first_name || '',
+      last_name: u.last_name || '',
+      email: u.email || '',
+      phone: u.phone || '',
+      role: u.role === 'coordinator' ? 'coordinator' : 'member',
+    })
+    setFormError('')
+  }
+
+  const cerrarForm = () => {
+    if (saving) return
+    setMode(null)
+    setEditing(null)
+    setForm(EMPTY_FORM)
+    setFormError('')
+  }
+
+  const guardar = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    setFormError('')
+    const payload = {
+      first_name: form.first_name.trim(),
+      last_name: form.last_name.trim(),
+      email: form.email.trim().toLowerCase(),
+      phone: form.phone.trim(),
+      role: form.role,
+    }
+    try {
+      if (mode === 'create') {
+        const { data } = await adminAPI.createUser(payload)
+        setMode(null)
+        setCreatedCreds({
+          username: data.username,
+          temporary_password: data.temporary_password,
+          full_name: data.full_name,
+          email: data.email,
+        })
+      } else {
+        await adminAPI.updateUser(editing.id, payload)
+        setMode(null)
+      }
+      await load()
+    } catch (err) {
+      setFormError(parseApiError(err))
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (loading) return <LoadingScreen rows={2} />
 
   return (
@@ -77,9 +230,19 @@ export default function AdminUsuarios() {
       <PageHeader
         title="Usuarios y accesos"
         subtitle="Haz clic en un miembro para supervisar su avance. Admin y coordinadores no llevan progreso propio."
+        action={
+          <Button variant="contained" onClick={abrirNuevo}>
+            Nuevo usuario
+          </Button>
+        }
       />
       {users.length === 0 ? (
-        <EmptyState title="No hay usuarios registrados" description="Cuando alguien se registre, aparecerá aquí para que puedas gestionar su acceso." />
+        <EmptyState
+          title="No hay usuarios registrados"
+          description="Crea una cuenta manualmente o espera a que alguien se registre."
+          actionLabel="Nuevo usuario"
+          onAction={abrirNuevo}
+        />
       ) : (
         <Card>
           <CardContent sx={{ pb: 1 }}>
@@ -153,6 +316,7 @@ export default function AdminUsuarios() {
                 ) : (
                   usersFiltrados.map((u) => {
                     const esMiembro = u.role === 'member'
+                    const esAdmin = u.role === 'admin'
                     return (
                       <TableRow
                         key={u.id}
@@ -172,6 +336,11 @@ export default function AdminUsuarios() {
                               Ver avance
                             </Button>
                           )}
+                          {!esAdmin && (
+                            <Button size="small" variant="text" onClick={() => abrirEditar(u)} sx={{ mr: 1 }}>
+                              Editar
+                            </Button>
+                          )}
                           <Button size="small" variant="outlined" onClick={() => setConfirmUser(u)}>
                             {u.is_active_member ? 'Desactivar acceso' : 'Activar acceso'}
                           </Button>
@@ -185,6 +354,52 @@ export default function AdminUsuarios() {
           </TableContainer>
         </Card>
       )}
+
+      <Dialog open={Boolean(mode)} onClose={cerrarForm} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ fontWeight: 400 }}>
+          {mode === 'create' ? 'Nuevo usuario' : 'Editar usuario'}
+        </DialogTitle>
+        <Box component="form" onSubmit={guardar}>
+          <DialogContent>
+            {formError && <Alert severity="error" sx={{ mb: 2 }}>{formError}</Alert>}
+            {mode === 'create' && (
+              <Alert severity="info" sx={{ mb: 2 }}>
+                Se generará una contraseña temporal. Compártela con la persona; deberá cambiarla en su primer inicio de sesión.
+              </Alert>
+            )}
+            <UserFormFields form={form} setForm={setForm} />
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={cerrarForm} variant="outlined" disabled={saving}>Cancelar</Button>
+            <Button type="submit" variant="contained" disabled={saving}>
+              {saving ? 'Guardando…' : mode === 'create' ? 'Crear usuario' : 'Guardar cambios'}
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+
+      <Dialog open={Boolean(createdCreds)} onClose={() => setCreatedCreds(null)} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ fontWeight: 400 }}>Cuenta creada</DialogTitle>
+        <DialogContent>
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            Guarda estos datos ahora. La contraseña temporal no se volverá a mostrar.
+          </Alert>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            <strong>{createdCreds?.full_name}</strong> ({createdCreds?.email})
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Usuario</Typography>
+          <Typography variant="h3" sx={{ fontWeight: 400, mb: 2, fontFamily: 'monospace' }}>
+            {createdCreds?.username}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Contraseña temporal</Typography>
+          <Typography variant="h3" sx={{ fontWeight: 400, fontFamily: 'monospace' }}>
+            {createdCreds?.temporary_password}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button variant="contained" onClick={() => setCreatedCreds(null)}>Entendido</Button>
+        </DialogActions>
+      </Dialog>
 
       <ConfirmDialog
         open={Boolean(confirmUser)}

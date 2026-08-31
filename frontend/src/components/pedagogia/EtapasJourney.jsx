@@ -4,15 +4,16 @@ import { colors } from '../../theme/muiTheme'
 
 export default function EtapasJourney({ modulos = [], etapaActualId, onSelect }) {
   const sorted = [...modulos].sort((a, b) => a.orden - b.orden)
-  const currentIdx = sorted.findIndex((m) => m.id === etapaActualId)
+  let currentIdx = sorted.findIndex((m) => m.id === etapaActualId)
+  if (currentIdx < 0 && sorted.length) currentIdx = 0
 
   return (
     <Box sx={{ overflowX: 'auto', pb: 1 }}>
       <Stack direction="row" spacing={0} alignItems="flex-start" sx={{ minWidth: { xs: 560, md: '100%' } }}>
         {sorted.map((mod, i) => {
-          const isPast = currentIdx >= 0 && i < currentIdx
-          const isCurrent = mod.id === etapaActualId
-          const isFuture = currentIdx >= 0 && i > currentIdx
+          const accent = mod.color || colors.primary
+          const isPast = i < currentIdx
+          const isCurrent = i === currentIdx
 
           return (
             <Box key={mod.id} sx={{ flex: 1, position: 'relative', px: 1 }}>
@@ -24,12 +25,12 @@ export default function EtapasJourney({ modulos = [], etapaActualId, onSelect })
                     left: '50%',
                     right: '-50%',
                     height: 2,
-                    bgcolor: isPast || isCurrent ? mod.color || colors.primary : colors.border,
+                    bgcolor: isPast || isCurrent ? accent : colors.border,
                     zIndex: 0,
                   }}
                 />
               )}
-              <Stack alignItems="center" spacing={1} sx={{ position: 'relative', zIndex: 1 }}>
+              <Stack alignItems="center" spacing={0.75} sx={{ position: 'relative', zIndex: 1 }}>
                 <Box
                   onClick={() => onSelect?.(mod)}
                   sx={{
@@ -39,16 +40,17 @@ export default function EtapasJourney({ modulos = [], etapaActualId, onSelect })
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: isCurrent ? mod.color || colors.primary : isPast ? `${mod.color || colors.moss}33` : colors.surface,
-                    border: `2px solid ${isCurrent ? mod.color || colors.primary : isFuture ? colors.border : mod.color || colors.primary}`,
-                    color: isCurrent ? '#fff' : isPast ? mod.color || colors.moss : colors.muted,
+                    bgcolor: isCurrent ? colors.dark : isPast ? `${accent}33` : colors.surface,
+                    border: `2px solid ${accent}`,
+                    boxShadow: isCurrent ? `0 0 0 4px ${colors.cream}` : 'none',
+                    color: isCurrent ? colors.cream : isPast ? accent : colors.muted,
                     cursor: onSelect ? 'pointer' : 'default',
                     transition: 'transform 0.2s',
                     '&:hover': onSelect ? { transform: 'scale(1.06)' } : {},
                   }}
                 >
                   {isPast ? <Check size={18} /> : (
-                    <Typography variant="caption" fontWeight={600}>{mod.orden}</Typography>
+                    <Typography variant="caption" fontWeight={700}>{mod.orden}</Typography>
                   )}
                 </Box>
                 <Typography
@@ -63,6 +65,20 @@ export default function EtapasJourney({ modulos = [], etapaActualId, onSelect })
                 >
                   {mod.nombre.replace(/^Etapa [IVX]+ — /, '')}
                 </Typography>
+                {isCurrent && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: colors.secondary,
+                      fontWeight: 600,
+                      fontSize: '0.65rem',
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Estás aquí
+                  </Typography>
+                )}
               </Stack>
             </Box>
           )

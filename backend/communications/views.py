@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts.permissions import IsModeratorOrAdmin
+from .contacts import destinatarios_agrupados
 from .models import Anuncio, Mensaje
 from .serializers import AnuncioSerializer, MensajeSerializer
 
@@ -32,6 +33,11 @@ class AnuncioViewSet(viewsets.ModelViewSet):
         if anuncio.es_global:
             anuncio.grupos.clear()
 
+    def perform_update(self, serializer):
+        anuncio = serializer.save()
+        if anuncio.es_global:
+            anuncio.grupos.clear()
+
 
 class MensajeViewSet(viewsets.ModelViewSet):
     queryset = Mensaje.objects.select_related('remitente', 'destinatario')
@@ -44,6 +50,10 @@ class MensajeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(remitente=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def destinatarios(self, request):
+        return Response(destinatarios_agrupados(request.user, request))
 
     @action(detail=False, methods=['get'])
     def recibidos(self, request):

@@ -11,6 +11,7 @@ class CategoriaContenidoSerializer(serializers.ModelSerializer):
 
 class ContenidoSerializer(serializers.ModelSerializer):
     categoria_nombre = serializers.CharField(source='categoria.nombre', read_only=True)
+    modulo_nombre = serializers.CharField(source='modulo.nombre', read_only=True, allow_null=True)
     creado_por_nombre = serializers.CharField(source='creado_por.get_full_name', read_only=True)
     visto = serializers.SerializerMethodField()
 
@@ -18,6 +19,7 @@ class ContenidoSerializer(serializers.ModelSerializer):
         model = Contenido
         fields = [
             'id', 'titulo', 'descripcion', 'tipo', 'categoria', 'categoria_nombre',
+            'modulo', 'modulo_nombre',
             'archivo', 'url_externa', 'thumbnail', 'duracion_minutos',
             'es_publico', 'requiere_suscripcion', 'orden', 'creado_por',
             'creado_por_nombre', 'created_at', 'updated_at', 'visto',

@@ -1,7 +1,8 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { getHomeRoute } from './utils/routes'
 import LoadingScreen from './components/common/LoadingScreen'
+import CambiarContrasena from './pages/CambiarContrasena'
 import MarketingLayout from './layouts/MarketingLayout'
 import HomePage from './pages/marketing/HomePage'
 import ContactPage from './pages/marketing/ContactPage'
@@ -33,8 +34,12 @@ import AdminPreguntas from './pages/admin/AdminPreguntas'
 
 function PrivateRoute({ children, adminOnly = false, coordinatorOnly = false }) {
   const { user, loading, isAdmin, isCoordinator } = useAuth()
+  const location = useLocation()
   if (loading) return <LoadingScreen />
   if (!user) return <Navigate to="/login" replace />
+  if (user.must_change_password && location.pathname !== '/cambiar-contrasena') {
+    return <Navigate to="/cambiar-contrasena" replace />
+  }
   if (adminOnly && !isAdmin) return <Navigate to={getHomeRoute(user)} replace />
   if (coordinatorOnly && !isCoordinator && !isAdmin) return <Navigate to={getHomeRoute(user)} replace />
   return children
@@ -43,6 +48,7 @@ function PrivateRoute({ children, adminOnly = false, coordinatorOnly = false }) 
 function PublicRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <LoadingScreen />
+  if (user?.must_change_password) return <Navigate to="/cambiar-contrasena" replace />
   if (user) return <Navigate to={getHomeRoute(user)} replace />
   return children
 }
@@ -61,6 +67,7 @@ export default function App() {
       </Route>
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/registro" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/cambiar-contrasena" element={<PrivateRoute><CambiarContrasena /></PrivateRoute>} />
 
       <Route path="/app" element={<PrivateRoute><UserLayout /></PrivateRoute>}>
         <Route index element={<Dashboard />} />

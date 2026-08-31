@@ -19,7 +19,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { contentAPI } from '../../services/api'
+import { contentAPI, pedagogiaAPI } from '../../services/api'
 import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
@@ -28,7 +28,7 @@ import FormField from '../../components/common/FormField'
 import StatusBadge from '../../components/common/StatusBadge'
 import { colors } from '../../theme/muiTheme'
 
-const emptyForm = { titulo: '', descripcion: '', tipo: 'documento', url_externa: '', es_publico: false }
+const emptyForm = { titulo: '', descripcion: '', tipo: 'documento', modulo: '', url_externa: '', es_publico: false }
 
 const tipoOptions = {
   documento: 'Documento',
@@ -59,8 +59,14 @@ export default function AdminContenidos() {
   const [ordenTitulo, setOrdenTitulo] = useState('az')
   const [filtroTipo, setFiltroTipo] = useState('todos')
   const [filtroVisibilidad, setFiltroVisibilidad] = useState('todos')
+  const [filtroEtapa, setFiltroEtapa] = useState('todos')
+  const [modulos, setModulos] = useState([])
 
-  const load = () => contentAPI.list().then((r) => setItems(r.data.results || r.data))
+  const load = () =>
+    Promise.all([contentAPI.list(), pedagogiaAPI.modulos()]).then(([c, m]) => {
+      setItems(c.data.results || c.data)
+      setModulos(m.data.results || m.data)
+    })
 
   useEffect(() => { load().finally(() => setLoading(false)) }, [])
 
@@ -75,6 +81,11 @@ export default function AdminContenidos() {
     } else if (filtroVisibilidad === 'privado') {
       list = list.filter((c) => !c.es_publico)
     }
+    if (filtroEtapa === 'sin') {
+      list = list.filter((c) => !c.modulo)
+    } else if (filtroEtapa !== 'todos') {
+      list = list.filter((c) => String(c.modulo) === String(filtroEtapa))
+    }
 
     const sorted = [...list].sort((a, b) => {
       const na = nombreContenido(a.titulo).localeCompare(nombreContenido(b.titulo), 'es', { sensitivity: 'base' })
@@ -82,11 +93,11 @@ export default function AdminContenidos() {
     })
 
     return sorted
-  }, [items, ordenTitulo, filtroTipo, filtroVisibilidad])
+  }, [items, ordenTitulo, filtroTipo, filtroVisibilidad, filtroEtapa])
 
   const crear = async (e) => {
     e.preventDefault()
-    await contentAPI.create({ ...form, es_publico: false })
+    await contentAPI.create({ ...form, modulo: form.modulo ? parseInt(form.modulo, 10) : null, es_publico: false })
     setForm(emptyForm)
     load()
   }
@@ -103,6 +114,7 @@ export default function AdminContenidos() {
       titulo: nombreContenido(contenido.titulo || ''),
       descripcion: contenido.descripcion || '',
       tipo: tipoOptions[contenido.tipo] ? contenido.tipo : 'documento',
+      modulo: contenido.modulo || '',
       url_externa: contenido.url_externa || '',
       es_publico: Boolean(contenido.es_publico),
     })
@@ -118,8 +130,14 @@ export default function AdminContenidos() {
     if (!editing) return
     setSavingEdit(true)
     try {
-      const { titulo, descripcion, tipo, url_externa } = editForm
-      await contentAPI.update(editing.id, { titulo, descripcion, tipo, url_externa })
+      const { titulo, descripcion, tipo, modulo, url_externa } = editForm
+      await contentAPI.update(editing.id, {
+        titulo,
+        descripcion,
+        tipo,
+        modulo: modulo ? parseInt(modulo, 10) : null,
+        url_externa,
+      })
       cerrarModificar()
       load()
     } finally {
@@ -151,6 +169,12 @@ export default function AdminContenidos() {
           <FormField label="Tipo de contenido">
             <TextField select fullWidth value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })} hiddenLabel>
               {Object.entries(tipoOptions).map(([k, v]) => <MenuItem key={k} value={k}>{v}</MenuItem>)}
+            </TextField>
+          </FormField>
+          <FormField label="Módulo relacionado">
+            <TextField select fullWidth value={form.modulo} onChange={(e) => setForm({ ...form, modulo: e.target.value })} hiddenLabel>
+              <MenuItem value="">Sin módulo específico</MenuItem>
+              {modulos.map((m) => <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>)}
             </TextField>
           </FormField>
           <FormField label="Descripción">
@@ -213,6 +237,20 @@ export default function AdminContenidos() {
                 <MenuItem value="publico">Público</MenuItem>
                 <MenuItem value="privado">Privado</MenuItem>
               </TextField>
+              <TextField
+                select
+                size="small"
+                label="Etapa"
+                value={filtroEtapa}
+                onChange={(e) => setFiltroEtapa(e.target.value)}
+                sx={{ minWidth: 200 }}
+              >
+                <MenuItem value="todos">Todas</MenuItem>
+                <MenuItem value="sin">Sin etapa</MenuItem>
+                {modulos.map((m) => (
+                  <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>
+                ))}
+              </TextField>
             </Stack>
           </CardContent>
           <TableContainer>
@@ -221,6 +259,7 @@ export default function AdminContenidos() {
                 <TableRow>
                   <TableCell>Título</TableCell>
                   <TableCell>Tipo</TableCell>
+                  <TableCell>Etapa</TableCell>
                   <TableCell>Visibilidad</TableCell>
                   <TableCell align="center">Acciones</TableCell>
                 </TableRow>
@@ -228,7 +267,7 @@ export default function AdminContenidos() {
               <TableBody>
                 {itemsFiltrados.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4}>
+                    <TableCell colSpan={5}>
                       <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
                         No hay contenidos con estos filtros.
                       </Typography>
@@ -243,6 +282,7 @@ export default function AdminContenidos() {
                         </Typography>
                       </TableCell>
                       <TableCell>{tipoLabel[c.tipo] || c.tipo}</TableCell>
+                      <TableCell>{c.modulo_nombre || 'Sin etapa'}</TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={1} alignItems="center">
                           <Switch
@@ -305,6 +345,20 @@ export default function AdminContenidos() {
                 >
                   {Object.entries(tipoOptions).map(([k, v]) => (
                     <MenuItem key={k} value={k}>{v}</MenuItem>
+                  ))}
+                </TextField>
+              </FormField>
+              <FormField label="Módulo relacionado">
+                <TextField
+                  select
+                  fullWidth
+                  value={editForm.modulo}
+                  onChange={(e) => setEditForm({ ...editForm, modulo: e.target.value })}
+                  hiddenLabel
+                >
+                  <MenuItem value="">Sin módulo específico</MenuItem>
+                  {modulos.map((m) => (
+                    <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>
                   ))}
                 </TextField>
               </FormField>

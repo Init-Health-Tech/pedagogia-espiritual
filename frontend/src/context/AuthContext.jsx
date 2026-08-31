@@ -11,15 +11,17 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('access_token')
     if (!token) {
       setLoading(false)
-      return
+      return null
     }
     try {
       const { data } = await authAPI.me()
       setUser(data)
+      return data
     } catch {
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
       setUser(null)
+      return null
     } finally {
       setLoading(false)
     }

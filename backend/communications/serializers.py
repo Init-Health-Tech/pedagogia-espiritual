@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from accounts.serializers import UserSerializer
 from groups.models import GrupoPastoreo
+from .contacts import puede_enviar_mensaje
 from .models import Anuncio, Mensaje
 
 
@@ -55,3 +56,13 @@ class MensajeSerializer(serializers.ModelSerializer):
         model = Mensaje
         fields = '__all__'
         read_only_fields = ('remitente', 'created_at')
+
+    def validate_destinatario(self, destinatario):
+        request = self.context.get('request')
+        remitente = getattr(request, 'user', None)
+        if remitente and remitente.is_authenticated:
+            if not puede_enviar_mensaje(remitente, destinatario):
+                raise serializers.ValidationError(
+                    'Solo puedes escribir a coordinadores y compañeros de tus grupos de pastoreo.',
+                )
+        return destinatario

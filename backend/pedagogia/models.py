@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.conf import settings
 from django.db import models
 
@@ -77,6 +79,26 @@ class FichaPedagogica(models.Model):
 
     def __str__(self):
         return f'Ficha de {self.usuario}'
+
+    def fecha_inicio(self):
+        if self.fecha_inicio_camino:
+            return self.fecha_inicio_camino
+        joined = getattr(self.usuario, 'date_joined', None)
+        if joined:
+            return joined.date() if hasattr(joined, 'date') else joined
+        return date.today()
+
+    def disponibilidad_semana(self, semana_num):
+        semana = max(1, int(semana_num or 1))
+        desbloquea = self.fecha_inicio() + timedelta(days=(semana - 1) * 7)
+        hoy = date.today()
+        disponible = hoy >= desbloquea
+        dias_restantes = 0 if disponible else (desbloquea - hoy).days
+        return {
+            'disponible': disponible,
+            'desbloquea_en': desbloquea.isoformat(),
+            'dias_restantes': dias_restantes,
+        }
 
     def recalcular_progreso(self):
         preguntas = PreguntaChecklist.objects.filter(activa=True)

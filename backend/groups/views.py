@@ -32,7 +32,7 @@ class GrupoPastoreoViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def mis_grupos(self, request):
         qs = self.get_queryset()
-        return Response(GrupoPastoreoListSerializer(qs, many=True).data)
+        return Response(GrupoPastoreoListSerializer(qs, many=True, context={'request': request}).data)
 
 
 class EsquemaGrupoViewSet(viewsets.ModelViewSet):

@@ -35,6 +35,14 @@ class Contenido(models.Model):
         blank=True,
         related_name='contenidos',
     )
+    modulo = models.ForeignKey(
+        'pedagogia.Modulo',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='contenidos',
+        help_text='Etapa / módulo pedagógico al que pertenece este contenido (opcional)',
+    )
     archivo = models.FileField(upload_to='contenidos/', blank=True, null=True)
     url_externa = models.URLField(blank=True, help_text='URL de video (YouTube, Vimeo, etc.)')
     thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)

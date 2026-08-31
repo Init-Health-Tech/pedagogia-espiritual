@@ -157,13 +157,19 @@ class Command(BaseCommand):
                 },
             )
 
-        grupo, _ = GrupoPastoreo.objects.get_or_create(
+        grupo, created = GrupoPastoreo.objects.get_or_create(
             nombre='Grupo San Francisco',
             defaults={
                 'descripcion': 'Grupo de pastoreo para formación inicial',
-                'horario_reunion': 'Sábados 10:00 AM',
+                'dia_reunion': 'sabado',
+                'hora_reunion': time(10, 0),
             },
         )
+        if not created and not grupo.dia_reunion:
+            grupo.dia_reunion = 'sabado'
+            grupo.hora_reunion = time(10, 0)
+            grupo.horario_reunion = ''
+            grupo.save(update_fields=['dia_reunion', 'hora_reunion', 'horario_reunion'])
         grupo.coordinadores.set([coordinator])
         grupo.miembros.add(member)
 

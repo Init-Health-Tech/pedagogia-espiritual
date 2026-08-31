@@ -24,7 +24,11 @@ export default function Login() {
     setLoading(true)
     try {
       const userData = await login(username, password)
-      navigate(getHomeRoute(userData))
+      if (userData.must_change_password) {
+        navigate('/cambiar-contrasena', { replace: true })
+      } else {
+        navigate(getHomeRoute(userData))
+      }
     } catch (err) {
       if (!err.response) {
         setError('No pudimos conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.')

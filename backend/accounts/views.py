@@ -5,7 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .permissions import IsAdminUser
-from .serializers import RegisterSerializer, UserAdminSerializer, UserSerializer
+from .serializers import (
+    ChangePasswordSerializer,
+    RegisterSerializer,
+    UserAdminSerializer,
+    UserSerializer,
+)
 
 User = get_user_model()
 
@@ -53,12 +58,41 @@ class MeView(APIView):
         return Response(serializer.data)
 
 
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'detail': 'Contraseña actualizada.'})
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserAdminSerializer
     permission_classes = [IsAdminUser]
     filterset_fields = ['role', 'is_active_member', 'is_active']
     search_fields = ['username', 'email', 'first_name', 'last_name']
+
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()
+        if user.is_admin_user or user.role == User.Role.ADMIN:
+            return Response(
+                {'detail': 'No se pueden editar cuentas de administrador desde este panel.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'detail': 'No se permite eliminar usuarios. Usa desactivar acceso.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
     @action(detail=True, methods=['post'])
     def toggle_active(self, request, pk=None):

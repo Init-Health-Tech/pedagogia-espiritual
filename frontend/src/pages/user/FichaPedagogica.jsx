@@ -40,7 +40,8 @@ export default function FichaPedagogica() {
           initial[c.pregunta_id] = c.nota || ''
         })
         setDrafts(initial)
-        const firstOpen = (f.data.checklist || []).find((c) => !c.completada)
+        const firstOpen = (f.data.checklist || []).find((c) => c.disponible && !c.completada)
+          || (f.data.checklist || []).find((c) => c.disponible)
         if (firstOpen) setExpandedWeek(firstOpen.pregunta_id)
       })
 
@@ -56,6 +57,7 @@ export default function FichaPedagogica() {
   const guardarEntrada = async (item) => {
     const nota = (drafts[item.pregunta_id] || '').trim()
     if (nota.length < 15) return
+    if (item.disponible === false) return
     setSaving(item.pregunta_id)
     try {
       const { data } = await pedagogiaAPI.responderChecklist({
@@ -81,8 +83,14 @@ export default function FichaPedagogica() {
         <Card sx={{ mb: 3, border: `1px solid ${colors.border}` }}>
           <CardContent>
             <Stack spacing={3}>
-              <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'flex-end' }} spacing={2}>
-                <Box>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems={{ xs: 'flex-start', sm: 'flex-end' }}
+                spacing={2}
+                sx={{ width: '100%' }}
+              >
+                <Box sx={{ flex: 1, minWidth: 0, pr: 2 }}>
                   <Typography variant="overline" color="text.secondary">Tu recorrido</Typography>
                   <Typography variant="h2" color="secondary.main" sx={{ fontWeight: 400 }}>{progreso}%</Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -90,11 +98,13 @@ export default function FichaPedagogica() {
                   </Typography>
                 </Box>
                 {ficha?.modulo_actual_detalle && (
-                  <Chip
-                    label={`Etapa actual: ${ficha.modulo_actual_detalle.nombre.replace(/^Etapa [IVX]+ — /, '')}`}
-                    sx={{ bgcolor: `${ficha.modulo_actual_detalle.color}22`, borderColor: ficha.modulo_actual_detalle.color }}
-                    variant="outlined"
-                  />
+                  <Box sx={{ ml: 'auto', flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Chip
+                      label={`Etapa actual: ${ficha.modulo_actual_detalle.nombre.replace(/^Etapa [IVX]+ — /, '')}`}
+                      sx={{ bgcolor: `${ficha.modulo_actual_detalle.color}22`, borderColor: ficha.modulo_actual_detalle.color }}
+                      variant="outlined"
+                    />
+                  </Box>
                 )}
               </Stack>
               <AnimatedProgress value={progreso} />
@@ -135,38 +145,59 @@ export default function FichaPedagogica() {
       ) : (
         <Stack spacing={2} sx={{ mb: 5 }}>
           {checklist.map((item) => {
-            const open = expandedWeek === item.pregunta_id
+            const locked = item.disponible === false
+            const open = !locked && expandedWeek === item.pregunta_id
             const draft = drafts[item.pregunta_id] ?? item.nota ?? ''
             const canSave = draft.trim().length >= 15
+            const lockLabel = item.dias_restantes === 1
+              ? 'Disponible mañana'
+              : item.dias_restantes > 1
+                ? `Disponible en ${item.dias_restantes} días`
+                : 'Próxima semana'
 
             return (
               <Card
                 key={item.pregunta_id}
                 sx={{
-                  border: `1px solid ${item.completada ? colors.moss + '55' : colors.border}`,
-                  bgcolor: item.completada ? `${colors.moss}0D` : 'background.paper',
+                  border: `1px solid ${locked ? colors.border : item.completada ? colors.moss + '55' : colors.border}`,
+                  bgcolor: locked ? colors.light : item.completada ? `${colors.moss}0D` : 'background.paper',
                   overflow: 'hidden',
+                  opacity: locked ? 0.78 : 1,
                 }}
               >
                 <CardContent
-                  sx={{ cursor: 'pointer', pb: open ? 0 : 2 }}
-                  onClick={() => setExpandedWeek(open ? null : item.pregunta_id)}
+                  sx={{ cursor: locked ? 'default' : 'pointer', pb: open ? 0 : 2 }}
+                  onClick={() => {
+                    if (locked) return
+                    setExpandedWeek(open ? null : item.pregunta_id)
+                  }}
                 >
-                  <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                    <Box>
+                  <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ width: '100%' }}>
+                    <Box sx={{ flex: 1, minWidth: 0, pr: 1 }}>
                       <Typography variant="overline" color="text.secondary">
                         Semana {item.semana || item.orden}
                         {item.modulo_nombre && ` · ${item.modulo_nombre.replace(/^Etapa [IVX]+ — /, '')}`}
                       </Typography>
-                      <Typography variant="subtitle1" fontWeight={500} sx={{ mt: 0.5 }}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight={500}
+                        sx={{ mt: 0.5, color: locked ? 'text.secondary' : 'text.primary' }}
+                      >
                         {item.texto.replace(/^Semana \d+ — /, '')}
                       </Typography>
                     </Box>
-                    {item.completada && (
-                      <Chip label="Escrito" size="small" color="success" variant="outlined" />
-                    )}
+                    {locked ? (
+                      <Chip
+                        label={lockLabel}
+                        size="small"
+                        variant="outlined"
+                        sx={{ ml: 'auto', flexShrink: 0, borderColor: colors.border, color: colors.muted }}
+                      />
+                    ) : item.completada ? (
+                      <Chip label="Escrito" size="small" color="success" variant="outlined" sx={{ ml: 'auto', flexShrink: 0 }} />
+                    ) : null}
                   </Stack>
-                  {!open && item.nota && (
+                  {!open && !locked && item.nota && (
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }} noWrap>
                       {item.nota.slice(0, 120)}…
                     </Typography>
@@ -189,18 +220,21 @@ export default function FichaPedagogica() {
                       onClick={(e) => e.stopPropagation()}
                       sx={{ mb: 2 }}
                     />
-                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Stack spacing={1} sx={{ mt: 0.5, width: '100%' }}>
                       <Typography variant="caption" color={canSave ? 'text.secondary' : 'warning.main'}>
                         {canSave ? `${draft.trim().length} caracteres` : 'Mínimo 15 caracteres para guardar'}
                       </Typography>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        disabled={!canSave || saving === item.pregunta_id}
-                        onClick={(e) => { e.stopPropagation(); guardarEntrada(item) }}
-                      >
-                        {saving === item.pregunta_id ? 'Guardando…' : item.completada ? 'Actualizar entrada' : 'Guardar semana'}
-                      </Button>
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          disabled={!canSave || saving === item.pregunta_id}
+                          onClick={(e) => { e.stopPropagation(); guardarEntrada(item) }}
+                          sx={{ minWidth: 168, px: 2.5 }}
+                        >
+                          {saving === item.pregunta_id ? 'Guardando…' : item.completada ? 'Actualizar entrada' : 'Guardar semana'}
+                        </Button>
+                      </Box>
                     </Stack>
                   </CardContent>
                 </Collapse>
@@ -219,26 +253,53 @@ export default function FichaPedagogica() {
       </Typography>
 
       <Stack spacing={2}>
-        {modulos.map((mod) => (
-          <Card key={mod.id} sx={{ borderLeft: 4, borderColor: mod.color || colors.primary }}>
-            <CardContent>
-              <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={2}>
-                <Box>
-                  <Typography variant="overline">Etapa {mod.orden}</Typography>
-                  <Typography variant="subtitle1" fontWeight={600}>{mod.nombre}</Typography>
-                  <Typography variant="body2" color="text.secondary">{mod.descripcion}</Typography>
-                </Box>
-                <Button
-                  variant={mod.contenido_manual?.length ? 'contained' : 'outlined'}
-                  onClick={() => mod.contenido_manual?.length && setManualModulo(mod)}
-                  disabled={!mod.contenido_manual?.length}
+        {modulos.map((mod) => {
+          const desbloqueado = Boolean(mod.contenido_manual?.length)
+          return (
+            <Card
+              key={mod.id}
+              sx={{
+                borderLeft: 4,
+                borderColor: desbloqueado ? (mod.color || colors.primary) : colors.border,
+                bgcolor: desbloqueado ? colors.surface : colors.light,
+                opacity: desbloqueado ? 1 : 0.78,
+              }}
+            >
+              <CardContent>
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  justifyContent="space-between"
+                  alignItems={{ xs: 'stretch', sm: 'center' }}
+                  spacing={2}
                 >
-                  {mod.contenido_manual?.length ? 'Abrir manual' : 'Próximamente'}
-                </Button>
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
+                  <Box sx={{ flex: 1, minWidth: 0, pr: { sm: 2 } }}>
+                    <Typography variant="overline" sx={{ color: desbloqueado ? 'text.secondary' : colors.muted }}>
+                      Etapa {mod.orden}
+                    </Typography>
+                    <Typography variant="subtitle1" fontWeight={600} sx={{ color: desbloqueado ? colors.dark : colors.muted }}>
+                      {mod.nombre}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">{mod.descripcion}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexShrink: 0, alignSelf: { xs: 'flex-end', sm: 'center' } }}>
+                    <Button
+                      variant={desbloqueado ? 'contained' : 'outlined'}
+                      onClick={() => desbloqueado && setManualModulo(mod)}
+                      disabled={!desbloqueado}
+                      sx={{
+                        minWidth: 168,
+                        px: 2.5,
+                        ...(desbloqueado ? {} : { borderColor: colors.border, color: colors.muted }),
+                      }}
+                    >
+                      {desbloqueado ? 'Abrir manual' : 'Próximamente'}
+                    </Button>
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+          )
+        })}
       </Stack>
     </>
   )

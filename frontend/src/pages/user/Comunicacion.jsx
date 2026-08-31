@@ -1,5 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
+  Alert,
+  Autocomplete,
+  Avatar,
   Box,
   Button,
   Card,
@@ -21,33 +25,108 @@ import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 import FormField from '../../components/common/FormField'
 import StatusBadge from '../../components/common/StatusBadge'
+import { colors } from '../../theme/muiTheme'
+
+function flattenContactos(payload) {
+  const secciones = payload?.secciones || []
+  return secciones.flatMap((seccion) =>
+    (seccion.personas || []).map((persona) => ({
+      ...persona,
+      grupoTitulo: seccion.titulo,
+    })),
+  )
+}
 
 export default function Comunicacion() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [tab, setTab] = useState(0)
   const [anuncios, setAnuncios] = useState([])
   const [recibidos, setRecibidos] = useState([])
+  const [contactos, setContactos] = useState([])
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
-  const [form, setForm] = useState({ destinatario: '', asunto: '', cuerpo: '' })
+  const [errorEnvio, setErrorEnvio] = useState('')
+  const [destinatario, setDestinatario] = useState(null)
+  const [form, setForm] = useState({ asunto: '', cuerpo: '' })
 
   const load = () => {
     setLoading(true)
-    Promise.all([communicationsAPI.anuncios(), communicationsAPI.mensajesRecibidos()])
-      .then(([a, m]) => {
+    Promise.all([
+      communicationsAPI.anuncios(),
+      communicationsAPI.mensajesRecibidos(),
+      communicationsAPI.destinatarios(),
+    ])
+      .then(([a, m, d]) => {
         setAnuncios(a.data.results || a.data)
         setRecibidos(m.data)
+        setContactos(flattenContactos(d.data))
       })
       .finally(() => setLoading(false))
   }
 
   useEffect(() => { load() }, [])
 
+  const cerrarCompose = () => {
+    setOpen(false)
+    setErrorEnvio('')
+    setDestinatario(null)
+    setForm({ asunto: '', cuerpo: '' })
+    if (searchParams.get('destinatario')) setSearchParams({})
+  }
+
+  useEffect(() => {
+    const dest = searchParams.get('destinatario')
+    if (!dest) return
+    const id = Number(dest)
+    const encontrado = contactos.find((p) => p.id === id) || (
+      Number.isFinite(id)
+        ? {
+            id,
+            full_name: searchParams.get('nombre') || '',
+            avatar: null,
+            iniciales: (searchParams.get('nombre') || '?').slice(0, 2).toUpperCase(),
+            grupoTitulo: 'Tu coordinador',
+          }
+        : null
+    )
+    setDestinatario(encontrado)
+    setForm((prev) => ({
+      ...prev,
+      asunto: searchParams.get('asunto') || prev.asunto,
+    }))
+    setTab(1)
+    setOpen(true)
+  }, [searchParams, contactos])
+
+  const opcionesUnicas = useMemo(() => {
+    const seen = new Set()
+    return contactos.filter((p) => {
+      const key = `${p.grupoTitulo}-${p.id}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }, [contactos])
+
   const enviar = async (e) => {
     e.preventDefault()
-    await communicationsAPI.enviarMensaje({ ...form, destinatario: parseInt(form.destinatario, 10) })
-    setOpen(false)
-    setForm({ destinatario: '', asunto: '', cuerpo: '' })
-    load()
+    if (!destinatario?.id) return
+    setErrorEnvio('')
+    try {
+      await communicationsAPI.enviarMensaje({
+        destinatario: destinatario.id,
+        asunto: form.asunto,
+        cuerpo: form.cuerpo,
+      })
+      cerrarCompose()
+      load()
+    } catch (err) {
+      const data = err.response?.data
+      const msg = data?.destinatario
+        ? (Array.isArray(data.destinatario) ? data.destinatario[0] : data.destinatario)
+        : 'No se pudo enviar el mensaje.'
+      setErrorEnvio(msg)
+    }
   }
 
   if (loading) return <LoadingScreen rows={2} />
@@ -106,12 +185,52 @@ export default function Comunicacion() {
         )
       )}
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+      <Dialog open={open} onClose={cerrarCompose} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 400 }}>Enviar mensaje</DialogTitle>
         <Box component="form" onSubmit={enviar}>
           <DialogContent>
-            <FormField label="Destinatario" helper="Número de identificación del miembro">
-              <TextField value={form.destinatario} onChange={(e) => setForm({ ...form, destinatario: e.target.value })} required fullWidth hiddenLabel />
+            {errorEnvio && <Alert severity="error" sx={{ mb: 2 }}>{errorEnvio}</Alert>}
+            <FormField
+              label="Destinatario"
+              helper={
+                opcionesUnicas.length === 0
+                  ? 'Cuando tengas un grupo de pastoreo, podrás escribir a tu coordinador y a tus compañeros.'
+                  : 'Elige a tu coordinador o a un compañero de grupo'
+              }
+            >
+              <Autocomplete
+                options={opcionesUnicas}
+                value={destinatario}
+                onChange={(_, value) => setDestinatario(value)}
+                groupBy={(option) => option.grupoTitulo}
+                getOptionLabel={(option) => option.full_name || ''}
+                isOptionEqualToValue={(a, b) => a.id === b.id}
+                noOptionsText="No hay personas disponibles"
+                renderOption={(props, option) => {
+                  const { key, ...rest } = props
+                  return (
+                    <Box key={key} component="li" {...rest} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Avatar
+                        src={option.avatar || undefined}
+                        alt={option.full_name}
+                        sx={{ width: 32, height: 32, fontSize: '0.75rem', bgcolor: colors.primary, color: colors.cream }}
+                      >
+                        {option.iniciales || (option.full_name || '?').slice(0, 2).toUpperCase()}
+                      </Avatar>
+                      <Typography variant="body1">{option.full_name}</Typography>
+                    </Box>
+                  )
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    required
+                    fullWidth
+                    hiddenLabel
+                    placeholder="Buscar por nombre"
+                  />
+                )}
+              />
             </FormField>
             <FormField label="Asunto">
               <TextField value={form.asunto} onChange={(e) => setForm({ ...form, asunto: e.target.value })} required fullWidth hiddenLabel />
@@ -121,8 +240,8 @@ export default function Comunicacion() {
             </FormField>
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={() => setOpen(false)} variant="outlined">Cancelar</Button>
-            <Button type="submit" variant="contained">Enviar mensaje</Button>
+            <Button onClick={cerrarCompose} variant="outlined">Cancelar</Button>
+            <Button type="submit" variant="contained" disabled={!destinatario}>Enviar mensaje</Button>
           </DialogActions>
         </Box>
       </Dialog>

@@ -45,6 +45,7 @@ export const authAPI = {
   register: (data) => api.post('/accounts/register/', data),
   me: () => api.get('/accounts/me/'),
   updateMe: (data) => api.patch('/accounts/me/', data),
+  changePassword: (data) => api.post('/accounts/me/change_password/', data),
 }
 
 export const pedagogiaAPI = {
@@ -91,14 +92,17 @@ export const paymentsAPI = {
   miSuscripcion: () => api.get('/payments/suscripciones/mi_suscripcion/'),
   pagos: () => api.get('/payments/pagos/'),
   confirmarPago: (id) => api.post(`/payments/pagos/${id}/confirmar/`),
+  registrarPago: (data) => api.post('/payments/pagos/registrar/', data),
 }
 
 export const communicationsAPI = {
   anuncios: () => api.get('/communications/anuncios/'),
   createAnuncio: (data) => api.post('/communications/anuncios/', data),
+  updateAnuncio: (id, data) => api.patch(`/communications/anuncios/${id}/`, data),
   deleteAnuncio: (id) => api.delete(`/communications/anuncios/${id}/`),
   mensajesRecibidos: () => api.get('/communications/mensajes/recibidos/'),
   mensajesEnviados: () => api.get('/communications/mensajes/enviados/'),
+  destinatarios: () => api.get('/communications/mensajes/destinatarios/'),
   enviarMensaje: (data) => api.post('/communications/mensajes/', data),
   noLeidos: () => api.get('/communications/mensajes/no_leidos/'),
   marcarLeido: (id) => api.post(`/communications/mensajes/${id}/marcar_leido/`),

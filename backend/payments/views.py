@@ -1,10 +1,11 @@
 from django.utils import timezone
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts.permissions import IsAdminUser, IsModeratorOrAdmin
 from .models import Pago, PlanSuscripcion, Suscripcion
+from .registration import RegistrarPagoSerializer
 from .serializers import PagoSerializer, PlanSuscripcionSerializer, SuscripcionSerializer
 
 
@@ -50,13 +51,27 @@ class SuscripcionViewSet(viewsets.ModelViewSet):
 
 
 class PagoViewSet(viewsets.ModelViewSet):
-    queryset = Pago.objects.select_related('usuario', 'suscripcion')
+    queryset = Pago.objects.select_related('usuario', 'suscripcion', 'suscripcion__plan')
     serializer_class = PagoSerializer
     permission_classes = [IsModeratorOrAdmin]
     filterset_fields = ['estado', 'metodo', 'usuario']
 
     def perform_create(self, serializer):
         serializer.save(registrado_por=self.request.user)
+
+    @action(detail=False, methods=['post'])
+    def registrar(self, request):
+        serializer = RegistrarPagoSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return Response(
+            {
+                'pago': PagoSerializer(result['pago']).data,
+                'suscripcion': SuscripcionSerializer(result['suscripcion']).data,
+                'proximo_pago': result['proximo_pago'].isoformat(),
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
     @action(detail=True, methods=['post'])
     def confirmar(self, request, pk=None):

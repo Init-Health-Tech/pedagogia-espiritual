@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
@@ -9,6 +10,7 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  MenuItem,
   Stack,
   Table,
   TableBody,
@@ -25,6 +27,8 @@ import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
+import FormField from '../../components/common/FormField'
+import StatusBadge from '../../components/common/StatusBadge'
 import { colors } from '../../theme/muiTheme'
 
 const emptyPlanForm = {
@@ -33,23 +37,53 @@ const emptyPlanForm = {
   duracion_meses: '',
 }
 
+const emptyPagoForm = {
+  usuario: null,
+  plan: '',
+  monto: '',
+  fecha_pago: new Date().toISOString().slice(0, 10),
+}
+
 function formatFecha(iso) {
   if (!iso) return '—'
-  const d = new Date(iso)
+  const raw = String(iso).includes('T') ? iso : `${iso}T00:00:00`
+  const d = new Date(raw)
   if (Number.isNaN(d.getTime())) return '—'
   return d.toLocaleDateString('es-MX', { dateStyle: 'medium' })
 }
 
 function addMonths(iso, months) {
-  const d = new Date(iso)
+  const raw = String(iso).includes('T') ? iso : `${iso}T00:00:00`
+  const d = new Date(raw)
   if (Number.isNaN(d.getTime())) return null
   const result = new Date(d)
   result.setMonth(result.getMonth() + Number(months || 0))
   return result
 }
 
+function toDateOnly(iso) {
+  if (!iso) return null
+  const raw = String(iso).includes('T') ? iso : `${iso}T00:00:00`
+  const d = new Date(raw)
+  if (Number.isNaN(d.getTime())) return null
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+}
+
+function isVencido(proximoPagoIso) {
+  const prox = toDateOnly(proximoPagoIso)
+  if (!prox) return false
+  const hoy = new Date()
+  const hoySolo = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
+  return prox < hoySolo
+}
+
 function nombreUsuario(u) {
   return u.full_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.username
+}
+
+function labelUsuario(u) {
+  const nombre = nombreUsuario(u)
+  return nombre ? `${nombre} (@${u.username})` : u.username
 }
 
 export default function AdminPagos() {
@@ -61,8 +95,12 @@ export default function AdminPagos() {
   const [dialogMode, setDialogMode] = useState(null)
   const [editingPlan, setEditingPlan] = useState(null)
   const [planForm, setPlanForm] = useState(emptyPlanForm)
+  const [pagoForm, setPagoForm] = useState(emptyPagoForm)
+  const [pagoOpen, setPagoOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [savingPago, setSavingPago] = useState(false)
   const [confirmId, setConfirmId] = useState(null)
+  const [confirmUser, setConfirmUser] = useState(null)
 
   const load = () =>
     Promise.all([
@@ -114,10 +152,23 @@ export default function AdminPagos() {
         monto: pago?.monto ?? plan?.precio ?? null,
         fechaPago,
         proximoPago,
+        vencido: isVencido(proximoPago),
+        is_active_member: Boolean(m.is_active_member),
+        full_name: nombreUsuario(m),
         tienePago: Boolean(pago || sub),
       }
     })
   }, [miembros, suscripciones, pagos])
+
+  const planSeleccionado = useMemo(
+    () => planes.find((p) => String(p.id) === String(pagoForm.plan)) || null,
+    [planes, pagoForm.plan],
+  )
+
+  const proximoPagoPreview = useMemo(() => {
+    if (!pagoForm.fecha_pago || !planSeleccionado?.duracion_meses) return null
+    return addMonths(pagoForm.fecha_pago, planSeleccionado.duracion_meses)
+  }, [pagoForm.fecha_pago, planSeleccionado])
 
   const abrirNuevo = () => {
     setEditingPlan(null)
@@ -169,6 +220,52 @@ export default function AdminPagos() {
       await paymentsAPI.updatePlan(id, { activo: false })
     }
     setConfirmId(null)
+    await load()
+  }
+
+  const abrirRegistrarPago = () => {
+    setPagoForm({
+      ...emptyPagoForm,
+      fecha_pago: new Date().toISOString().slice(0, 10),
+    })
+    setPagoOpen(true)
+  }
+
+  const cerrarRegistrarPago = () => {
+    setPagoOpen(false)
+    setPagoForm(emptyPagoForm)
+  }
+
+  const onSelectPlan = (planId) => {
+    const plan = planes.find((p) => String(p.id) === String(planId))
+    setPagoForm((prev) => ({
+      ...prev,
+      plan: planId,
+      monto: plan ? String(plan.precio) : prev.monto,
+    }))
+  }
+
+  const guardarPago = async (e) => {
+    e.preventDefault()
+    if (!pagoForm.usuario?.id || !pagoForm.plan) return
+    setSavingPago(true)
+    try {
+      await paymentsAPI.registrarPago({
+        usuario: pagoForm.usuario.id,
+        plan: Number(pagoForm.plan),
+        monto: pagoForm.monto,
+        fecha_pago: pagoForm.fecha_pago,
+      })
+      cerrarRegistrarPago()
+      await load()
+    } finally {
+      setSavingPago(false)
+    }
+  }
+
+  const toggleAcceso = async (id) => {
+    await adminAPI.toggleActive(id)
+    setConfirmUser(null)
     await load()
   }
 
@@ -251,10 +348,17 @@ export default function AdminPagos() {
 
       <Card>
         <CardContent sx={{ pb: 1 }}>
-          <Typography variant="h3">Pagos de miembros</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Plan contratado, monto pagado, fecha de pago y próxima renovación según la duración del plan.
-          </Typography>
+          <Box sx={{ mb: 0.5 }}>
+            <Typography variant="h3">Pagos de miembros</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Plan contratado, monto pagado, fecha de pago y próxima renovación según la duración del plan.
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+              <Button variant="contained" onClick={abrirRegistrarPago}>
+                Registrar pago
+              </Button>
+            </Box>
+          </Box>
         </CardContent>
 
         {filasMiembros.length === 0 ? (
@@ -274,23 +378,40 @@ export default function AdminPagos() {
                   <TableCell>Pago</TableCell>
                   <TableCell>Fecha de pago</TableCell>
                   <TableCell>Próximo pago</TableCell>
+                  <TableCell>Acceso</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filasMiembros.map((fila) => (
-                  <TableRow key={fila.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={500}>{fila.nombre}</Typography>
-                      <Typography variant="caption" color="text.secondary">@{fila.username}</Typography>
-                    </TableCell>
-                    <TableCell>{fila.plan}</TableCell>
-                    <TableCell>
-                      {fila.monto != null ? `$${fila.monto}` : '—'}
-                    </TableCell>
-                    <TableCell>{formatFecha(fila.fechaPago)}</TableCell>
-                    <TableCell>{formatFecha(fila.proximoPago)}</TableCell>
-                  </TableRow>
-                ))}
+                {filasMiembros.map((fila) => {
+                  const estadoAcceso = fila.vencido
+                    ? { status: 'pending', label: 'Vencido' }
+                    : fila.is_active_member
+                      ? { status: 'active', label: 'Activo' }
+                      : { status: 'alert', label: 'Inactivo' }
+
+                  return (
+                    <TableRow key={fila.id} hover>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={500}>{fila.nombre}</Typography>
+                        <Typography variant="caption" color="text.secondary">@{fila.username}</Typography>
+                      </TableCell>
+                      <TableCell>{fila.plan}</TableCell>
+                      <TableCell>
+                        {fila.monto != null ? `$${fila.monto}` : '—'}
+                      </TableCell>
+                      <TableCell>{formatFecha(fila.fechaPago)}</TableCell>
+                      <TableCell>{formatFecha(fila.proximoPago)}</TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <StatusBadge status={estadoAcceso.status} label={estadoAcceso.label} />
+                          <Button size="small" variant="outlined" onClick={() => setConfirmUser(fila)}>
+                            {fila.is_active_member ? 'Desactivar' : 'Activar'}
+                          </Button>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </TableContainer>
@@ -339,6 +460,84 @@ export default function AdminPagos() {
         </form>
       </Dialog>
 
+      <Dialog open={pagoOpen} onClose={cerrarRegistrarPago} fullWidth maxWidth="sm">
+        <Box component="form" onSubmit={guardarPago}>
+          <DialogTitle sx={{ fontWeight: 400 }}>Registrar pago</DialogTitle>
+          <DialogContent dividers>
+            <FormField label="Miembro" required helper="Busca por nombre">
+              <Autocomplete
+                options={miembros}
+                value={pagoForm.usuario}
+                onChange={(_, value) => setPagoForm({ ...pagoForm, usuario: value })}
+                getOptionLabel={labelUsuario}
+                isOptionEqualToValue={(a, b) => a?.id === b?.id}
+                renderInput={(params) => (
+                  <TextField {...params} required={!pagoForm.usuario} placeholder="Seleccionar miembro" />
+                )}
+                noOptionsText="No hay miembros"
+              />
+            </FormField>
+            <FormField label="Plan" required>
+              <TextField
+                select
+                fullWidth
+                required
+                value={pagoForm.plan}
+                onChange={(e) => onSelectPlan(e.target.value)}
+                hiddenLabel
+              >
+                <MenuItem value="" disabled>Seleccionar plan</MenuItem>
+                {planes.map((p) => (
+                  <MenuItem key={p.id} value={p.id}>
+                    {p.nombre} — ${p.precio} ({p.duracion_meses} {Number(p.duracion_meses) === 1 ? 'mes' : 'meses'})
+                  </MenuItem>
+                ))}
+              </TextField>
+            </FormField>
+            <FormField label="Monto pagado" required helper="Se completa con el precio del plan; puedes ajustarlo">
+              <TextField
+                type="number"
+                fullWidth
+                required
+                inputProps={{ min: 0, step: '0.01' }}
+                value={pagoForm.monto}
+                onChange={(e) => setPagoForm({ ...pagoForm, monto: e.target.value })}
+                hiddenLabel
+              />
+            </FormField>
+            <FormField label="Fecha de pago" required>
+              <TextField
+                type="date"
+                fullWidth
+                required
+                value={pagoForm.fecha_pago}
+                onChange={(e) => setPagoForm({ ...pagoForm, fecha_pago: e.target.value })}
+                hiddenLabel
+                InputLabelProps={{ shrink: true }}
+              />
+            </FormField>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Próximo pago:{' '}
+              <strong>
+                {proximoPagoPreview
+                  ? proximoPagoPreview.toLocaleDateString('es-MX', { dateStyle: 'medium' })
+                  : '—'}
+              </strong>
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, py: 2 }}>
+            <Button onClick={cerrarRegistrarPago} disabled={savingPago}>Cancelar</Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={savingPago || !pagoForm.usuario || !pagoForm.plan}
+            >
+              {savingPago ? 'Guardando…' : 'Registrar pago'}
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+
       <ConfirmDialog
         open={Boolean(confirmId)}
         title="¿Eliminar este plan?"
@@ -346,6 +545,20 @@ export default function AdminPagos() {
         confirmLabel="Sí, eliminar"
         onConfirm={() => eliminarPlan(confirmId)}
         onClose={() => setConfirmId(null)}
+      />
+
+      <ConfirmDialog
+        open={Boolean(confirmUser)}
+        title={confirmUser?.is_active_member ? '¿Desactivar este usuario?' : '¿Activar este usuario?'}
+        message={
+          confirmUser?.is_active_member
+            ? `${confirmUser.full_name || confirmUser.username} no podrá acceder a la plataforma hasta que lo reactives.`
+            : `${confirmUser?.full_name || confirmUser?.username} podrá volver a ingresar a la plataforma.`
+        }
+        confirmLabel={confirmUser?.is_active_member ? 'Sí, desactivar' : 'Sí, activar'}
+        destructive={confirmUser?.is_active_member}
+        onConfirm={() => toggleAcceso(confirmUser.id)}
+        onClose={() => setConfirmUser(null)}
       />
     </>
   )

@@ -10,12 +10,38 @@ export default function HubActionCard({ icon: Icon, title, description, to, onCl
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'visible',
         '&:hover': { transform: 'scale(1.01)', borderColor: colors.primary },
       }}
     >
-      <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: `${colors.primary}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, color: colors.primary }}>
-          <Icon size={24} strokeWidth={1.75} />
+      <CardContent
+        sx={{
+          p: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          overflow: 'visible',
+        }}
+      >
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            minWidth: 48,
+            minHeight: 48,
+            borderRadius: 2,
+            bgcolor: `${colors.primary}18`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mb: 2,
+            color: colors.primary,
+            flexShrink: 0,
+            overflow: 'visible',
+            '& svg': { display: 'block', overflow: 'visible', flexShrink: 0 },
+          }}
+        >
+          <Icon size={22} strokeWidth={1.75} />
         </Box>
         <Typography variant="h3" gutterBottom sx={{ fontWeight: 400 }}>{title}</Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3, flex: 1 }}>{description}</Typography>

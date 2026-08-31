@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom'
-import { Box, Grid, Paper, Stack, Typography } from '@mui/material'
+import { Box, Button, Grid, Paper, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
-import { ClipboardList, BookOpen, Users, Heart } from 'lucide-react'
+import { BookOpen, ClipboardList, MessageCircle, Users } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import HubActionCard from '../../components/common/HubActionCard'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
@@ -15,7 +15,10 @@ function getGreeting() {
   return 'Buenas noches'
 }
 
-const quickActions = [
+const DAYS_FOR_FREQUENT = 7
+const INTERACTIONS_FOR_FREQUENT = 3
+
+const shortcutCards = [
   {
     icon: ClipboardList,
     title: 'Mi camino',
@@ -34,12 +37,35 @@ const quickActions = [
     description: 'Tu comunidad de camino y encuentro.',
     to: '/app/grupos',
   },
+  {
+    icon: MessageCircle,
+    title: 'Mensajes',
+    description: 'Comunícate con tu coordinador y tu grupo.',
+    to: '/app/comunicacion',
+  },
 ]
+
+function daysSince(isoDate) {
+  if (!isoDate) return 0
+  const then = new Date(isoDate)
+  if (Number.isNaN(then.getTime())) return 0
+  return Math.floor((Date.now() - then.getTime()) / (1000 * 60 * 60 * 24))
+}
 
 export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
   const { user } = useAuth()
   const progreso = ficha?.progreso_general ?? 0
   const nombre = user?.first_name || user?.username || 'hermano/a'
+  const isNew = progreso === 0
+
+  const completedItems = (ficha?.checklist || []).filter((item) => item.completada).length
+  const hasRepeatedUse = completedItems >= INTERACTIONS_FOR_FREQUENT
+    || (progreso > 0 && daysSince(user?.date_joined) >= DAYS_FOR_FREQUENT)
+
+  const continueTo = ficha?.modulo_actual ? '/app/ficha' : '/app/ficha-espiritual'
+  const continueLabel = ficha?.modulo_actual_detalle?.nombre
+    ? `Continúa: ${ficha.modulo_actual_detalle.nombre}`
+    : 'Ficha pedagógica – Espiritual'
 
   const actividad = [
     ...anuncios.map((a) => ({
@@ -68,26 +94,52 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
       {ficha && (
         <motion.div variants={staggerItem}>
           <Paper sx={{ p: 3, mb: 4, borderRadius: 4, border: `1px solid ${colors.border}` }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={2} sx={{ mb: 2 }}>
-              <Box>
-                <Typography variant="overline">Tu progreso</Typography>
-                <Typography variant="body1">Diario semanal y etapas de formación</Typography>
-              </Box>
-              <Typography variant="h3" sx={{ color: colors.primary, fontWeight: 500 }}>{progreso}%</Typography>
-            </Stack>
-            <AnimatedProgress value={progreso} />
+            {isNew ? (
+              <Stack spacing={2} alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
+                <Typography variant="h3" sx={{ fontWeight: 400, color: colors.dark }}>
+                  Estás por comenzar tu camino de formación
+                </Typography>
+                <Button
+                  component={RouterLink}
+                  to={continueTo}
+                  variant="contained"
+                  color="secondary"
+                >
+                  Da el primer paso →
+                </Button>
+              </Stack>
+            ) : (
+              <>
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  justifyContent="space-between"
+                  alignItems={{ sm: 'center' }}
+                  spacing={2}
+                  sx={{ mb: 2 }}
+                >
+                  <Box>
+                    <Typography variant="overline">Tu progreso</Typography>
+                    <Typography variant="body1">Diario semanal y etapas de formación</Typography>
+                  </Box>
+                  <Typography variant="h3" sx={{ color: colors.primary, fontWeight: 500 }}>{progreso}%</Typography>
+                </Stack>
+                <AnimatedProgress value={progreso} />
+              </>
+            )}
           </Paper>
         </motion.div>
       )}
 
       <motion.div variants={staggerItem}>
-        <Typography variant="overline" sx={{ display: 'block', mb: 2 }}>Acciones frecuentes</Typography>
+        <Typography variant="overline" sx={{ display: 'block', mb: 2 }}>
+          {hasRepeatedUse ? 'Acciones frecuentes' : 'Continúa aquí'}
+        </Typography>
       </motion.div>
 
       <motion.div variants={staggerItem}>
         <Box
           component={RouterLink}
-          to="/app/ficha-espiritual"
+          to={continueTo}
           sx={{
             display: 'block',
             mb: 2.5,
@@ -104,6 +156,7 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
               display: 'flex',
               alignItems: 'center',
               gap: 2,
+              overflow: 'visible',
               transition: 'border-color 0.2s, transform 0.2s',
               '&:hover': {
                 borderColor: colors.primary,
@@ -115,6 +168,8 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
               sx={{
                 width: 48,
                 height: 48,
+                minWidth: 48,
+                minHeight: 48,
                 borderRadius: 2,
                 bgcolor: `${colors.moss}22`,
                 display: 'flex',
@@ -122,31 +177,40 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
                 justifyContent: 'center',
                 color: colors.moss,
                 flexShrink: 0,
+                overflow: 'visible',
+                '& svg': { display: 'block', overflow: 'visible' },
               }}
             >
-              <Heart size={24} strokeWidth={1.75} />
+              <BookOpen size={22} strokeWidth={1.75} />
             </Box>
-            <Typography
-              variant="h3"
-              className="font-display"
-              sx={{
-                fontWeight: 500,
-                letterSpacing: '0.05em',
-                fontSize: { xs: '1rem', sm: '1.125rem' },
-                color: colors.dark,
-              }}
-            >
-              FICHA PEDAGÓGICA – ESPIRITUAL
-            </Typography>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography
+                variant="h3"
+                className="font-display"
+                sx={{
+                  fontWeight: 500,
+                  letterSpacing: '0.05em',
+                  fontSize: { xs: '1rem', sm: '1.125rem' },
+                  color: colors.dark,
+                }}
+              >
+                {continueLabel.toUpperCase()}
+              </Typography>
+              {!hasRepeatedUse && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  Retoma donde lo dejaste, o empieza por el primer contenido de tu etapa.
+                </Typography>
+              )}
+            </Box>
           </Paper>
         </Box>
       </motion.div>
 
       <Grid container spacing={2.5} sx={{ mb: 4 }}>
-        {quickActions.map((action) => (
-          <Grid key={action.to} size={{ xs: 12, sm: 6, lg: 3 }}>
+        {shortcutCards.map((card) => (
+          <Grid key={card.to} size={{ xs: 12, sm: 6 }}>
             <motion.div variants={staggerItem} style={{ height: '100%' }}>
-              <HubActionCard {...action} />
+              <HubActionCard {...card} />
             </motion.div>
           </Grid>
         ))}

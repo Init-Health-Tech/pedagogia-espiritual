@@ -5,7 +5,12 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -21,6 +26,7 @@ import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
+import StatusBadge from '../../components/common/StatusBadge'
 import { colors } from '../../theme/muiTheme'
 
 const emptyForm = {
@@ -28,6 +34,7 @@ const emptyForm = {
   contenido: '',
   destino: 'todos',
   grupos: [],
+  importante: false,
 }
 
 const ROL_LABEL = {
@@ -73,12 +80,126 @@ function filtraPorPeriodo(anuncios, periodo) {
   })
 }
 
+function anuncioToForm(anuncio, gruposCatalogo) {
+  const ids = Array.isArray(anuncio.grupos) ? anuncio.grupos : []
+  return {
+    titulo: anuncio.titulo || '',
+    contenido: anuncio.contenido || '',
+    destino: anuncio.es_global ? 'todos' : 'grupos',
+    grupos: ids
+      .map((id) => gruposCatalogo.find((g) => g.id === id))
+      .filter(Boolean),
+    importante: Boolean(anuncio.importante),
+  }
+}
+
+function formToPayload(form) {
+  const esGlobal = form.destino === 'todos'
+  return {
+    titulo: form.titulo,
+    contenido: form.contenido,
+    es_global: esGlobal,
+    grupos: esGlobal ? [] : form.grupos.map((g) => g.id),
+    importante: form.importante,
+  }
+}
+
+function AnuncioFormFields({ form, setForm, grupos }) {
+  return (
+    <>
+      <TextField
+        label="Título"
+        fullWidth
+        required
+        sx={{ mb: 2 }}
+        value={form.titulo}
+        onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+      />
+      <TextField
+        label="Contenido"
+        multiline
+        rows={4}
+        fullWidth
+        required
+        sx={{ mb: 2 }}
+        value={form.contenido}
+        onChange={(e) => setForm({ ...form, contenido: e.target.value })}
+      />
+
+      <FormControl component="fieldset" sx={{ mb: 2, width: '100%' }}>
+        <FormLabel component="legend" sx={{ mb: 1, color: colors.dark, fontWeight: 500 }}>
+          Destinatario
+        </FormLabel>
+        <RadioGroup
+          value={form.destino}
+          onChange={(e) => setForm({
+            ...form,
+            destino: e.target.value,
+            grupos: e.target.value === 'todos' ? [] : form.grupos,
+          })}
+        >
+          <FormControlLabel
+            value="todos"
+            control={<Radio />}
+            label="Para todos"
+          />
+          <FormControlLabel
+            value="grupos"
+            control={<Radio />}
+            label="Seleccionar grupos"
+          />
+        </RadioGroup>
+      </FormControl>
+
+      {form.destino === 'grupos' && (
+        <Autocomplete
+          multiple
+          options={grupos}
+          value={form.grupos}
+          onChange={(_, value) => setForm({ ...form, grupos: value })}
+          getOptionLabel={(g) => g.nombre}
+          isOptionEqualToValue={(a, b) => a.id === b.id}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip {...getTagProps({ index })} key={option.id} label={option.nombre} size="small" />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Grupos"
+              required={form.destino === 'grupos'}
+              helperText="Elige uno o más grupos que recibirán este aviso"
+              sx={{ mb: 2 }}
+            />
+          )}
+          noOptionsText="No hay grupos disponibles"
+        />
+      )}
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={form.importante}
+            onChange={(e) => setForm({ ...form, importante: e.target.checked })}
+          />
+        }
+        label="Marcar como importante"
+        sx={{ mb: 1, display: 'block' }}
+      />
+    </>
+  )
+}
+
 export default function AdminAnuncios() {
   const [anuncios, setAnuncios] = useState([])
   const [grupos, setGrupos] = useState([])
   const [form, setForm] = useState(emptyForm)
+  const [editForm, setEditForm] = useState(emptyForm)
+  const [editing, setEditing] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [savingEdit, setSavingEdit] = useState(false)
   const [confirmId, setConfirmId] = useState(null)
   const [ordenFecha, setOrdenFecha] = useState('reciente')
   const [filtroPeriodo, setFiltroPeriodo] = useState('todos')
@@ -104,17 +225,34 @@ export default function AdminAnuncios() {
     e.preventDefault()
     setSaving(true)
     try {
-      const esGlobal = form.destino === 'todos'
-      await communicationsAPI.createAnuncio({
-        titulo: form.titulo,
-        contenido: form.contenido,
-        es_global: esGlobal,
-        grupos: esGlobal ? [] : form.grupos.map((g) => g.id),
-      })
+      await communicationsAPI.createAnuncio(formToPayload(form))
       setForm(emptyForm)
       await load()
     } finally {
       setSaving(false)
+    }
+  }
+
+  const abrirEditar = (anuncio) => {
+    setEditing(anuncio)
+    setEditForm(anuncioToForm(anuncio, grupos))
+  }
+
+  const cerrarEditar = () => {
+    setEditing(null)
+    setEditForm(emptyForm)
+  }
+
+  const guardarEditar = async (e) => {
+    e.preventDefault()
+    if (!editing) return
+    setSavingEdit(true)
+    try {
+      await communicationsAPI.updateAnuncio(editing.id, formToPayload(editForm))
+      cerrarEditar()
+      await load()
+    } finally {
+      setSavingEdit(false)
     }
   }
 
@@ -132,76 +270,7 @@ export default function AdminAnuncios() {
       <Card sx={{ mb: 3, maxWidth: 720 }}>
         <CardContent component="form" onSubmit={crear}>
           <Typography variant="h3" gutterBottom>Nuevo anuncio</Typography>
-          <TextField
-            label="Título"
-            fullWidth
-            required
-            sx={{ mb: 2 }}
-            value={form.titulo}
-            onChange={(e) => setForm({ ...form, titulo: e.target.value })}
-          />
-          <TextField
-            label="Contenido"
-            multiline
-            rows={4}
-            fullWidth
-            required
-            sx={{ mb: 2 }}
-            value={form.contenido}
-            onChange={(e) => setForm({ ...form, contenido: e.target.value })}
-          />
-
-          <FormControl component="fieldset" sx={{ mb: 2, width: '100%' }}>
-            <FormLabel component="legend" sx={{ mb: 1, color: colors.dark, fontWeight: 500 }}>
-              Destinatario
-            </FormLabel>
-            <RadioGroup
-              value={form.destino}
-              onChange={(e) => setForm({
-                ...form,
-                destino: e.target.value,
-                grupos: e.target.value === 'todos' ? [] : form.grupos,
-              })}
-            >
-              <FormControlLabel
-                value="todos"
-                control={<Radio />}
-                label="Para todos"
-              />
-              <FormControlLabel
-                value="grupos"
-                control={<Radio />}
-                label="Seleccionar grupos"
-              />
-            </RadioGroup>
-          </FormControl>
-
-          {form.destino === 'grupos' && (
-            <Autocomplete
-              multiple
-              options={grupos}
-              value={form.grupos}
-              onChange={(_, value) => setForm({ ...form, grupos: value })}
-              getOptionLabel={(g) => g.nombre}
-              isOptionEqualToValue={(a, b) => a.id === b.id}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip {...getTagProps({ index })} key={option.id} label={option.nombre} size="small" />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Grupos"
-                  required={form.destino === 'grupos'}
-                  helperText="Elige uno o más grupos que recibirán este aviso"
-                  sx={{ mb: 2 }}
-                />
-              )}
-              noOptionsText="No hay grupos disponibles"
-            />
-          )}
-
+          <AnuncioFormFields form={form} setForm={setForm} grupos={grupos} />
           <Box sx={{ mt: 1 }}>
             <Button
               type="submit"
@@ -276,13 +345,16 @@ export default function AdminAnuncios() {
                       mb: 1,
                     }}
                   >
-                    <Typography
-                      variant="subtitle1"
-                      fontWeight={600}
-                      sx={{ flex: 1, minWidth: 0, lineHeight: 1.4, m: 0 }}
-                    >
-                      {a.titulo}
-                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight={600}
+                        sx={{ lineHeight: 1.4, m: 0 }}
+                      >
+                        {a.titulo}
+                      </Typography>
+                      {a.importante && <StatusBadge status="pending" label="Importante" />}
+                    </Stack>
                     <Typography
                       component="span"
                       variant="body2"
@@ -314,7 +386,14 @@ export default function AdminAnuncios() {
                         ? a.grupos_nombres.join(', ')
                         : 'Sin grupos asignados'}
                   </Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => abrirEditar(a)}
+                    >
+                      Editar
+                    </Button>
                     <Button
                       size="small"
                       color="error"
@@ -323,13 +402,32 @@ export default function AdminAnuncios() {
                     >
                       Eliminar
                     </Button>
-                  </Box>
+                  </Stack>
                 </CardContent>
               </Card>
             ))}
           </Stack>
         )}
       </Card>
+
+      <Dialog open={Boolean(editing)} onClose={cerrarEditar} fullWidth maxWidth="sm">
+        <Box component="form" onSubmit={guardarEditar}>
+          <DialogTitle>Editar anuncio</DialogTitle>
+          <DialogContent dividers>
+            <AnuncioFormFields form={editForm} setForm={setEditForm} grupos={grupos} />
+          </DialogContent>
+          <DialogActions sx={{ px: 3, py: 2 }}>
+            <Button onClick={cerrarEditar}>Cancelar</Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={savingEdit || (editForm.destino === 'grupos' && editForm.grupos.length === 0)}
+            >
+              {savingEdit ? 'Guardando…' : 'Guardar cambios'}
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
 
       <ConfirmDialog
         open={Boolean(confirmId)}

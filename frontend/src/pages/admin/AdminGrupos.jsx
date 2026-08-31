@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -19,10 +20,36 @@ import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 
+const DIAS = [
+  { value: 'lunes', label: 'Lunes' },
+  { value: 'martes', label: 'Martes' },
+  { value: 'miercoles', label: 'Miércoles' },
+  { value: 'jueves', label: 'Jueves' },
+  { value: 'viernes', label: 'Viernes' },
+  { value: 'sabado', label: 'Sábado' },
+  { value: 'domingo', label: 'Domingo' },
+]
+
+function buildHoraOptions() {
+  const options = []
+  for (let h = 0; h < 24; h += 1) {
+    for (const m of [0, 30]) {
+      const value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+      const hour12 = h % 12 || 12
+      const sufijo = h < 12 ? 'AM' : 'PM'
+      options.push({ value, label: `${hour12}:${String(m).padStart(2, '0')} ${sufijo}` })
+    }
+  }
+  return options
+}
+
+const HORAS = buildHoraOptions()
+
 const emptyForm = {
   nombre: '',
   descripcion: '',
-  horario_reunion: '',
+  dia_reunion: '',
+  hora_reunion: '',
   miembros: [],
   coordinadores: [],
 }
@@ -32,11 +59,18 @@ function labelUsuario(u) {
   return nombre ? `${nombre} (@${u.username})` : u.username
 }
 
+function horaToInput(hora) {
+  if (!hora) return ''
+  return String(hora).slice(0, 5)
+}
+
 function payloadFromForm(form) {
   return {
     nombre: form.nombre,
     descripcion: form.descripcion,
-    horario_reunion: form.horario_reunion,
+    dia_reunion: form.dia_reunion || '',
+    hora_reunion: form.hora_reunion || null,
+    horario_reunion: '',
     miembros: form.miembros.map((u) => u.id),
     coordinadores: form.coordinadores.map((u) => u.id),
   }
@@ -62,13 +96,32 @@ function GrupoFields({ form, setForm, miembrosActivos, coordinadoresDisponibles 
         value={form.descripcion}
         onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
       />
-      <TextField
-        label="Horario"
-        fullWidth
-        sx={{ mb: 2 }}
-        value={form.horario_reunion}
-        onChange={(e) => setForm({ ...form, horario_reunion: e.target.value })}
-      />
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
+        <TextField
+          select
+          label="Día de la semana"
+          fullWidth
+          value={form.dia_reunion}
+          onChange={(e) => setForm({ ...form, dia_reunion: e.target.value })}
+        >
+          <MenuItem value="">Sin definir</MenuItem>
+          {DIAS.map((d) => (
+            <MenuItem key={d.value} value={d.value}>{d.label}</MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          select
+          label="Hora"
+          fullWidth
+          value={form.hora_reunion}
+          onChange={(e) => setForm({ ...form, hora_reunion: e.target.value })}
+        >
+          <MenuItem value="">Sin definir</MenuItem>
+          {HORAS.map((h) => (
+            <MenuItem key={h.value} value={h.value}>{h.label}</MenuItem>
+          ))}
+        </TextField>
+      </Stack>
       <Autocomplete
         multiple
         options={miembrosActivos}
@@ -137,6 +190,7 @@ export default function AdminGrupos() {
   const [editForm, setEditForm] = useState(emptyForm)
   const [loadingEdit, setLoadingEdit] = useState(false)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [busqueda, setBusqueda] = useState('')
 
   const load = () =>
     Promise.all([groupsAPI.list(), adminAPI.users()]).then(([g, u]) => {
@@ -161,6 +215,16 @@ export default function AdminGrupos() {
     users.forEach((u) => map.set(u.id, u))
     return map
   }, [users])
+
+  const gruposFiltrados = useMemo(() => {
+    const q = busqueda.trim().toLowerCase()
+    if (!q) return grupos
+    return grupos.filter((g) => {
+      const nombre = (g.nombre || '').toLowerCase()
+      const coords = (g.coordinadores_nombres || []).join(' ').toLowerCase()
+      return nombre.includes(q) || coords.includes(q)
+    })
+  }, [grupos, busqueda])
 
   const crear = async (e) => {
     e.preventDefault()
@@ -188,9 +252,15 @@ export default function AdminGrupos() {
       setEditForm({
         nombre: data.nombre || '',
         descripcion: data.descripcion || '',
-        horario_reunion: data.horario_reunion || '',
+        dia_reunion: data.dia_reunion || '',
+        hora_reunion: horaToInput(data.hora_reunion),
         miembros,
         coordinadores,
+      })
+      setEditing({
+        ...grupo,
+        ...data,
+        horario_requiere_revision: data.horario_requiere_revision,
       })
     } catch {
       setEditing(null)
@@ -240,9 +310,17 @@ export default function AdminGrupos() {
       <Card>
         <CardContent sx={{ pb: 1 }}>
           <Typography variant="h3">Grupos Existentes</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
             Revisa cada grupo y modifica sus datos, miembros o coordinadores cuando lo necesites.
           </Typography>
+          <TextField
+            size="small"
+            label="Buscar"
+            placeholder="Nombre del grupo o coordinador"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            sx={{ minWidth: 260, maxWidth: 420, mb: 1 }}
+          />
         </CardContent>
 
         {grupos.length === 0 ? (
@@ -252,18 +330,29 @@ export default function AdminGrupos() {
               description="Crea el primero con el formulario de arriba."
             />
           </CardContent>
+        ) : gruposFiltrados.length === 0 ? (
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+              No hay grupos con esta búsqueda.
+            </Typography>
+          </CardContent>
         ) : (
           <Grid container spacing={2} sx={{ px: 2, pb: 2.5 }}>
-            {grupos.map((g) => (
+            {gruposFiltrados.map((g) => (
               <Grid key={g.id} size={{ xs: 12, sm: 6 }}>
                 <Card variant="outlined" sx={{ height: '100%' }}>
                   <CardContent>
-                    <Typography variant="subtitle1" fontWeight={600}>{g.nombre}</Typography>
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }} flexWrap="wrap" useFlexGap>
+                      <Typography variant="subtitle1" fontWeight={600}>{g.nombre}</Typography>
+                      {g.horario_requiere_revision && (
+                        <Chip size="small" color="warning" label="Revisar horario" />
+                      )}
+                    </Stack>
                     <Typography variant="body2" color="text.secondary" sx={{ my: 1 }}>
                       {g.descripcion || 'Sin descripción'}
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>
-                      <strong>Horario:</strong> {g.horario_reunion || '—'}
+                      <strong>Horario:</strong> {g.horario_display || g.horario_reunion || '—'}
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>
                       <strong>Miembros ({g.total_miembros}):</strong>{' '}
@@ -300,6 +389,12 @@ export default function AdminGrupos() {
               </Typography>
             ) : (
               <Stack sx={{ pt: 1 }}>
+                {editing?.horario_requiere_revision && (
+                  <Typography variant="body2" color="warning.main" sx={{ mb: 2 }}>
+                    Este grupo tenía horario en texto libre que no se pudo interpretar.
+                    Define día y hora abajo. Texto anterior: “{editing.horario_reunion}”
+                  </Typography>
+                )}
                 <GrupoFields
                   form={editForm}
                   setForm={setEditForm}
