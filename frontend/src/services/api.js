@@ -61,6 +61,18 @@ export const pedagogiaAPI = {
   createPregunta: (data) => api.post('/pedagogia/preguntas/', data),
   updatePregunta: (id, data) => api.patch(`/pedagogia/preguntas/${id}/`, data),
   deletePregunta: (id) => api.delete(`/pedagogia/preguntas/${id}/`),
+  actualizarPerfil: (data) => api.post('/pedagogia/fichas/actualizar_perfil/', data),
+  guardarSemanaFicha: (data) => api.post('/pedagogia/fichas/guardar_semana_ficha/', data),
+  confirmarAvance: (fichaId) => api.post(`/pedagogia/fichas/${fichaId}/confirmar_avance/`),
+  posponerAvance: (fichaId) => api.post(`/pedagogia/fichas/${fichaId}/posponer_avance/`),
+  areasEvaluacion: () => api.get('/pedagogia/areas-evaluacion/'),
+  createAreaEvaluacion: (data) => api.post('/pedagogia/areas-evaluacion/', data),
+  updateAreaEvaluacion: (id, data) => api.patch(`/pedagogia/areas-evaluacion/${id}/`, data),
+  deleteAreaEvaluacion: (id) => api.delete(`/pedagogia/areas-evaluacion/${id}/`),
+  praxisItems: () => api.get('/pedagogia/praxis-items/'),
+  createPraxisItem: (data) => api.post('/pedagogia/praxis-items/', data),
+  updatePraxisItem: (id, data) => api.patch(`/pedagogia/praxis-items/${id}/`, data),
+  deletePraxisItem: (id) => api.delete(`/pedagogia/praxis-items/${id}/`),
 }
 
 export const contentAPI = {

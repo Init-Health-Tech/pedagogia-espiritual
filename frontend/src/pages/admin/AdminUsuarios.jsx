@@ -325,7 +325,14 @@ export default function AdminUsuarios() {
                         sx={{ cursor: esMiembro ? 'pointer' : 'default' }}
                       >
                         <TableCell>{u.username}</TableCell>
-                        <TableCell>{u.full_name}</TableCell>
+                        <TableCell>
+                          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ gap: 1 }}>
+                            <span>{u.full_name}</span>
+                            {esMiembro && u.listo_para_avanzar && (
+                              <StatusBadge status="pending" label="Listo para avanzar" />
+                            )}
+                          </Stack>
+                        </TableCell>
                         <TableCell>{ROLE_LABELS[u.role] || u.role}</TableCell>
                         <TableCell>
                           <StatusBadge status={u.is_active_member ? 'active' : 'alert'} label={u.is_active_member ? 'Activo' : 'Inactivo'} />

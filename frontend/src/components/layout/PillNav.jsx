@@ -22,11 +22,11 @@ function NavLink({ item, mobile }) {
         alignItems: 'center',
         justifyContent: 'center',
         gap: 0.35,
-        px: mobile ? 1.25 : 2,
+        px: mobile ? 1.25 : 1.5,
         py: mobile ? 0.75 : 1,
         borderRadius: 999,
         textDecoration: 'none',
-        minWidth: mobile ? 64 : 80,
+        minWidth: mobile ? 64 : 72,
         flexShrink: 0,
         transition: 'background-color 200ms ease-out',
         bgcolor: active ? colors.primary : 'transparent',
@@ -109,10 +109,12 @@ export default function PillNav({ items }) {
           border: `1px solid ${colors.border}`,
           borderRadius: 999,
           p: 0.5,
-          maxWidth: 640,
+          maxWidth: { md: '100%', lg: 1100 },
           width: '100%',
           justifyContent: 'center',
-          flexWrap: 'wrap',
+          flexWrap: 'nowrap',
+          overflowX: 'auto',
+          '&::-webkit-scrollbar': { display: 'none' },
         }}
       >
         {items.map((item) => (

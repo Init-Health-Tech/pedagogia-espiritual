@@ -20,6 +20,7 @@ import EmptyState from '../../components/common/EmptyState'
 import StatusBadge from '../../components/common/StatusBadge'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
 import EtapasJourney from '../../components/pedagogia/EtapasJourney'
+import FichaProgresoVista from '../../components/pedagogia/FichaProgresoVista'
 import { colors } from '../../theme/muiTheme'
 
 const ROLE_LABELS = {
@@ -68,17 +69,20 @@ export default function AdminUsuarioProgreso() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [expanded, setExpanded] = useState('documento')
+  const [avanceBusy, setAvanceBusy] = useState(false)
+
+  const reload = () =>
+    Promise.all([adminAPI.userProgreso(userId), pedagogiaAPI.modulos()])
+      .then(([progresoRes, modulosRes]) => {
+        setData(progresoRes.data)
+        setModulos(modulosRes.data.results || modulosRes.data)
+      })
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
-    Promise.all([adminAPI.userProgreso(userId), pedagogiaAPI.modulos()])
-      .then(([progresoRes, modulosRes]) => {
-        if (cancelled) return
-        setData(progresoRes.data)
-        setModulos(modulosRes.data.results || modulosRes.data)
-      })
+    reload()
       .catch(() => {
         if (!cancelled) setError('No se pudo cargar el progreso de este usuario.')
       })
@@ -86,7 +90,7 @@ export default function AdminUsuarioProgreso() {
         if (!cancelled) setLoading(false)
       })
     return () => { cancelled = true }
-  }, [userId])
+  }, [userId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const byTipo = useMemo(() => {
     const map = { documento: [], presentacion: [], video: [] }
@@ -144,6 +148,30 @@ export default function AdminUsuarioProgreso() {
   const caminoPercent = ficha?.progreso_general ?? 0
   const checklistHechas = (ficha?.checklist || []).filter((c) => c.completada).length
   const checklistTotal = (ficha?.checklist || []).length
+  const sugerencia = ficha?.sugerencia_avance
+  const etapaLabel = (n) => (n || '').replace(/^Etapa [IVX]+ — /, '')
+
+  const confirmarAvance = async () => {
+    if (!ficha?.id) return
+    setAvanceBusy(true)
+    try {
+      await pedagogiaAPI.confirmarAvance(ficha.id)
+      await reload()
+    } finally {
+      setAvanceBusy(false)
+    }
+  }
+
+  const posponerAvance = async () => {
+    if (!ficha?.id) return
+    setAvanceBusy(true)
+    try {
+      await pedagogiaAPI.posponerAvance(ficha.id)
+      await reload()
+    } finally {
+      setAvanceBusy(false)
+    }
+  }
 
   return (
     <>
@@ -165,6 +193,42 @@ export default function AdminUsuarioProgreso() {
           />
         }
       />
+
+      {sugerencia?.mostrar_banner_coordinador && sugerencia?.siguiente_etapa && (
+        <Box
+          sx={{
+            mb: 3,
+            p: { xs: 2.5, md: 3 },
+            borderRadius: 3,
+            border: `1px solid ${colors.border}`,
+            bgcolor: colors.cream,
+          }}
+        >
+          <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.65 }}>
+            <strong>{nombre}</strong> ha completado su recorrido en{' '}
+            <strong>{etapaLabel(sugerencia.etapa_actual?.nombre)}</strong>.
+            {' '}¿Confirmas su avance a{' '}
+            <strong>{etapaLabel(sugerencia.siguiente_etapa?.nombre)}</strong>?
+          </Typography>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+            <Button
+              variant="contained"
+              disabled={avanceBusy}
+              onClick={confirmarAvance}
+            >
+              {avanceBusy ? 'Guardando…' : 'Confirmar avance'}
+            </Button>
+            <Button
+              variant="outlined"
+              disabled={avanceBusy}
+              onClick={posponerAvance}
+              sx={{ borderColor: colors.border, color: colors.dark }}
+            >
+              Aún no
+            </Button>
+          </Stack>
+        </Box>
+      )}
 
       <Stack spacing={3}>
         <Box
@@ -442,6 +506,33 @@ export default function AdminUsuarioProgreso() {
               )
             })}
           </Stack>
+        </Box>
+
+        <Box>
+          <Typography variant="overline" sx={{ color: colors.muted, display: 'block', mb: 1.5 }}>
+            Ficha Pedagógica
+          </Typography>
+          <Box
+            sx={{
+              p: { xs: 2, md: 2.5 },
+              borderRadius: 3,
+              border: `1px solid ${colors.border}`,
+              bgcolor: colors.surface,
+            }}
+          >
+            {!ficha ? (
+              <Typography variant="body2" color="text.secondary">
+                Este miembro aún no ha comenzado su Ficha Pedagógica.
+              </Typography>
+            ) : (
+              <FichaProgresoVista
+                ficha={ficha}
+                variant="admin"
+                showResumenCards
+                showPerfil
+              />
+            )}
+          </Box>
         </Box>
       </Stack>
     </>

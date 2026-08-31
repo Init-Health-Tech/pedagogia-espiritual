@@ -31,6 +31,7 @@ import AdminGrupos from './pages/admin/AdminGrupos'
 import AdminAnuncios from './pages/admin/AdminAnuncios'
 import AdminModulos from './pages/admin/AdminModulos'
 import AdminPreguntas from './pages/admin/AdminPreguntas'
+import AdminFichaPedagogica from './pages/admin/AdminFichaPedagogica'
 
 function PrivateRoute({ children, adminOnly = false, coordinatorOnly = false }) {
   const { user, loading, isAdmin, isCoordinator } = useAuth()
@@ -94,6 +95,7 @@ export default function App() {
         <Route path="anuncios" element={<AdminAnuncios />} />
         <Route path="modulos" element={<AdminModulos />} />
         <Route path="preguntas" element={<AdminPreguntas />} />
+        <Route path="ficha" element={<AdminFichaPedagogica />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

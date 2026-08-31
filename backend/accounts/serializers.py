@@ -42,6 +42,8 @@ class UserSerializer(serializers.ModelSerializer):
 class UserAdminSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True, required=False, min_length=8)
+    listo_para_avanzar = serializers.SerializerMethodField()
+    sugerencia_avance_pendiente = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -50,12 +52,22 @@ class UserAdminSerializer(serializers.ModelSerializer):
             'first_name', 'last_name', 'full_name',
             'role', 'phone', 'avatar', 'bio', 'is_active_member', 'is_active',
             'must_change_password', 'date_joined_movement', 'date_joined', 'created_at',
+            'listo_para_avanzar', 'sugerencia_avance_pendiente',
         )
         read_only_fields = ('id', 'username', 'must_change_password', 'date_joined', 'created_at')
 
     def get_full_name(self, obj):
         name = f'{obj.first_name} {obj.last_name}'.strip()
         return name or obj.username
+
+    def get_listo_para_avanzar(self, obj):
+        ficha = getattr(obj, 'ficha_pedagogica', None)
+        return bool(ficha and ficha.listo_para_avanzar)
+
+    def get_sugerencia_avance_pendiente(self, obj):
+        from pedagogia.avance import sugerencia_avance_para_coordinador
+        ficha = getattr(obj, 'ficha_pedagogica', None)
+        return sugerencia_avance_para_coordinador(ficha) if ficha else False
 
     def validate_role(self, role):
         if role not in ROLES_ADMIN_EDITABLES:

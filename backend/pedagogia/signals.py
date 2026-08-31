@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from accounts.models import User
-from .models import FichaPedagogica, Modulo
+from .models import FichaPedagogica, FichaPerfil, Modulo
 
 
 def asegurar_ficha(usuario):
@@ -21,6 +21,7 @@ def asegurar_ficha(usuario):
             changed.append('modulo_actual')
     if changed:
         ficha.save(update_fields=[*changed, 'updated_at'])
+    FichaPerfil.objects.get_or_create(ficha=ficha)
     return ficha
 
 
