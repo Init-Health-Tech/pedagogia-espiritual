@@ -24,6 +24,8 @@ import AnimatedProgress from '../../components/common/AnimatedProgress'
 import EtapasJourney from '../../components/pedagogia/EtapasJourney'
 import ModuloManual from '../../components/pedagogia/ModuloManual'
 import MiProgresoTab from '../../components/pedagogia/MiProgresoTab'
+import MemberGuidedTour from '../../components/help/MemberGuidedTour'
+import { CAMINO_TOUR_STEPS } from '../../components/help/tourSteps'
 import { colors } from '../../theme/muiTheme'
 
 function groupByGrupo(entradas) {
@@ -63,7 +65,7 @@ function DiarioTab({
   }
 
   return (
-    <Stack spacing={2} sx={{ mb: 5 }}>
+    <Stack spacing={2} sx={{ mb: 5 }} data-tour-id="camino-semanas">
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
         <PenLine size={20} color={colors.primary} />
         <Typography variant="h3">Diario semanal</Typography>
@@ -453,7 +455,7 @@ function FichaTab({ ficha, onFichaUpdate }) {
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
                       Marca lo que sí viviste. Si esta semana fue distinta, está bien dejarlo en blanco.
                     </Typography>
-                    <Stack sx={{ mb: 3 }}>
+                    <Stack sx={{ mb: 3, gap: 0.5 }}>
                       {(s.praxis || []).map((item) => (
                         <FormControlLabel
                           key={item.item_id}
@@ -468,6 +470,7 @@ function FichaTab({ ficha, onFichaUpdate }) {
                             />
                           )}
                           label={item.nombre}
+                          sx={{ py: 0.25 }}
                         />
                       ))}
                     </Stack>
@@ -500,7 +503,7 @@ function FichaTab({ ficha, onFichaUpdate }) {
                                 <Stack
                                   direction="row"
                                   flexWrap="wrap"
-                                  sx={{ gap: 0.75 }}
+                                  sx={{ gap: 1 }}
                                 >
                                   {nums.map((n) => {
                                     const active = Number(selected) === n
@@ -515,7 +518,8 @@ function FichaTab({ ficha, onFichaUpdate }) {
                                           [area.area_id]: n,
                                         }))}
                                         sx={{
-                                          minWidth: 40,
+                                          minWidth: 44,
+                                          minHeight: 44,
                                           px: 1.25,
                                           borderRadius: 2,
                                           ...(active
@@ -580,6 +584,7 @@ export default function FichaPedagogica() {
   const [manualModulo, setManualModulo] = useState(null)
   const [expandedWeek, setExpandedWeek] = useState(null)
   const [tab, setTab] = useState(0)
+  const [tourOpen, setTourOpen] = useState(false)
 
   const load = () =>
     Promise.all([pedagogiaAPI.miFicha(), pedagogiaAPI.modulos()])
@@ -634,6 +639,8 @@ export default function FichaPedagogica() {
       <PageHeader
         title="Mi camino"
         subtitle="Diario semanal, ficha pedagógica y etapas de formación"
+        onHelp={() => setTourOpen(true)}
+        helpLabel="Ver ayuda de Camino"
       />
 
       {ficha?.sugerencia_avance?.mostrar_aviso_miembro && (
@@ -658,6 +665,7 @@ export default function FichaPedagogica() {
           <CardContent>
             <Stack spacing={3}>
               <Stack
+                data-tour-id="camino-recorrido"
                 direction="row"
                 justifyContent="space-between"
                 alignItems={{ xs: 'flex-start', sm: 'flex-end' }}
@@ -687,13 +695,15 @@ export default function FichaPedagogica() {
                 )}
               </Stack>
               <AnimatedProgress value={progreso} />
-              <EtapasJourney
-                modulos={modulos}
-                etapaActualId={etapaActual}
-                onSelect={(mod) => {
-                  if (mod.contenido_manual?.length) setManualModulo(mod)
-                }}
-              />
+              <Box data-tour-id="camino-etapas">
+                <EtapasJourney
+                  modulos={modulos}
+                  etapaActualId={etapaActual}
+                  onSelect={(mod) => {
+                    if (mod.contenido_manual?.length) setManualModulo(mod)
+                  }}
+                />
+              </Box>
               <Typography variant="caption" color="text.secondary">
                 Tu coordinador acompaña tu avance por etapas. Toca una etapa para abrir su manual digital.
               </Typography>
@@ -708,7 +718,12 @@ export default function FichaPedagogica() {
         </Box>
       )}
 
-      <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 3 }}>
+      <Tabs
+        value={tab}
+        onChange={(_, v) => setTab(v)}
+        sx={{ mb: 3 }}
+        data-tour-id="camino-pestanas"
+      >
         <Tab label="Diario semanal" sx={{ fontSize: '1rem' }} />
         <Tab label="Ficha pedagógica" sx={{ fontSize: '1rem' }} />
         <Tab label="Mi progreso" sx={{ fontSize: '1rem' }} />
@@ -735,63 +750,76 @@ export default function FichaPedagogica() {
 
       {tab === 2 && <MiProgresoTab ficha={ficha} />}
 
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-        <BookOpen size={20} color={colors.primary} />
-        <Typography variant="h3">Manuales por etapa</Typography>
-      </Stack>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Guías interactivas — no solo PDFs. Explora tips, reflexiones e imágenes de cada etapa.
-      </Typography>
+      <Box data-tour-id="camino-manuales">
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+          <BookOpen size={20} color={colors.primary} />
+          <Typography variant="h3">Manuales por etapa</Typography>
+        </Stack>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Guías interactivas — no solo PDFs. Explora tips, reflexiones e imágenes de cada etapa.
+        </Typography>
 
-      <Stack spacing={2}>
-        {modulos.map((mod) => {
-          const desbloqueado = Boolean(mod.contenido_manual?.length)
-          return (
-            <Card
-              key={mod.id}
-              sx={{
-                borderLeft: 4,
-                borderColor: desbloqueado ? (mod.color || colors.primary) : colors.border,
-                bgcolor: desbloqueado ? colors.surface : colors.light,
-                opacity: desbloqueado ? 1 : 0.78,
-              }}
-            >
-              <CardContent>
-                <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
-                  justifyContent="space-between"
-                  alignItems={{ xs: 'stretch', sm: 'center' }}
-                  spacing={2}
-                >
-                  <Box sx={{ flex: 1, minWidth: 0, pr: { sm: 2 } }}>
-                    <Typography variant="overline" sx={{ color: desbloqueado ? 'text.secondary' : colors.muted }}>
-                      Etapa {mod.orden}
-                    </Typography>
-                    <Typography variant="subtitle1" fontWeight={600} sx={{ color: desbloqueado ? colors.dark : colors.muted }}>
-                      {mod.nombre}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">{mod.descripcion}</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexShrink: 0, alignSelf: { xs: 'flex-end', sm: 'center' } }}>
-                    <Button
-                      variant={desbloqueado ? 'contained' : 'outlined'}
-                      onClick={() => desbloqueado && setManualModulo(mod)}
-                      disabled={!desbloqueado}
-                      sx={{
-                        minWidth: 168,
-                        px: 2.5,
-                        ...(desbloqueado ? {} : { borderColor: colors.border, color: colors.muted }),
-                      }}
-                    >
-                      {desbloqueado ? 'Abrir manual' : 'Próximamente'}
-                    </Button>
-                  </Box>
-                </Stack>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </Stack>
+        <Stack spacing={2}>
+          {modulos.map((mod) => {
+            const desbloqueado = Boolean(mod.contenido_manual?.length)
+            return (
+              <Card
+                key={mod.id}
+                sx={{
+                  borderLeft: 4,
+                  borderColor: desbloqueado ? (mod.color || colors.primary) : colors.border,
+                  bgcolor: desbloqueado ? colors.surface : colors.light,
+                  opacity: desbloqueado ? 1 : 0.78,
+                }}
+              >
+                <CardContent>
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: 'stretch', sm: 'center' }}
+                    spacing={2}
+                  >
+                    <Box sx={{ flex: 1, minWidth: 0, pr: { sm: 2 } }}>
+                      <Typography variant="overline" sx={{ color: desbloqueado ? 'text.secondary' : colors.muted }}>
+                        Etapa {mod.orden}
+                      </Typography>
+                      <Typography variant="subtitle1" fontWeight={600} sx={{ color: desbloqueado ? colors.dark : colors.muted }}>
+                        {mod.nombre}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">{mod.descripcion}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexShrink: 0, alignSelf: { xs: 'flex-end', sm: 'center' } }}>
+                      <Button
+                        variant={desbloqueado ? 'contained' : 'outlined'}
+                        onClick={() => desbloqueado && setManualModulo(mod)}
+                        disabled={!desbloqueado}
+                        sx={{
+                          minWidth: 168,
+                          px: 2.5,
+                          ...(desbloqueado ? {} : { borderColor: colors.border, color: colors.muted }),
+                        }}
+                      >
+                        {desbloqueado ? 'Abrir manual' : 'Próximamente'}
+                      </Button>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </Stack>
+      </Box>
+
+      <MemberGuidedTour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={CAMINO_TOUR_STEPS}
+        onStepChange={(step) => {
+          if (step?.id === 'camino-semanas' || step?.id === 'camino-pestanas') {
+            setTab(0)
+          }
+        }}
+      />
     </>
   )
 }

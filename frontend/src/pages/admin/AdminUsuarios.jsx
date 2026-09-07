@@ -338,19 +338,38 @@ export default function AdminUsuarios() {
                           <StatusBadge status={u.is_active_member ? 'active' : 'alert'} label={u.is_active_member ? 'Activo' : 'Inactivo'} />
                         </TableCell>
                         <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                          {esMiembro && (
-                            <Button size="small" variant="text" onClick={() => navigate(`/admin/usuarios/${u.id}`)} sx={{ mr: 1 }}>
-                              Ver avance
+                          <Box
+                            sx={{
+                              display: 'grid',
+                              gridTemplateColumns: 'auto auto auto',
+                              columnGap: 2,
+                              justifyContent: 'end',
+                              alignItems: 'center',
+                              justifyItems: 'stretch',
+                            }}
+                          >
+                            {esMiembro ? (
+                              <Button size="small" variant="text" onClick={() => navigate(`/admin/usuarios/${u.id}`)}>
+                                Ver avance
+                              </Button>
+                            ) : (
+                              <Box aria-hidden sx={{ visibility: 'hidden', pointerEvents: 'none' }}>
+                                <Button size="small" variant="text" tabIndex={-1}>Ver avance</Button>
+                              </Box>
+                            )}
+                            {!esAdmin ? (
+                              <Button size="small" variant="text" onClick={() => abrirEditar(u)}>
+                                Editar
+                              </Button>
+                            ) : (
+                              <Box aria-hidden sx={{ visibility: 'hidden', pointerEvents: 'none' }}>
+                                <Button size="small" variant="text" tabIndex={-1}>Editar</Button>
+                              </Box>
+                            )}
+                            <Button size="small" variant="outlined" onClick={() => setConfirmUser(u)}>
+                              {u.is_active_member ? 'Desactivar acceso' : 'Activar acceso'}
                             </Button>
-                          )}
-                          {!esAdmin && (
-                            <Button size="small" variant="text" onClick={() => abrirEditar(u)} sx={{ mr: 1 }}>
-                              Editar
-                            </Button>
-                          )}
-                          <Button size="small" variant="outlined" onClick={() => setConfirmUser(u)}>
-                            {u.is_active_member ? 'Desactivar acceso' : 'Activar acceso'}
-                          </Button>
+                          </Box>
                         </TableCell>
                       </TableRow>
                     )
@@ -376,7 +395,7 @@ export default function AdminUsuarios() {
             )}
             <UserFormFields form={form} setForm={setForm} />
           </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 2 }}>
+          <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
             <Button onClick={cerrarForm} variant="outlined" disabled={saving}>Cancelar</Button>
             <Button type="submit" variant="contained" disabled={saving}>
               {saving ? 'Guardando…' : mode === 'create' ? 'Crear usuario' : 'Guardar cambios'}
@@ -403,7 +422,7 @@ export default function AdminUsuarios() {
             {createdCreds?.temporary_password}
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
           <Button variant="contained" onClick={() => setCreatedCreds(null)}>Entendido</Button>
         </DialogActions>
       </Dialog>

@@ -159,7 +159,11 @@ export default function AdminContenidos() {
 
   return (
     <>
-      <PageHeader title="Gestión de contenidos" subtitle="Documentos, presentaciones y videos" />
+      <PageHeader
+        title="Gestión de contenidos"
+        subtitle="Documentos, presentaciones y videos"
+      />
+
       <Card sx={{ mb: 3 }}>
         <CardContent component="form" onSubmit={crear}>
           <Typography variant="h3" gutterBottom>Nuevo contenido</Typography>
@@ -303,7 +307,7 @@ export default function AdminContenidos() {
                         </Stack>
                       </TableCell>
                       <TableCell align="center">
-                        <Stack direction="row" spacing={1} justifyContent="center">
+                        <Stack direction="row" spacing={2} justifyContent="center">
                           <Button size="small" variant="outlined" onClick={() => abrirModificar(c)}>
                             Modificar
                           </Button>
@@ -382,7 +386,7 @@ export default function AdminContenidos() {
               </FormField>
             </Stack>
           </DialogContent>
-          <DialogActions sx={{ px: 3, py: 2 }}>
+          <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
             <Button onClick={cerrarModificar} disabled={savingEdit}>Cancelar</Button>
             <Button type="submit" variant="contained" disabled={savingEdit}>
               {savingEdit ? 'Guardando…' : 'Guardar cambios'}

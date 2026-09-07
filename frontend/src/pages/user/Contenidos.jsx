@@ -16,6 +16,8 @@ import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
+import MemberGuidedTour from '../../components/help/MemberGuidedTour'
+import { CONTENIDOS_TOUR_STEPS } from '../../components/help/tourSteps'
 import { colors } from '../../theme/muiTheme'
 
 const SECTIONS = [
@@ -57,6 +59,7 @@ export default function Contenidos() {
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState('documento')
   const [openingId, setOpeningId] = useState(null)
+  const [tourOpen, setTourOpen] = useState(false)
 
   const loadItems = () =>
     contentAPI.list().then((r) => setItems(r.data.results || r.data))
@@ -105,6 +108,8 @@ export default function Contenidos() {
       <PageHeader
         title="Biblioteca de contenidos"
         subtitle="Explora documentos, presentaciones y videos. Marca tu avance al consultar cada material."
+        onHelp={() => setTourOpen(true)}
+        helpLabel="Ver ayuda de Contenidos"
       />
 
       {!hasContent ? (
@@ -117,6 +122,7 @@ export default function Contenidos() {
       ) : (
         <Stack spacing={3}>
           <Box
+            data-tour-id="contenidos-progreso"
             sx={{
               p: { xs: 2.5, md: 3 },
               borderRadius: 3,
@@ -133,7 +139,7 @@ export default function Contenidos() {
             <AnimatedProgress value={overall.percent} />
           </Box>
 
-          <Stack spacing={1.5}>
+          <Stack spacing={1.5} data-tour-id="contenidos-categorias">
             {SECTIONS.map((section) => {
               const sectionItems = byTipo[section.tipo]
               const stats = sectionStats(sectionItems)
@@ -220,7 +226,7 @@ export default function Contenidos() {
                       </Typography>
                     ) : (
                       <Stack spacing={1.5}>
-                        {sectionItems.map((contenido) => (
+                        {sectionItems.map((contenido, idx) => (
                           <Box
                             key={contenido.id}
                             sx={{
@@ -259,6 +265,7 @@ export default function Contenidos() {
                               onClick={() => handleOpen(contenido)}
                               disabled={openingId === contenido.id || (!contenido.url_externa && !contenido.archivo)}
                               sx={{ flexShrink: 0, minWidth: 140 }}
+                              {...(idx === 0 && isOpen ? { 'data-tour-id': 'contenidos-abrir' } : {})}
                             >
                               {openingId === contenido.id
                                 ? 'Abriendo…'
@@ -277,6 +284,18 @@ export default function Contenidos() {
           </Stack>
         </Stack>
       )}
+
+      <MemberGuidedTour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={CONTENIDOS_TOUR_STEPS}
+        onStepChange={(step) => {
+          if (step?.id === 'contenidos-abrir' || step?.id === 'contenidos-categorias') {
+            const firstWithItems = SECTIONS.find((s) => byTipo[s.tipo]?.length)
+            if (firstWithItems) setExpanded(firstWithItems.tipo)
+          }
+        }}
+      />
     </>
   )
 }

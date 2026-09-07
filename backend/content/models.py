@@ -90,3 +90,29 @@ class ContenidoVista(models.Model):
 
     def __str__(self):
         return f'{self.usuario} · {self.contenido}'
+
+
+class TutorialVideo(models.Model):
+    """Tutoriales fijos del portal de miembro (una entrada por sección de navegación)."""
+
+    class Seccion(models.TextChoices):
+        INICIO = 'inicio', 'Inicio'
+        CAMINO = 'camino', 'Camino'
+        CONTENIDOS = 'contenidos', 'Contenidos'
+        GRUPOS = 'grupos', 'Grupos'
+        MENSAJES = 'mensajes', 'Mensajes'
+
+    seccion = models.CharField(max_length=20, choices=Seccion.choices, unique=True)
+    titulo = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True)
+    url_video = models.URLField(blank=True, help_text='Enlace externo del video (YouTube, Vimeo, etc.)')
+    orden = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['orden', 'seccion']
+        verbose_name = 'Tutorial en video'
+        verbose_name_plural = 'Tutoriales en video'
+
+    def __str__(self):
+        return self.titulo

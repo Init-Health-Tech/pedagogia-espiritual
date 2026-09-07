@@ -386,7 +386,7 @@ export default function AdminAnuncios() {
                         ? a.grupos_nombres.join(', ')
                         : 'Sin grupos asignados'}
                   </Typography>
-                  <Stack direction="row" spacing={1}>
+                  <Stack direction="row" spacing={2}>
                     <Button
                       size="small"
                       variant="outlined"
@@ -416,7 +416,7 @@ export default function AdminAnuncios() {
           <DialogContent dividers>
             <AnuncioFormFields form={editForm} setForm={setEditForm} grupos={grupos} />
           </DialogContent>
-          <DialogActions sx={{ px: 3, py: 2 }}>
+          <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
             <Button onClick={cerrarEditar}>Cancelar</Button>
             <Button
               type="submit"

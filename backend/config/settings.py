@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'groups',
     'payments',
     'communications',
+    'events',
 ]
 
 MIDDLEWARE = [

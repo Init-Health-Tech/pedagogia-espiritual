@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Avatar,
   Box,
@@ -12,11 +12,12 @@ import {
   Divider,
   ListItemIcon,
   ListItemText,
+  Tooltip,
 } from '@mui/material'
 import { Bell, LogOut, User, LayoutDashboard, Shield } from 'lucide-react'
 import TorLogo from '../common/TorLogo'
 import { useAuth } from '../../context/AuthContext'
-import { TOP_BAR_HEIGHT, colors } from '../../theme/muiTheme'
+import { TOP_BAR_HEIGHT_REM, colors } from '../../theme/muiTheme'
 
 export default function TopBar({ sectionTitle, notificationCount = 0 }) {
   const { user, logout, isAdmin } = useAuth()
@@ -45,7 +46,9 @@ export default function TopBar({ sectionTitle, notificationCount = 0 }) {
         top: 0,
         left: 0,
         right: 0,
-        height: TOP_BAR_HEIGHT,
+        minHeight: `${TOP_BAR_HEIGHT_REM}rem`,
+        height: 'auto',
+        py: 0.75,
         bgcolor: colors.primary,
         color: '#fff',
         zIndex: (t) => t.zIndex.appBar,
@@ -67,26 +70,42 @@ export default function TopBar({ sectionTitle, notificationCount = 0 }) {
         )}
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 } }}>
-        <IconButton
-          aria-label="Notificaciones"
-          sx={{ color: 'rgba(255,255,255,0.85)' }}
-          onClick={() => navigate(messagesPath)}
-        >
-          <Badge badgeContent={notificationCount || null} sx={{ '& .MuiBadge-badge': { bgcolor: colors.blue, color: '#fff' } }} max={99}>
-            <Bell size={20} strokeWidth={1.75} />
-          </Badge>
-        </IconButton>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1.5 } }}>
+        <Tooltip title="Notificaciones">
+          <Button
+            aria-label="Notificaciones"
+            onClick={() => navigate(messagesPath)}
+            startIcon={(
+              <Badge badgeContent={notificationCount || null} sx={{ '& .MuiBadge-badge': { bgcolor: colors.blue, color: '#fff' } }} max={99}>
+                <Bell size={20} strokeWidth={1.75} />
+              </Badge>
+            )}
+            sx={{
+              color: 'rgba(255,255,255,0.9)',
+              minHeight: 44,
+              minWidth: 44,
+              px: { xs: 1, md: 1.5 },
+              '& .MuiButton-startIcon': { mr: { xs: 0, md: 1 } },
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
+            }}
+          >
+            <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>
+              Notificaciones
+            </Box>
+          </Button>
+        </Tooltip>
 
-        <IconButton
-          onClick={(e) => setAnchor(e.currentTarget)}
-          aria-label="Menú de usuario"
-          sx={{ p: 0.5 }}
-        >
-          <Avatar sx={{ width: 32, height: 32, bgcolor: colors.blue, color: '#fff', fontSize: '0.875rem' }}>
-            {initials}
-          </Avatar>
-        </IconButton>
+        <Tooltip title="Mi cuenta">
+          <IconButton
+            onClick={(e) => setAnchor(e.currentTarget)}
+            aria-label="Menú de usuario"
+            sx={{ p: 0.5, minWidth: 44, minHeight: 44 }}
+          >
+            <Avatar sx={{ width: 36, height: 36, bgcolor: colors.blue, color: '#fff', fontSize: '0.875rem' }}>
+              {initials}
+            </Avatar>
+          </IconButton>
+        </Tooltip>
 
         <Button
           onClick={handleLogout}
@@ -94,7 +113,7 @@ export default function TopBar({ sectionTitle, notificationCount = 0 }) {
           sx={{
             display: { xs: 'none', md: 'inline-flex' },
             color: 'rgba(255,255,255,0.9)',
-            minHeight: 40,
+            minHeight: 44,
             fontSize: '0.875rem',
             '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
           }}

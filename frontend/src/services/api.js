@@ -120,6 +120,16 @@ export const communicationsAPI = {
   marcarLeido: (id) => api.post(`/communications/mensajes/${id}/marcar_leido/`),
 }
 
+export const eventsAPI = {
+  list: () => api.get('/events/eventos/'),
+  proximos: () => api.get('/events/eventos/proximos/'),
+  create: (data) => api.post('/events/eventos/', data),
+  update: (id, data) => api.patch(`/events/eventos/${id}/`, data),
+  delete: (id) => api.delete(`/events/eventos/${id}/`),
+  rsvp: (id, respuesta) => api.post(`/events/eventos/${id}/rsvp/`, { respuesta }),
+  respuestas: (id) => api.get(`/events/eventos/${id}/respuestas/`),
+}
+
 export const adminAPI = {
   users: () => api.get('/accounts/users/'),
   getUser: (id) => api.get(`/accounts/users/${id}/`),

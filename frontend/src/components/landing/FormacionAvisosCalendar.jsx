@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Box, IconButton, Stack, Typography } from '@mui/material'
+import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { AVISOS_EVENTOS } from '../../data/marketingContent'
@@ -146,33 +146,37 @@ export default function FormacionAvisosCalendar() {
         }}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <IconButton
-            aria-label="Mes anterior"
-            onClick={() => goMonth(-1)}
-            sx={{
-              color: colors.primary,
-              border: `1px solid ${colors.border}`,
-              width: 44,
-              height: 44,
-            }}
-          >
-            <ChevronLeftIcon />
-          </IconButton>
+          <Tooltip title="Mes anterior">
+            <IconButton
+              aria-label="Mes anterior"
+              onClick={() => goMonth(-1)}
+              sx={{
+                color: colors.primary,
+                border: `1px solid ${colors.border}`,
+                width: 44,
+                height: 44,
+              }}
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+          </Tooltip>
           <Typography className="font-display" sx={{ fontSize: { xs: '1.25rem', md: '1.4rem' }, color: colors.dark }}>
             {MONTHS[month]} {year}
           </Typography>
-          <IconButton
-            aria-label="Mes siguiente"
-            onClick={() => goMonth(1)}
-            sx={{
-              color: colors.primary,
-              border: `1px solid ${colors.border}`,
-              width: 44,
-              height: 44,
-            }}
-          >
-            <ChevronRightIcon />
-          </IconButton>
+          <Tooltip title="Mes siguiente">
+            <IconButton
+              aria-label="Mes siguiente"
+              onClick={() => goMonth(1)}
+              sx={{
+                color: colors.primary,
+                border: `1px solid ${colors.border}`,
+                width: 44,
+                height: 44,
+              }}
+            >
+              <ChevronRightIcon />
+            </IconButton>
+          </Tooltip>
         </Stack>
 
         <Box

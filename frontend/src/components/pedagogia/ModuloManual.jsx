@@ -166,27 +166,54 @@ export default function ModuloManual({ modulo, onClose }) {
         alignItems="center"
         sx={{ px: 2, py: 2, borderTop: `1px solid ${colors.border}`, bgcolor: colors.surface }}
       >
-        <IconButton
+        <Button
           disabled={index === 0}
           onClick={() => setIndex((i) => i - 1)}
+          startIcon={<ChevronLeft size={18} />}
+          variant="outlined"
+          size="small"
           aria-label="Anterior"
         >
-          <ChevronLeft />
-        </IconButton>
-        <Stack direction="row" spacing={0.75}>
+          Anterior
+        </Button>
+        <Stack direction="row" spacing={0.5} alignItems="center">
           {secciones.map((s, i) => (
             <Box
               key={s.id}
+              component="button"
+              type="button"
               onClick={() => setIndex(i)}
+              aria-label={`Ir a sección ${i + 1}`}
+              aria-current={i === index ? 'true' : undefined}
               sx={{
-                width: i === index ? 20 : 8,
-                height: 8,
-                borderRadius: 4,
-                bgcolor: i === index ? colors.primary : colors.border,
+                appearance: 'none',
+                border: 'none',
+                bgcolor: 'transparent',
+                p: 0,
+                m: 0,
+                minWidth: 44,
+                minHeight: 44,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                borderRadius: 1,
+                '&:focus-visible': {
+                  outline: `3px solid ${colors.primary}`,
+                  outlineOffset: 2,
+                },
               }}
-            />
+            >
+              <Box
+                sx={{
+                  width: i === index ? 20 : 8,
+                  height: 8,
+                  borderRadius: 4,
+                  bgcolor: i === index ? colors.primary : colors.border,
+                  transition: 'all 0.2s',
+                }}
+              />
+            </Box>
           ))}
         </Stack>
         {index < secciones.length - 1 ? (

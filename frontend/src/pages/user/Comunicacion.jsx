@@ -25,6 +25,8 @@ import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 import FormField from '../../components/common/FormField'
 import StatusBadge from '../../components/common/StatusBadge'
+import MemberGuidedTour from '../../components/help/MemberGuidedTour'
+import { MENSAJES_TOUR_STEPS } from '../../components/help/tourSteps'
 import { colors } from '../../theme/muiTheme'
 
 function flattenContactos(payload) {
@@ -48,6 +50,7 @@ export default function Comunicacion() {
   const [errorEnvio, setErrorEnvio] = useState('')
   const [destinatario, setDestinatario] = useState(null)
   const [form, setForm] = useState({ asunto: '', cuerpo: '' })
+  const [tourOpen, setTourOpen] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -136,13 +139,34 @@ export default function Comunicacion() {
       <PageHeader
         title="Comunicación interna"
         subtitle="Anuncios institucionales y mensajería entre miembros"
-        action={<Button variant="contained" onClick={() => setOpen(true)}>Escribir mensaje</Button>}
+        onHelp={() => setTourOpen(true)}
+        helpLabel="Ver ayuda de Mensajes"
       />
 
-      <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 3 }}>
-        <Tab label="Anuncios" sx={{ fontSize: '1rem' }} />
-        <Tab label="Mensajes recibidos" sx={{ fontSize: '1rem' }} />
-      </Tabs>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        justifyContent="space-between"
+        spacing={1.5}
+        sx={{ mb: 3 }}
+      >
+        <Tabs
+          value={tab}
+          onChange={(_, v) => setTab(v)}
+          sx={{ minHeight: 48, flex: 1 }}
+        >
+          <Tab label="Anuncios" sx={{ fontSize: '1rem' }} data-tour-id="mensajes-anuncios" />
+          <Tab label="Mensajes recibidos" sx={{ fontSize: '1rem' }} data-tour-id="mensajes-recibidos" />
+        </Tabs>
+        <Button
+          variant="contained"
+          onClick={() => setOpen(true)}
+          data-tour-id="mensajes-escribir"
+          sx={{ alignSelf: { xs: 'flex-end', sm: 'center' }, flexShrink: 0 }}
+        >
+          Escribir mensaje
+        </Button>
+      </Stack>
 
       {tab === 0 && (
         anuncios.length === 0 ? (
@@ -239,12 +263,22 @@ export default function Comunicacion() {
               <TextField multiline rows={4} value={form.cuerpo} onChange={(e) => setForm({ ...form, cuerpo: e.target.value })} required fullWidth hiddenLabel />
             </FormField>
           </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 2 }}>
+          <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
             <Button onClick={cerrarCompose} variant="outlined">Cancelar</Button>
             <Button type="submit" variant="contained" disabled={!destinatario}>Enviar mensaje</Button>
           </DialogActions>
         </Box>
       </Dialog>
+
+      <MemberGuidedTour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={MENSAJES_TOUR_STEPS}
+        onStepChange={(step) => {
+          if (step?.id === 'mensajes-anuncios') setTab(0)
+          if (step?.id === 'mensajes-recibidos') setTab(1)
+        }}
+      />
     </>
   )
 }

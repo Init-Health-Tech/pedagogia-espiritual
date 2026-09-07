@@ -1,12 +1,19 @@
 from rest_framework import serializers
 
-from .models import CategoriaContenido, Contenido, ContenidoVista
+from .models import CategoriaContenido, Contenido, ContenidoVista, TutorialVideo
 
 
 class CategoriaContenidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoriaContenido
         fields = '__all__'
+
+
+class TutorialVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TutorialVideo
+        fields = ['id', 'seccion', 'titulo', 'descripcion', 'url_video', 'orden', 'updated_at']
+        read_only_fields = ['id', 'seccion', 'titulo', 'orden', 'updated_at']
 
 
 class ContenidoSerializer(serializers.ModelSerializer):

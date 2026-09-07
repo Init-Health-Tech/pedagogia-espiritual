@@ -13,6 +13,7 @@ import {
   Grid,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { Calendar, MessageCircle, Users, X } from 'lucide-react'
@@ -20,6 +21,8 @@ import { groupsAPI } from '../../services/api'
 import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
+import MemberGuidedTour from '../../components/help/MemberGuidedTour'
+import { GRUPOS_TOUR_STEPS } from '../../components/help/tourSteps'
 import { colors } from '../../theme/muiTheme'
 
 const VISIBLE_AVATARS = 4
@@ -112,6 +115,7 @@ export default function Grupos() {
   const [loading, setLoading] = useState(true)
   const [detalle, setDetalle] = useState(null)
   const [loadingDetalle, setLoadingDetalle] = useState(false)
+  const [tourOpen, setTourOpen] = useState(false)
 
   useEffect(() => {
     groupsAPI.misGrupos()
@@ -153,7 +157,12 @@ export default function Grupos() {
 
   return (
     <>
-      <PageHeader title="Grupos de pastoreo" subtitle="Tu comunidad de formación y acompañamiento" />
+      <PageHeader
+        title="Grupos de pastoreo"
+        subtitle="Tu comunidad de formación y acompañamiento"
+        onHelp={() => setTourOpen(true)}
+        helpLabel="Ver ayuda de Grupos"
+      />
       {grupos.length === 0 ? (
         <EmptyState
           title="Aún no tienes un grupo asignado"
@@ -167,9 +176,13 @@ export default function Grupos() {
           spacing={2.5}
           sx={{ maxWidth: grupos.length === 1 ? 440 : '100%' }}
         >
-          {grupos.map((g) => (
+          {grupos.map((g, idx) => (
             <Grid key={g.id} size={{ xs: 12, sm: grupos.length === 1 ? 12 : 6, lg: grupos.length === 1 ? 12 : 4 }}>
-              <Card className="card-hover" sx={{ height: '100%' }}>
+              <Card
+                className="card-hover"
+                sx={{ height: '100%' }}
+                {...(idx === 0 ? { 'data-tour-id': 'grupos-tarjeta' } : {})}
+              >
                 <CardActionArea
                   onClick={() => abrirDetalle(g)}
                   sx={{ height: '100%', display: 'flex', alignItems: 'stretch' }}
@@ -190,8 +203,10 @@ export default function Grupos() {
                         ? g.coordinadores_nombres.join(', ')
                         : 'Por asignar'}
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 1, color: colors.muted }}>Comunidad</Typography>
-                    <AvatarStack people={miembrosDe(g)} total={g.total_miembros} />
+                    <Box {...(idx === 0 ? { 'data-tour-id': 'grupos-comunidad' } : {})}>
+                      <Typography variant="body2" sx={{ mb: 1, color: colors.muted }}>Comunidad</Typography>
+                      <AvatarStack people={miembrosDe(g)} total={g.total_miembros} />
+                    </Box>
                     {(g.proxima_reunion?.fecha || g.horario_display || g.horario_reunion) && (
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                         {etiquetaProximaReunion(g.proxima_reunion, g.horario_display || g.horario_reunion)}
@@ -215,13 +230,15 @@ export default function Grupos() {
           <>
             <DialogTitle sx={{ pr: 6, fontWeight: 400 }}>
               {detalle.nombre}
-              <IconButton
-                onClick={() => setDetalle(null)}
-                sx={{ position: 'absolute', right: 12, top: 12 }}
-                aria-label="Cerrar"
-              >
-                <X size={18} />
-              </IconButton>
+              <Tooltip title="Cerrar">
+                <IconButton
+                  onClick={() => setDetalle(null)}
+                  sx={{ position: 'absolute', right: 8, top: 8 }}
+                  aria-label="Cerrar"
+                >
+                  <X size={18} />
+                </IconButton>
+              </Tooltip>
             </DialogTitle>
             <DialogContent dividers>
               {loadingDetalle ? (
@@ -250,7 +267,7 @@ export default function Grupos() {
                     )}
                   </Box>
 
-                  <Box>
+                  <Box data-tour-id="grupos-coordinador">
                     <Typography variant="overline" sx={{ display: 'block', mb: 1.25 }}>Coordinación</Typography>
                     <Stack spacing={1.5}>
                       {coordinadoresDe(detalle).length === 0 ? (
@@ -296,6 +313,17 @@ export default function Grupos() {
           </>
         )}
       </Dialog>
+
+      <MemberGuidedTour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={GRUPOS_TOUR_STEPS}
+        onStepChange={(step) => {
+          if (step?.id === 'grupos-coordinador' && grupos[0] && !detalle) {
+            abrirDetalle(grupos[0])
+          }
+        }}
+      />
     </>
   )
 }

@@ -3,8 +3,11 @@ import { useLocation } from 'react-router-dom'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
 import TopBar from './TopBar'
 import PillNav from './PillNav'
-import { TOP_BAR_HEIGHT, DOCK_HEIGHT } from '../../theme/muiTheme'
+import { TOP_BAR_HEIGHT_REM, DOCK_HEIGHT_REM } from '../../theme/muiTheme'
 import { communicationsAPI } from '../../services/api'
+
+/** Altura aproximada del PillNav desktop (en rem, escala con el texto) */
+const DESKTOP_PILL_NAV_REM = 3.5
 
 export default function HubShell({ navItems, children }) {
   const location = useLocation()
@@ -25,15 +28,27 @@ export default function HubShell({ navItems, children }) {
       .catch(() => {})
   }, [location.pathname])
 
-  const topOffset = TOP_BAR_HEIGHT + (isMobile ? 0 : 56)
-  const bottomOffset = isMobile ? DOCK_HEIGHT : 0
+  const topPad = isMobile
+    ? `calc(${TOP_BAR_HEIGHT_REM}rem + 1.5rem)`
+    : `calc(${TOP_BAR_HEIGHT_REM + DESKTOP_PILL_NAV_REM}rem + 3rem)`
+  const bottomPad = isMobile
+    ? `calc(${DOCK_HEIGHT_REM}rem + 1.5rem)`
+    : '3rem'
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column' }}>
       <TopBar sectionTitle={sectionTitle} notificationCount={notificationCount} />
 
       {!isMobile && (
-        <Box sx={{ position: 'fixed', top: TOP_BAR_HEIGHT, left: 0, right: 0, zIndex: (t) => t.zIndex.appBar - 1 }}>
+        <Box
+          sx={{
+            position: 'fixed',
+            top: `${TOP_BAR_HEIGHT_REM}rem`,
+            left: 0,
+            right: 0,
+            zIndex: (t) => t.zIndex.appBar - 1,
+          }}
+        >
           <PillNav items={navItems} />
         </Box>
       )}
@@ -42,8 +57,8 @@ export default function HubShell({ navItems, children }) {
         component="main"
         sx={{
           flex: 1,
-          pt: `${topOffset + (isMobile ? 24 : 48)}px`,
-          pb: `${bottomOffset + (isMobile ? 24 : 48)}px`,
+          pt: topPad,
+          pb: bottomPad,
           px: { xs: 3, md: 6 },
         }}
       >

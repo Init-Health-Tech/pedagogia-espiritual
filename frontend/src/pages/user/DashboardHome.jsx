@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { Box, Button, Grid, Paper, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
@@ -5,6 +6,10 @@ import { BookOpen, ClipboardList, MessageCircle, Users } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import HubActionCard from '../../components/common/HubActionCard'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
+import ProximosEventosCard from '../../components/user/ProximosEventosCard'
+import SectionHelpButton from '../../components/help/SectionHelpButton'
+import MemberGuidedTour from '../../components/help/MemberGuidedTour'
+import { INICIO_TOUR_STEPS } from '../../components/help/tourSteps'
 import { staggerContainer, staggerItem } from '../../animations/variants'
 import { colors } from '../../theme/muiTheme'
 
@@ -52,8 +57,15 @@ function daysSince(isoDate) {
   return Math.floor((Date.now() - then.getTime()) / (1000 * 60 * 60 * 24))
 }
 
-export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
+export default function DashboardHome({
+  ficha,
+  anuncios = [],
+  grupos = [],
+  eventos = [],
+  onEventosUpdated,
+}) {
   const { user } = useAuth()
+  const [tourOpen, setTourOpen] = useState(false)
   const progreso = ficha?.progreso_general ?? 0
   const nombre = user?.first_name || user?.username || 'hermano/a'
   const isNew = progreso === 0
@@ -83,18 +95,37 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
   return (
     <Box component={motion.div} variants={staggerContainer} initial="initial" animate="animate">
       <motion.div variants={staggerItem}>
-        <Typography variant="h2" component="h1" sx={{ mb: 0.5, fontWeight: 300, color: colors.dark }}>
-          {getGreeting()}, {nombre}
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Este es tu espacio de formación. Elige por dónde continuar hoy.
-        </Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="flex-start"
+          spacing={2}
+          sx={{ mb: 4 }}
+        >
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Typography variant="h2" component="h1" sx={{ mb: 0.5, fontWeight: 300, color: colors.dark }}>
+              {getGreeting()}, {nombre}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Este es tu espacio de formación. Elige por dónde continuar hoy.
+            </Typography>
+          </Box>
+          <Box sx={{ flexShrink: 0, alignSelf: { xs: 'flex-end', sm: 'flex-start' } }}>
+            <SectionHelpButton
+              onClick={() => setTourOpen(true)}
+              label="Ver ayuda de Inicio"
+            />
+          </Box>
+        </Stack>
       </motion.div>
 
-      {ficha && (
-        <motion.div variants={staggerItem}>
-          <Paper sx={{ p: 3, mb: 4, borderRadius: 4, border: `1px solid ${colors.border}` }}>
-            {isNew ? (
+      <motion.div variants={staggerItem}>
+        <Paper
+          data-tour-id="inicio-progreso"
+          sx={{ p: 3, mb: 4, borderRadius: 4, border: `1px solid ${colors.border}` }}
+        >
+          {ficha ? (
+            isNew ? (
               <Stack spacing={2} alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
                 <Typography variant="h3" sx={{ fontWeight: 400, color: colors.dark }}>
                   Estás por comenzar tu camino de formación
@@ -111,24 +142,39 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
             ) : (
               <>
                 <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
+                  direction="row"
                   justifyContent="space-between"
-                  alignItems={{ sm: 'center' }}
+                  alignItems="center"
                   spacing={2}
                   sx={{ mb: 2 }}
                 >
-                  <Box>
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography variant="overline">Tu progreso</Typography>
                     <Typography variant="body1">Diario semanal y etapas de formación</Typography>
                   </Box>
-                  <Typography variant="h3" sx={{ color: colors.primary, fontWeight: 500 }}>{progreso}%</Typography>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      color: colors.primary,
+                      fontWeight: 500,
+                      flexShrink: 0,
+                      textAlign: 'right',
+                      ml: 'auto',
+                    }}
+                  >
+                    {progreso}%
+                  </Typography>
                 </Stack>
                 <AnimatedProgress value={progreso} />
               </>
-            )}
-          </Paper>
-        </motion.div>
-      )}
+            )
+          ) : (
+            <Typography variant="body1" color="text.secondary">
+              Aquí aparecerá tu progreso cuando tengas tu ficha lista.
+            </Typography>
+          )}
+        </Paper>
+      </motion.div>
 
       <motion.div variants={staggerItem}>
         <Typography variant="overline" sx={{ display: 'block', mb: 2 }}>
@@ -140,6 +186,7 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
         <Box
           component={RouterLink}
           to={continueTo}
+          data-tour-id="inicio-continuar"
           sx={{
             display: 'block',
             mb: 2.5,
@@ -206,7 +253,16 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
         </Box>
       </motion.div>
 
-      <Grid container spacing={2.5} sx={{ mb: 4 }}>
+      <motion.div variants={staggerItem}>
+        <ProximosEventosCard eventos={eventos} onUpdated={onEventosUpdated} />
+      </motion.div>
+
+      <Grid
+        container
+        spacing={2.5}
+        sx={{ mb: 4 }}
+        data-tour-id="inicio-atajos"
+      >
         {shortcutCards.map((card) => (
           <Grid key={card.to} size={{ xs: 12, sm: 6 }}>
             <motion.div variants={staggerItem} style={{ height: '100%' }}>
@@ -251,6 +307,12 @@ export default function DashboardHome({ ficha, anuncios = [], grupos = [] }) {
           )}
         </Paper>
       </motion.div>
+
+      <MemberGuidedTour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={INICIO_TOUR_STEPS}
+      />
     </Box>
   )
 }

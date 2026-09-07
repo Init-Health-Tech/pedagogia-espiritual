@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import { DOCK_HEIGHT, colors } from '../../theme/muiTheme'
+import { DOCK_HEIGHT_REM, colors } from '../../theme/muiTheme'
 
 function NavLink({ item, mobile }) {
   const location = useLocation()
@@ -16,6 +16,7 @@ function NavLink({ item, mobile }) {
     <Box
       component={Link}
       to={item.to}
+      data-tour-id={item.tourId || undefined}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -26,11 +27,16 @@ function NavLink({ item, mobile }) {
         py: mobile ? 0.75 : 1,
         borderRadius: 999,
         textDecoration: 'none',
-        minWidth: mobile ? 64 : 72,
+        minWidth: mobile ? 72 : 80,
+        minHeight: 56,
         flexShrink: 0,
-        transition: 'background-color 200ms ease-out',
+        transition: 'background-color 200ms ease-out, box-shadow 200ms ease-out',
         bgcolor: active ? colors.primary : 'transparent',
         '&:hover': { bgcolor: active ? colors.blue : alpha(colors.primary, 0.08) },
+        '&:focus-visible': {
+          outline: `3px solid ${alpha(colors.primary, 0.55)}`,
+          outlineOffset: 2,
+        },
       }}
     >
       <Icon size={20} strokeWidth={1.75} color={active ? '#fff' : colors.muted} />
@@ -65,15 +71,15 @@ export default function PillNav({ items }) {
           bottom: 0,
           left: 0,
           right: 0,
-          minHeight: DOCK_HEIGHT,
+          minHeight: `${DOCK_HEIGHT_REM}rem`,
           bgcolor: colors.light,
           borderTop: `1px solid ${colors.border}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-start',
-          gap: 0.25,
-          px: 0.5,
-          py: 0.5,
+          gap: 0.75,
+          px: 0.75,
+          py: 0.75,
           overflowX: 'auto',
           '&::-webkit-scrollbar': { display: 'none' },
           zIndex: (t) => t.zIndex.appBar,
@@ -104,11 +110,11 @@ export default function PillNav({ items }) {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 0.25,
+          gap: 0.75,
           bgcolor: '#fff',
           border: `1px solid ${colors.border}`,
           borderRadius: 999,
-          p: 0.5,
+          p: 0.75,
           maxWidth: { md: '100%', lg: 1100 },
           width: '100%',
           justifyContent: 'center',

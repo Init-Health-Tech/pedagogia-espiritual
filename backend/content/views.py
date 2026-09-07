@@ -4,8 +4,8 @@ from rest_framework.response import Response
 
 from accounts.permissions import IsModeratorOrAdmin
 from payments.models import Suscripcion
-from .models import CategoriaContenido, Contenido, ContenidoVista
-from .serializers import CategoriaContenidoSerializer, ContenidoSerializer
+from .models import CategoriaContenido, Contenido, ContenidoVista, TutorialVideo
+from .serializers import CategoriaContenidoSerializer, ContenidoSerializer, TutorialVideoSerializer
 
 
 class CategoriaContenidoViewSet(viewsets.ModelViewSet):
@@ -17,6 +17,20 @@ class CategoriaContenidoViewSet(viewsets.ModelViewSet):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
             return [IsModeratorOrAdmin()]
         return super().get_permissions()
+
+
+class TutorialVideoViewSet(viewsets.ModelViewSet):
+    """Entradas fijas de tutoriales: listado para miembros; edición para admin."""
+
+    queryset = TutorialVideo.objects.all()
+    serializer_class = TutorialVideoSerializer
+    http_method_names = ['get', 'patch', 'head', 'options']
+    lookup_field = 'seccion'
+
+    def get_permissions(self):
+        if self.action in ('update', 'partial_update'):
+            return [IsModeratorOrAdmin()]
+        return [permissions.IsAuthenticated()]
 
 
 class ContenidoViewSet(viewsets.ModelViewSet):

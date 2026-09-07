@@ -54,12 +54,22 @@ html {
 
 body {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.75;
   color: var(--color-dark);
   background-color: var(--color-light);
   -webkit-font-smoothing: antialiased;
   font-weight: 400;
+}
+
+html[data-high-contrast='true'] body {
+  background-color: #fff;
+  color: #000;
+}
+
+html[data-high-contrast='true'] .MuiCard-root,
+html[data-high-contrast='true'] .MuiPaper-root {
+  border-color: var(--color-border) !important;
 }
 
 h1, h2, h3, h4, h5, h6,

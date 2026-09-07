@@ -14,6 +14,7 @@ import {
   MenuItem,
   Stack,
   Toolbar,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
@@ -31,7 +32,7 @@ const navLinkSx = {
   fontWeight: 400,
   fontSize: '0.8125rem',
   color: 'rgba(255,255,255,0.75)',
-  minHeight: 36,
+  minHeight: 44,
   px: 1.5,
   '&:hover': { color: colors.cream, bgcolor: 'transparent' },
 }
@@ -53,14 +54,16 @@ function NavDropdown({ item, onNavigate }) {
         >
           {item.label}
         </Button>
-        <IconButton
-          size="small"
-          aria-label={`Submenú ${item.label}`}
-          onClick={(e) => setAnchor(e.currentTarget)}
-          sx={{ color: 'rgba(255,255,255,0.75)', '&:hover': { color: colors.cream } }}
-        >
-          <ExpandMoreIcon sx={{ fontSize: 18 }} />
-        </IconButton>
+        <Tooltip title={`Submenú de ${item.label}`}>
+          <IconButton
+            size="small"
+            aria-label={`Submenú ${item.label}`}
+            onClick={(e) => setAnchor(e.currentTarget)}
+            sx={{ color: 'rgba(255,255,255,0.75)', '&:hover': { color: colors.cream } }}
+          >
+            <ExpandMoreIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
       </Stack>
       <Menu
         anchorEl={anchor}
@@ -114,17 +117,19 @@ function MobileNavGroup({ item, onNavigate }) {
         sx={{ py: 1.25 }}
       >
         <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: '0.9375rem', fontWeight: 600 }} />
-        <IconButton
-          edge="end"
-          size="small"
-          aria-label={`Subsecciones de ${item.label}`}
-          onClick={(e) => {
-            e.stopPropagation()
-            setOpen(!open)
-          }}
-        >
-          {open ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-        </IconButton>
+        <Tooltip title={open ? 'Ocultar subsecciones' : 'Ver subsecciones'}>
+          <IconButton
+            edge="end"
+            size="small"
+            aria-label={`Subsecciones de ${item.label}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              setOpen(!open)
+            }}
+          >
+            {open ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+          </IconButton>
+        </Tooltip>
       </ListItemButton>
       <Collapse in={open}>
         <List disablePadding sx={{ pl: 2 }}>
@@ -197,15 +202,17 @@ export default function MarketingNav() {
 
           {!isMobile && (
             <Stack direction="row" spacing={0.5} alignItems="center">
-              <Button component={RouterLink} to="/login" variant="text" className="landing-btn" sx={{ color: 'rgba(255,255,255,0.85)', minHeight: 36 }}>Iniciar sesión</Button>
-              <Button component={RouterLink} to="/registro" variant="contained" className="landing-btn" sx={{ minHeight: 36, bgcolor: colors.blue, '&:hover': { bgcolor: colors.cream, color: colors.primary } }}>Registrarse</Button>
+              <Button component={RouterLink} to="/login" variant="text" className="landing-btn" sx={{ color: 'rgba(255,255,255,0.85)', minHeight: 44 }}>Iniciar sesión</Button>
+              <Button component={RouterLink} to="/registro" variant="contained" className="landing-btn" sx={{ minHeight: 44, bgcolor: colors.blue, '&:hover': { bgcolor: colors.cream, color: colors.primary } }}>Registrarse</Button>
             </Stack>
           )}
 
           {isMobile && (
-            <IconButton edge="end" onClick={() => setDrawerOpen(true)} aria-label="menú" size="small" sx={{ color: '#fff' }}>
-              <MenuIcon fontSize="small" />
-            </IconButton>
+            <Tooltip title="Abrir menú">
+              <IconButton edge="end" onClick={() => setDrawerOpen(true)} aria-label="Abrir menú" sx={{ color: '#fff' }}>
+                <MenuIcon />
+              </IconButton>
+            </Tooltip>
           )}
         </Toolbar>
       </AppBar>
@@ -224,7 +231,11 @@ export default function MarketingNav() {
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderBottom: `1px solid ${colors.border}` }}>
           <Typography variant="body2" color="text.secondary">Menú</Typography>
-          <IconButton onClick={() => setDrawerOpen(false)} size="small"><CloseIcon fontSize="small" /></IconButton>
+          <Tooltip title="Cerrar menú">
+            <IconButton onClick={() => setDrawerOpen(false)} aria-label="Cerrar menú">
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
         <List sx={{ py: 0.5 }}>
           <ListItemButton component={RouterLink} to="/" onClick={() => setDrawerOpen(false)} sx={{ py: 1.25 }}>

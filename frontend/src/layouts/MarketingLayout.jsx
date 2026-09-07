@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { Box } from '@mui/material'
 import MarketingNav from '../components/landing/MarketingNav'
 import MarketingFooter from '../components/landing/MarketingFooter'
+import HelpFab from '../components/help/HelpFab'
 import { scrollToHash } from '../utils/marketingNav'
 import { colors } from '../theme/muiTheme'
 
@@ -23,6 +24,7 @@ export default function MarketingLayout() {
       <MarketingNav />
       <Outlet />
       <MarketingFooter />
+      <HelpFab variant="public" />
     </Box>
   )
 }

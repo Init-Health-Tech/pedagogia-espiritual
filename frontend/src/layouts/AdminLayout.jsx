@@ -7,6 +7,7 @@ import {
   UsersRound,
   CreditCard,
   Megaphone,
+  CalendarDays,
 } from 'lucide-react'
 import PageTransitionOutlet from '../components/layout/PageTransitionOutlet'
 import HubShell from '../components/layout/HubShell'
@@ -20,6 +21,7 @@ export const adminNavItems = [
   { to: '/admin/grupos', icon: UsersRound, label: 'Grupos', shortLabel: 'Grupos' },
   { to: '/admin/pagos', icon: CreditCard, label: 'Pagos', shortLabel: 'Pagos' },
   { to: '/admin/anuncios', icon: Megaphone, label: 'Anuncios', shortLabel: 'Anuncios' },
+  { to: '/admin/eventos', icon: CalendarDays, label: 'Eventos', shortLabel: 'Eventos' },
 ]
 
 export default function AdminLayout() {

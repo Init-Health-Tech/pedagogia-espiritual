@@ -1,8 +1,9 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
 import { fadeInUp } from '../../animations/variants'
+import SectionHelpButton from '../help/SectionHelpButton'
 
-export default function PageHeader({ title, subtitle, action }) {
+export default function PageHeader({ title, subtitle, action, onHelp, helpLabel }) {
   return (
     <Box
       component={motion.div}
@@ -19,7 +20,7 @@ export default function PageHeader({ title, subtitle, action }) {
         gap: 2,
       }}
     >
-      <Box>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography variant="h1" component="h1" color="primary">
           {title}
         </Typography>
@@ -29,14 +30,26 @@ export default function PageHeader({ title, subtitle, action }) {
           </Typography>
         )}
       </Box>
-      {action && (
-        <motion.div
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.35 }}
+      {(action || onHelp) && (
+        <Stack
+          direction="row"
+          spacing={1.5}
+          alignItems="center"
+          sx={{ flexShrink: 0, alignSelf: { xs: 'flex-end', sm: 'flex-start' } }}
         >
-          {action}
-        </motion.div>
+          {action && (
+            <motion.div
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.35 }}
+            >
+              {action}
+            </motion.div>
+          )}
+          {onHelp && (
+            <SectionHelpButton onClick={onHelp} label={helpLabel} />
+          )}
+        </Stack>
       )}
     </Box>
   )

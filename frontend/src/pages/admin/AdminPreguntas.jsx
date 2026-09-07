@@ -183,7 +183,7 @@ export default function AdminPreguntas() {
                     </Typography>
                   )}
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button size="small" variant="outlined" onClick={() => abrirEditar(p)}>
                     Editar
                   </Button>
@@ -203,7 +203,7 @@ export default function AdminPreguntas() {
           <DialogContent dividers>
             <PreguntaFormFields form={editForm} setForm={setEditForm} modulos={modulos} />
           </DialogContent>
-          <DialogActions sx={{ px: 3, py: 2 }}>
+          <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
             <Button onClick={cerrarEditar} disabled={savingEdit}>Cancelar</Button>
             <Button type="submit" variant="contained" disabled={savingEdit}>
               {savingEdit ? 'Guardando…' : 'Guardar cambios'}

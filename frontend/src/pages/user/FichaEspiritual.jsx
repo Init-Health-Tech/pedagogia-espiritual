@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import {
   Box,
+  Button,
   Card,
   CardContent,
-  IconButton,
   Stack,
   Typography,
 } from '@mui/material'
@@ -126,33 +126,69 @@ export default function FichaEspiritual() {
               direction="row"
               justifyContent="center"
               alignItems="center"
-              spacing={1}
+              spacing={2}
               sx={{ mt: 3, pt: 2, borderTop: `1px solid ${colors.border}` }}
             >
-              <IconButton onClick={goPrev} aria-label="Anterior" size="small">
-                <ChevronLeft size={22} />
-              </IconButton>
+              <Button
+                onClick={goPrev}
+                aria-label="Anterior"
+                startIcon={<ChevronLeft size={18} />}
+                variant="outlined"
+                size="small"
+              >
+                Anterior
+              </Button>
 
-              <Stack direction="row" spacing={0.75} sx={{ mx: 1 }}>
+              <Stack direction="row" spacing={0.5} alignItems="center">
                 {SLIDES.map((_, i) => (
                   <Box
                     key={SLIDES[i].subtitle}
+                    component="button"
+                    type="button"
                     onClick={() => setIndex(i)}
+                    aria-label={`Ir a diapositiva ${i + 1}`}
+                    aria-current={i === index ? 'true' : undefined}
                     sx={{
-                      width: i === index ? 20 : 8,
-                      height: 8,
-                      borderRadius: 4,
-                      bgcolor: i === index ? colors.primary : colors.border,
+                      appearance: 'none',
+                      border: 'none',
+                      bgcolor: 'transparent',
+                      p: 0,
+                      m: 0,
+                      minWidth: 44,
+                      minHeight: 44,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       cursor: 'pointer',
-                      transition: 'all 0.2s',
+                      borderRadius: 1,
+                      '&:focus-visible': {
+                        outline: `3px solid ${colors.primary}`,
+                        outlineOffset: 2,
+                      },
                     }}
-                  />
+                  >
+                    <Box
+                      sx={{
+                        width: i === index ? 20 : 8,
+                        height: 8,
+                        borderRadius: 4,
+                        bgcolor: i === index ? colors.primary : colors.border,
+                        transition: 'all 0.2s',
+                      }}
+                    />
+                  </Box>
                 ))}
               </Stack>
 
-              <IconButton onClick={goNext} aria-label="Siguiente" size="small">
-                <ChevronRight size={22} />
-              </IconButton>
+              <Button
+                onClick={goNext}
+                aria-label="Siguiente"
+                endIcon={<ChevronRight size={18} />}
+                variant="outlined"
+                size="small"
+              >
+                Siguiente
+              </Button>
             </Stack>
           </CardContent>
         </Card>

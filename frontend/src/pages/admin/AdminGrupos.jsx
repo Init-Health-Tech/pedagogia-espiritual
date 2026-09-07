@@ -404,7 +404,7 @@ export default function AdminGrupos() {
               </Stack>
             )}
           </DialogContent>
-          <DialogActions sx={{ px: 3, py: 2 }}>
+          <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
             <Button onClick={cerrarModificar} disabled={savingEdit}>Cancelar</Button>
             <Button type="submit" variant="contained" disabled={savingEdit || loadingEdit}>
               {savingEdit ? 'Guardando…' : 'Guardar cambios'}

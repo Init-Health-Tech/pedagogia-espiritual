@@ -14,6 +14,7 @@ urlpatterns = [
     path('api/groups/', include('groups.urls')),
     path('api/payments/', include('payments.urls')),
     path('api/communications/', include('communications.urls')),
+    path('api/events/', include('events.urls')),
 ]
 
 if settings.DEBUG:

@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -174,12 +175,14 @@ export default function AdminModulos() {
                       <StatusBadge status={m.activo ? 'active' : 'pending'} label={m.activo ? 'Activo' : 'Inactivo'} />
                     </TableCell>
                     <TableCell align="right">
-                      <Button size="small" variant="outlined" onClick={() => abrirEditar(m)} sx={{ mr: 1 }}>
-                        Editar
-                      </Button>
-                      <Button size="small" color="error" variant="outlined" onClick={() => setConfirmId(m.id)}>
-                        Eliminar
-                      </Button>
+                      <Stack direction="row" spacing={2} justifyContent="flex-end" flexWrap="wrap" useFlexGap>
+                        <Button size="small" variant="outlined" onClick={() => abrirEditar(m)}>
+                          Editar
+                        </Button>
+                        <Button size="small" color="error" variant="outlined" onClick={() => setConfirmId(m.id)}>
+                          Eliminar
+                        </Button>
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -195,7 +198,7 @@ export default function AdminModulos() {
           <DialogContent dividers>
             <ModuloFormFields form={editForm} setForm={setEditForm} />
           </DialogContent>
-          <DialogActions sx={{ px: 3, py: 2 }}>
+          <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
             <Button onClick={cerrarEditar} disabled={savingEdit}>Cancelar</Button>
             <Button type="submit" variant="contained" disabled={savingEdit}>
               {savingEdit ? 'Guardando…' : 'Guardar cambios'}

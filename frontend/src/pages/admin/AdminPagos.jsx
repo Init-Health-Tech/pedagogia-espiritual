@@ -289,7 +289,7 @@ export default function AdminPagos() {
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                     Duración: {p.duracion_meses} {Number(p.duracion_meses) === 1 ? 'mes' : 'meses'}
                   </Typography>
-                  <Stack direction="row" spacing={1}>
+                  <Stack direction="row" spacing={2}>
                     <Button size="small" variant="outlined" onClick={() => abrirModificar(p)}>
                       Modificar
                     </Button>
@@ -402,7 +402,7 @@ export default function AdminPagos() {
                       <TableCell>{formatFecha(fila.fechaPago)}</TableCell>
                       <TableCell>{formatFecha(fila.proximoPago)}</TableCell>
                       <TableCell>
-                        <Stack direction="row" spacing={1} alignItems="center">
+                        <Stack direction="row" spacing={2} alignItems="center">
                           <StatusBadge status={estadoAcceso.status} label={estadoAcceso.label} />
                           <Button size="small" variant="outlined" onClick={() => setConfirmUser(fila)}>
                             {fila.is_active_member ? 'Desactivar' : 'Activar'}
@@ -451,7 +451,7 @@ export default function AdminPagos() {
               />
             </Stack>
           </DialogContent>
-          <DialogActions sx={{ px: 3, py: 2 }}>
+          <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
             <Button onClick={cerrarDialog} disabled={saving}>Cancelar</Button>
             <Button type="submit" variant="contained" disabled={saving}>
               {saving ? 'Guardando…' : dialogMode === 'edit' ? 'Guardar cambios' : 'Crear plan'}
@@ -525,7 +525,7 @@ export default function AdminPagos() {
               </strong>
             </Typography>
           </DialogContent>
-          <DialogActions sx={{ px: 3, py: 2 }}>
+          <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
             <Button onClick={cerrarRegistrarPago} disabled={savingPago}>Cancelar</Button>
             <Button
               type="submit"
