@@ -15,11 +15,16 @@ from .models import (
     Modulo,
     PreguntaChecklist,
     RespuestaChecklist,
+    TareaBienvenida,
 )
 from .avance import (
     confirmar_avance,
     posponer_avance,
     recalcular_listo_para_avanzar,
+)
+from .bienvenida import (
+    lista_tareas_miembro,
+    marcar_tarea,
 )
 from .signals import asegurar_ficha
 from .serializers import (
@@ -35,6 +40,8 @@ from .serializers import (
     ModuloSerializer,
     PreguntaChecklistSerializer,
     ResponderChecklistSerializer,
+    TareaBienvenidaMarcarSerializer,
+    TareaBienvenidaSerializer,
 )
 
 User = get_user_model()
@@ -70,6 +77,39 @@ class PreguntaChecklistViewSet(viewsets.ModelViewSet):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
             return [IsModeratorOrAdmin()]
         return super().get_permissions()
+
+
+class TareaBienvenidaViewSet(viewsets.ModelViewSet):
+    queryset = TareaBienvenida.objects.all()
+    serializer_class = TareaBienvenidaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.is_formador:
+            return self.queryset
+        return self.queryset.filter(activa=True)
+
+    def get_permissions(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return [IsModeratorOrAdmin()]
+        return super().get_permissions()
+
+    @action(detail=False, methods=['get'])
+    def mi_progreso(self, request):
+        return Response(lista_tareas_miembro(request.user))
+
+    @action(detail=False, methods=['post'])
+    def marcar(self, request):
+        writer = TareaBienvenidaMarcarSerializer(data=request.data)
+        writer.is_valid(raise_exception=True)
+        registro, ok = marcar_tarea(
+            request.user,
+            writer.validated_data['tarea_id'],
+            writer.validated_data['completada'],
+        )
+        if not ok:
+            return Response({'detail': 'Tarea no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(lista_tareas_miembro(request.user))
 
 
 class FichaPedagogicaViewSet(viewsets.ModelViewSet):

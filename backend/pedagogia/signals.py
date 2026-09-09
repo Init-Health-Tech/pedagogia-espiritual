@@ -10,7 +10,11 @@ from .models import FichaPedagogica, FichaPerfil, Modulo
 def asegurar_ficha(usuario):
     ficha, _ = FichaPedagogica.objects.get_or_create(usuario=usuario)
     changed = []
-    if not ficha.fecha_inicio_camino:
+    # Solo arranca el conteo de semanas cuando el camino formal ya está activo.
+    if (
+        not ficha.fecha_inicio_camino
+        and getattr(usuario, 'estado_camino', None) == User.EstadoCamino.FORMAL
+    ):
         joined = getattr(usuario, 'date_joined', None)
         ficha.fecha_inicio_camino = joined.date() if joined and hasattr(joined, 'date') else date.today()
         changed.append('fecha_inicio_camino')

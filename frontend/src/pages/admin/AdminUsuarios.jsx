@@ -328,6 +328,9 @@ export default function AdminUsuarios() {
                         <TableCell>
                           <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ gap: 1 }}>
                             <span>{u.full_name}</span>
+                            {esMiembro && u.estado_camino === 'bienvenida' && (
+                              <StatusBadge status="pending" label="En bienvenida" />
+                            )}
                             {esMiembro && u.listo_para_avanzar && (
                               <StatusBadge status="pending" label="Listo para avanzar" />
                             )}

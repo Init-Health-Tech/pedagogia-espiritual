@@ -11,6 +11,8 @@ from .models import (
     Modulo,
     PreguntaChecklist,
     RespuestaChecklist,
+    TareaBienvenida,
+    TareaBienvenidaRegistro,
 )
 
 
@@ -88,3 +90,17 @@ class FichaPraxisRegistroAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'semana_global', 'item', 'cumplido', 'fecha_registro')
     list_filter = ('cumplido', 'item')
     search_fields = ('usuario__username', 'usuario__first_name', 'usuario__last_name')
+
+
+@admin.register(TareaBienvenida)
+class TareaBienvenidaAdmin(admin.ModelAdmin):
+    list_display = ('orden', 'nombre', 'activa')
+    list_filter = ('activa',)
+    ordering = ('orden',)
+
+
+@admin.register(TareaBienvenidaRegistro)
+class TareaBienvenidaRegistroAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'tarea', 'completada', 'fecha_completado')
+    list_filter = ('completada',)
+    search_fields = ('usuario__username', 'tarea__nombre')

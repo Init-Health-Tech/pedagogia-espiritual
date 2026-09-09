@@ -9,11 +9,13 @@ from .views import (
     FichaPraxisRegistroViewSet,
     ModuloViewSet,
     PreguntaChecklistViewSet,
+    TareaBienvenidaViewSet,
 )
 
 router = DefaultRouter()
 router.register('modulos', ModuloViewSet, basename='modulos')
 router.register('preguntas', PreguntaChecklistViewSet, basename='preguntas')
+router.register('tareas-bienvenida', TareaBienvenidaViewSet, basename='tareas-bienvenida')
 router.register('fichas', FichaPedagogicaViewSet, basename='fichas')
 router.register('avances', AvanceEspiritualViewSet, basename='avances')
 router.register('areas-evaluacion', FichaAreaEvaluacionViewSet, basename='areas-evaluacion')

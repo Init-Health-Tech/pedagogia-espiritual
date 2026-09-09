@@ -11,6 +11,8 @@ import {
   DialogTitle,
   FormControlLabel,
   Stack,
+  Tab,
+  Tabs,
   Table,
   TableBody,
   TableCell,
@@ -27,6 +29,7 @@ import EmptyState from '../../components/common/EmptyState'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import FormField from '../../components/common/FormField'
 import StatusBadge from '../../components/common/StatusBadge'
+import AdminTareasBienvenidaPanel from '../../components/admin/AdminTareasBienvenidaPanel'
 
 const emptyForm = { nombre: '', descripcion: '', orden: 1, color: '#030E30', manual_url: '', activo: true }
 
@@ -79,7 +82,7 @@ function ModuloFormFields({ form, setForm }) {
   )
 }
 
-export default function AdminModulos() {
+function EtapasPanel() {
   const [modulos, setModulos] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [editForm, setEditForm] = useState(emptyForm)
@@ -139,7 +142,6 @@ export default function AdminModulos() {
 
   return (
     <>
-      <PageHeader title="Módulos (manuales)" subtitle="Gestión de las etapas formativas del camino pedagógico" />
       <Card sx={{ mb: 3 }}>
         <CardContent component="form" onSubmit={crear}>
           <Typography variant="h3" gutterBottom>Nuevo módulo</Typography>
@@ -215,6 +217,28 @@ export default function AdminModulos() {
         onConfirm={() => eliminar(confirmId)}
         onClose={() => setConfirmId(null)}
       />
+    </>
+  )
+}
+
+export default function AdminModulos() {
+  const [tab, setTab] = useState(0)
+
+  return (
+    <>
+      <PageHeader
+        title="Módulos"
+        subtitle="Etapas formativas y periodo de bienvenida"
+      />
+      <Tabs
+        value={tab}
+        onChange={(_, v) => setTab(v)}
+        sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab label="Etapas del camino" />
+        <Tab label="Periodo de bienvenida" />
+      </Tabs>
+      {tab === 0 ? <EtapasPanel /> : <AdminTareasBienvenidaPanel />}
     </>
   )
 }

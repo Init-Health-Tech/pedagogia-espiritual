@@ -65,6 +65,12 @@ export const pedagogiaAPI = {
   guardarSemanaFicha: (data) => api.post('/pedagogia/fichas/guardar_semana_ficha/', data),
   confirmarAvance: (fichaId) => api.post(`/pedagogia/fichas/${fichaId}/confirmar_avance/`),
   posponerAvance: (fichaId) => api.post(`/pedagogia/fichas/${fichaId}/posponer_avance/`),
+  tareasBienvenida: () => api.get('/pedagogia/tareas-bienvenida/'),
+  createTareaBienvenida: (data) => api.post('/pedagogia/tareas-bienvenida/', data),
+  updateTareaBienvenida: (id, data) => api.patch(`/pedagogia/tareas-bienvenida/${id}/`, data),
+  deleteTareaBienvenida: (id) => api.delete(`/pedagogia/tareas-bienvenida/${id}/`),
+  miBienvenida: () => api.get('/pedagogia/tareas-bienvenida/mi_progreso/'),
+  marcarBienvenida: (data) => api.post('/pedagogia/tareas-bienvenida/marcar/', data),
   areasEvaluacion: () => api.get('/pedagogia/areas-evaluacion/'),
   createAreaEvaluacion: (data) => api.post('/pedagogia/areas-evaluacion/', data),
   updateAreaEvaluacion: (id, data) => api.patch(`/pedagogia/areas-evaluacion/${id}/`, data),
@@ -137,6 +143,8 @@ export const adminAPI = {
   createUser: (data) => api.post('/accounts/users/', data),
   updateUser: (id, data) => api.patch(`/accounts/users/${id}/`, data),
   toggleActive: (id) => api.post(`/accounts/users/${id}/toggle_active/`),
+  confirmarInicioFormal: (id) => api.post(`/accounts/users/${id}/confirmar_inicio_formal/`),
+  posponerInicioFormal: (id) => api.post(`/accounts/users/${id}/posponer_inicio_formal/`),
 }
 
 export default api

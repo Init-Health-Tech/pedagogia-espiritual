@@ -12,6 +12,8 @@ from .models import (
     Modulo,
     PreguntaChecklist,
     RespuestaChecklist,
+    TareaBienvenida,
+    TareaBienvenidaRegistro,
 )
 
 # Campos de seguimiento pedagógico (label visible para el miembro)
@@ -45,6 +47,17 @@ class PreguntaChecklistSerializer(serializers.ModelSerializer):
     class Meta:
         model = PreguntaChecklist
         fields = '__all__'
+
+
+class TareaBienvenidaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TareaBienvenida
+        fields = ('id', 'nombre', 'descripcion', 'orden', 'activa')
+
+
+class TareaBienvenidaMarcarSerializer(serializers.Serializer):
+    tarea_id = serializers.IntegerField()
+    completada = serializers.BooleanField()
 
 
 class RespuestaChecklistSerializer(serializers.ModelSerializer):

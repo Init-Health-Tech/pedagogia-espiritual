@@ -101,11 +101,28 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save(update_fields=['is_active_member'])
         return Response(UserAdminSerializer(user).data)
 
+    @action(detail=True, methods=['post'])
+    def confirmar_inicio_formal(self, request, pk=None):
+        from pedagogia.bienvenida import confirmar_inicio_formal
+        user = self.get_object()
+        user, ok = confirmar_inicio_formal(user)
+        if not ok and user.estado_camino == User.EstadoCamino.FORMAL:
+            return Response(UserAdminSerializer(user).data)
+        return Response(UserAdminSerializer(user).data)
+
+    @action(detail=True, methods=['post'])
+    def posponer_inicio_formal(self, request, pk=None):
+        from pedagogia.bienvenida import posponer_inicio_formal
+        user = self.get_object()
+        user = posponer_inicio_formal(user)
+        return Response(UserAdminSerializer(user).data)
+
     @action(detail=True, methods=['get'])
     def progreso(self, request, pk=None):
         """Progreso pedagógico y de contenidos de un usuario (vista admin)."""
         from content.models import Contenido, ContenidoVista
         from content.serializers import ContenidoSerializer
+        from pedagogia.bienvenida import lista_tareas_miembro
         from pedagogia.models import FichaPedagogica
         from pedagogia.serializers import FichaPedagogicaSerializer
 
@@ -149,4 +166,5 @@ class UserViewSet(viewsets.ModelViewSet):
             'ficha': FichaPedagogicaSerializer(ficha).data if ficha else None,
             'contenidos': contenidos_data,
             'resumen_contenidos': _stats_por_tipo(contenidos_data),
+            'bienvenida': lista_tareas_miembro(usuario) if usuario.role == User.Role.MEMBER else None,
         })

@@ -22,6 +22,7 @@ def _username_desde_email(email):
 
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    sugerencia_inicio_formal = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -29,14 +30,20 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name', 'full_name',
             'role', 'phone', 'avatar', 'bio', 'is_active_member',
             'must_change_password', 'date_joined_movement', 'date_joined', 'created_at',
+            'estado_camino', 'sugerencia_inicio_formal',
         )
         read_only_fields = (
             'id', 'role', 'must_change_password', 'date_joined', 'created_at',
+            'estado_camino',
         )
 
     def get_full_name(self, obj):
         name = f'{obj.first_name} {obj.last_name}'.strip()
         return name or obj.username
+
+    def get_sugerencia_inicio_formal(self, obj):
+        from pedagogia.bienvenida import payload_sugerencia_inicio_formal
+        return payload_sugerencia_inicio_formal(obj)
 
 
 class UserAdminSerializer(serializers.ModelSerializer):
@@ -44,6 +51,7 @@ class UserAdminSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False, min_length=8)
     listo_para_avanzar = serializers.SerializerMethodField()
     sugerencia_avance_pendiente = serializers.SerializerMethodField()
+    sugerencia_inicio_formal = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -52,9 +60,13 @@ class UserAdminSerializer(serializers.ModelSerializer):
             'first_name', 'last_name', 'full_name',
             'role', 'phone', 'avatar', 'bio', 'is_active_member', 'is_active',
             'must_change_password', 'date_joined_movement', 'date_joined', 'created_at',
-            'listo_para_avanzar', 'sugerencia_avance_pendiente',
+            'estado_camino', 'bienvenida_inicio_pospuesto',
+            'listo_para_avanzar', 'sugerencia_avance_pendiente', 'sugerencia_inicio_formal',
         )
-        read_only_fields = ('id', 'username', 'must_change_password', 'date_joined', 'created_at')
+        read_only_fields = (
+            'id', 'username', 'must_change_password', 'date_joined', 'created_at',
+            'estado_camino', 'bienvenida_inicio_pospuesto',
+        )
 
     def get_full_name(self, obj):
         name = f'{obj.first_name} {obj.last_name}'.strip()
@@ -68,6 +80,10 @@ class UserAdminSerializer(serializers.ModelSerializer):
         from pedagogia.avance import sugerencia_avance_para_coordinador
         ficha = getattr(obj, 'ficha_pedagogica', None)
         return sugerencia_avance_para_coordinador(ficha) if ficha else False
+
+    def get_sugerencia_inicio_formal(self, obj):
+        from pedagogia.bienvenida import payload_sugerencia_inicio_formal
+        return payload_sugerencia_inicio_formal(obj)
 
     def validate_role(self, role):
         if role not in ROLES_ADMIN_EDITABLES:
@@ -114,6 +130,10 @@ class UserAdminSerializer(serializers.ModelSerializer):
         user.set_password(temp)
         user.must_change_password = True
         user.is_active_member = True
+        if role == User.Role.MEMBER:
+            user.estado_camino = User.EstadoCamino.BIENVENIDA
+        else:
+            user.estado_camino = User.EstadoCamino.FORMAL
         user.save()
         self._temporary_password = temp
         return user

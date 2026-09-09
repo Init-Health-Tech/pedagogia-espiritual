@@ -9,10 +9,24 @@ class User(AbstractUser):
         COORDINATOR = 'coordinator', 'Coordinador'
         MEMBER = 'member', 'Miembro'
 
+    class EstadoCamino(models.TextChoices):
+        BIENVENIDA = 'bienvenida', 'Periodo de bienvenida'
+        FORMAL = 'formal', 'Camino formal'
+
     role = models.CharField(
         max_length=20,
         choices=Role.choices,
         default=Role.MEMBER,
+    )
+    estado_camino = models.CharField(
+        max_length=20,
+        choices=EstadoCamino.choices,
+        default=EstadoCamino.BIENVENIDA,
+        help_text='bienvenida = orientación inicial; formal = etapas, diario y ficha.',
+    )
+    bienvenida_inicio_pospuesto = models.BooleanField(
+        default=False,
+        help_text='Si el coordinador eligió «Aún no» tras completar la bienvenida.',
     )
     phone = models.CharField(max_length=20, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)

@@ -21,6 +21,7 @@ import StatusBadge from '../../components/common/StatusBadge'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
 import EtapasJourney from '../../components/pedagogia/EtapasJourney'
 import FichaProgresoVista from '../../components/pedagogia/FichaProgresoVista'
+import SugerenciaBanner from '../../components/pedagogia/SugerenciaBanner'
 import { colors } from '../../theme/muiTheme'
 
 const ROLE_LABELS = {
@@ -70,6 +71,7 @@ export default function AdminUsuarioProgreso() {
   const [error, setError] = useState(null)
   const [expanded, setExpanded] = useState('documento')
   const [avanceBusy, setAvanceBusy] = useState(false)
+  const [inicioBusy, setInicioBusy] = useState(false)
 
   const reload = () =>
     Promise.all([adminAPI.userProgreso(userId), pedagogiaAPI.modulos()])
@@ -149,6 +151,7 @@ export default function AdminUsuarioProgreso() {
   const checklistHechas = (ficha?.checklist || []).filter((c) => c.completada).length
   const checklistTotal = (ficha?.checklist || []).length
   const sugerencia = ficha?.sugerencia_avance
+  const sugInicio = usuario?.sugerencia_inicio_formal
   const etapaLabel = (n) => (n || '').replace(/^Etapa [IVX]+ — /, '')
 
   const confirmarAvance = async () => {
@@ -173,6 +176,26 @@ export default function AdminUsuarioProgreso() {
     }
   }
 
+  const confirmarInicioFormal = async () => {
+    setInicioBusy(true)
+    try {
+      await adminAPI.confirmarInicioFormal(usuario.id)
+      await reload()
+    } finally {
+      setInicioBusy(false)
+    }
+  }
+
+  const posponerInicioFormal = async () => {
+    setInicioBusy(true)
+    try {
+      await adminAPI.posponerInicioFormal(usuario.id)
+      await reload()
+    } finally {
+      setInicioBusy(false)
+    }
+  }
+
   return (
     <>
       <Button
@@ -187,45 +210,72 @@ export default function AdminUsuarioProgreso() {
         title={nombre}
         subtitle={`Progreso de @${usuario.username} · ${ROLE_LABELS[usuario.role] || usuario.role}`}
         action={
-          <StatusBadge
-            status={usuario.is_active_member ? 'active' : 'alert'}
-            label={usuario.is_active_member ? 'Activo' : 'Inactivo'}
-          />
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            {usuario.estado_camino === 'bienvenida' && (
+              <StatusBadge status="pending" label="En bienvenida" />
+            )}
+            <StatusBadge
+              status={usuario.is_active_member ? 'active' : 'alert'}
+              label={usuario.is_active_member ? 'Activo' : 'Inactivo'}
+            />
+          </Stack>
         }
       />
 
+      {sugInicio?.mostrar_banner_coordinador && sugInicio?.etapa_inicio && (
+        <SugerenciaBanner
+          mode="coordinator"
+          confirmLabel="Confirmar inicio"
+          onConfirm={confirmarInicioFormal}
+          onPostpone={posponerInicioFormal}
+          busy={inicioBusy}
+        >
+          <strong>{nombre}</strong> completó su periodo de bienvenida. ¿Confirmas el
+          inicio de su camino formal en{' '}
+          <strong>{etapaLabel(sugInicio.etapa_inicio?.nombre) || sugInicio.etapa_inicio?.nombre}</strong>?
+        </SugerenciaBanner>
+      )}
+
       {sugerencia?.mostrar_banner_coordinador && sugerencia?.siguiente_etapa && (
+        <SugerenciaBanner
+          mode="coordinator"
+          confirmLabel="Confirmar avance"
+          onConfirm={confirmarAvance}
+          onPostpone={posponerAvance}
+          busy={avanceBusy}
+        >
+          <strong>{nombre}</strong> ha completado su recorrido en{' '}
+          <strong>{etapaLabel(sugerencia.etapa_actual?.nombre)}</strong>.
+          {' '}¿Confirmas su avance a{' '}
+          <strong>{etapaLabel(sugerencia.siguiente_etapa?.nombre)}</strong>?
+        </SugerenciaBanner>
+      )}
+
+      {usuario.estado_camino === 'bienvenida' && data.bienvenida && (
         <Box
           sx={{
             mb: 3,
             p: { xs: 2.5, md: 3 },
             borderRadius: 3,
             border: `1px solid ${colors.border}`,
-            bgcolor: colors.cream,
+            bgcolor: colors.surface,
           }}
         >
-          <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.65 }}>
-            <strong>{nombre}</strong> ha completado su recorrido en{' '}
-            <strong>{etapaLabel(sugerencia.etapa_actual?.nombre)}</strong>.
-            {' '}¿Confirmas su avance a{' '}
-            <strong>{etapaLabel(sugerencia.siguiente_etapa?.nombre)}</strong>?
+          <Typography variant="overline" sx={{ display: 'block', mb: 1 }}>
+            Periodo de bienvenida
           </Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-            <Button
-              variant="contained"
-              disabled={avanceBusy}
-              onClick={confirmarAvance}
-            >
-              {avanceBusy ? 'Guardando…' : 'Confirmar avance'}
-            </Button>
-            <Button
-              variant="outlined"
-              disabled={avanceBusy}
-              onClick={posponerAvance}
-              sx={{ borderColor: colors.border, color: colors.dark }}
-            >
-              Aún no
-            </Button>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {data.bienvenida.progreso?.completadas || 0} de {data.bienvenida.progreso?.total || 0} tareas completadas
+            {typeof data.bienvenida.semanas_en_bienvenida === 'number'
+              ? ` · ${data.bienvenida.semanas_en_bienvenida} semanas desde el registro`
+              : ''}
+          </Typography>
+          <Stack spacing={1}>
+            {(data.bienvenida.tareas || []).map((t) => (
+              <Typography key={t.id} variant="body2" sx={{ color: t.completada ? colors.moss : colors.dark }}>
+                {t.completada ? '✓' : '○'} {t.nombre}
+              </Typography>
+            ))}
           </Stack>
         </Box>
       )}
@@ -258,16 +308,28 @@ export default function AdminUsuarioProgreso() {
           >
             <Box sx={{ flex: 1 }}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                Camino pedagógico
+                {usuario.estado_camino === 'bienvenida' ? 'Periodo de bienvenida' : 'Camino pedagógico'}
               </Typography>
               <Typography className="font-display" sx={{ fontSize: '1.5rem', color: colors.dark, mb: 1 }}>
-                {caminoPercent}%
+                {usuario.estado_camino === 'bienvenida'
+                  ? `${data.bienvenida?.progreso?.completadas || 0}/${data.bienvenida?.progreso?.total || 0}`
+                  : `${caminoPercent}%`}
               </Typography>
-              <AnimatedProgress value={caminoPercent} />
+              <AnimatedProgress
+                value={
+                  usuario.estado_camino === 'bienvenida'
+                    ? (data.bienvenida?.progreso?.total
+                      ? Math.round(((data.bienvenida.progreso.completadas || 0) / data.bienvenida.progreso.total) * 100)
+                      : 0)
+                    : caminoPercent
+                }
+              />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                {ficha
-                  ? `${checklistHechas} de ${checklistTotal} semanas en diario`
-                  : 'Sin ficha pedagógica aún'}
+                {usuario.estado_camino === 'bienvenida'
+                  ? 'Tareas de orientación completadas'
+                  : ficha
+                    ? `${checklistHechas} de ${checklistTotal} semanas en diario`
+                    : 'Sin ficha pedagógica aún'}
               </Typography>
             </Box>
             <Box sx={{ flex: 1 }}>
@@ -285,6 +347,7 @@ export default function AdminUsuarioProgreso() {
           </Stack>
         </Box>
 
+        {usuario.estado_camino === 'formal' && (
         <Box>
           <Typography variant="overline" sx={{ color: colors.muted, display: 'block', mb: 1.5 }}>
             Camino pedagógico
@@ -371,6 +434,7 @@ export default function AdminUsuarioProgreso() {
             </Stack>
           )}
         </Box>
+        )}
 
         <Box>
           <Typography variant="overline" sx={{ color: colors.muted, display: 'block', mb: 1.5 }}>
@@ -508,6 +572,7 @@ export default function AdminUsuarioProgreso() {
           </Stack>
         </Box>
 
+        {usuario.estado_camino === 'formal' && (
         <Box>
           <Typography variant="overline" sx={{ color: colors.muted, display: 'block', mb: 1.5 }}>
             Ficha Pedagógica
@@ -534,6 +599,7 @@ export default function AdminUsuarioProgreso() {
             )}
           </Box>
         </Box>
+        )}
       </Stack>
     </>
   )

@@ -24,8 +24,11 @@ import AnimatedProgress from '../../components/common/AnimatedProgress'
 import EtapasJourney from '../../components/pedagogia/EtapasJourney'
 import ModuloManual from '../../components/pedagogia/ModuloManual'
 import MiProgresoTab from '../../components/pedagogia/MiProgresoTab'
+import BienvenidaCaminoView from '../../components/pedagogia/BienvenidaCaminoView'
+import SugerenciaBanner from '../../components/pedagogia/SugerenciaBanner'
 import MemberGuidedTour from '../../components/help/MemberGuidedTour'
 import { CAMINO_TOUR_STEPS } from '../../components/help/tourSteps'
+import { useAuth } from '../../context/AuthContext'
 import { colors } from '../../theme/muiTheme'
 
 function groupByGrupo(entradas) {
@@ -576,6 +579,7 @@ function FichaTab({ ficha, onFichaUpdate }) {
 }
 
 export default function FichaPedagogica() {
+  const { user } = useAuth()
   const [ficha, setFicha] = useState(null)
   const [modulos, setModulos] = useState([])
   const [loading, setLoading] = useState(true)
@@ -585,6 +589,8 @@ export default function FichaPedagogica() {
   const [expandedWeek, setExpandedWeek] = useState(null)
   const [tab, setTab] = useState(0)
   const [tourOpen, setTourOpen] = useState(false)
+
+  const enBienvenida = user?.estado_camino === 'bienvenida'
 
   const load = () =>
     Promise.all([pedagogiaAPI.miFicha(), pedagogiaAPI.modulos()])
@@ -602,19 +608,36 @@ export default function FichaPedagogica() {
       })
 
   useEffect(() => {
+    if (enBienvenida) {
+      setLoading(false)
+      return
+    }
     load().finally(() => setLoading(false))
-  }, [])
-
-  const checklist = ficha?.checklist || []
-  const completadas = checklist.filter((c) => c.completada).length
-  const progreso = ficha?.progreso_general || 0
-  const etapaActual = ficha?.modulo_actual
+  }, [enBienvenida])
 
   const fichaProgresoLabel = useMemo(() => {
     const s = ficha?.ficha_semanal
     if (!s) return null
     return `${s.semanas_completadas || 0} de ${s.total_semanas || 0} semanas acompañadas en tu ficha`
   }, [ficha])
+
+  if (enBienvenida) {
+    return (
+      <>
+        <BienvenidaCaminoView onHelp={() => setTourOpen(true)} />
+        <MemberGuidedTour
+          open={tourOpen}
+          onClose={() => setTourOpen(false)}
+          steps={CAMINO_TOUR_STEPS}
+        />
+      </>
+    )
+  }
+
+  const checklist = ficha?.checklist || []
+  const completadas = checklist.filter((c) => c.completada).length
+  const progreso = ficha?.progreso_general || 0
+  const etapaActual = ficha?.modulo_actual
 
   const guardarEntrada = async (item) => {
     const nota = (drafts[item.pregunta_id] || '').trim()
@@ -644,20 +667,10 @@ export default function FichaPedagogica() {
       />
 
       {ficha?.sugerencia_avance?.mostrar_aviso_miembro && (
-        <Card
-          sx={{
-            mb: 2,
-            border: `1px solid ${colors.border}`,
-            bgcolor: colors.surface,
-          }}
-        >
-          <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-            <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
-              Has completado tu recorrido en esta etapa. Tu coordinador revisará tu
-              camino y se pondrá en contacto contigo pronto.
-            </Typography>
-          </CardContent>
-        </Card>
+        <SugerenciaBanner mode="member">
+          Has completado tu recorrido en esta etapa. Tu coordinador revisará tu
+          camino y se pondrá en contacto contigo pronto.
+        </SugerenciaBanner>
       )}
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>

@@ -152,6 +152,53 @@ class RespuestaChecklist(models.Model):
         return f'{self.ficha} — P{self.pregunta.orden}'
 
 
+class TareaBienvenida(models.Model):
+    """Tarea de orientación del periodo de bienvenida (catálogo administrable)."""
+    nombre = models.CharField(max_length=255)
+    descripcion = models.TextField(blank=True)
+    orden = models.PositiveIntegerField(default=1)
+    activa = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['orden', 'id']
+        verbose_name = 'Tarea de bienvenida'
+        verbose_name_plural = 'Tareas de bienvenida'
+
+    def __str__(self):
+        return f'{self.orden}. {self.nombre}'
+
+
+class TareaBienvenidaRegistro(models.Model):
+    """Progreso de un miembro en una tarea de bienvenida."""
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='tareas_bienvenida',
+    )
+    tarea = models.ForeignKey(
+        TareaBienvenida,
+        on_delete=models.CASCADE,
+        related_name='registros',
+    )
+    completada = models.BooleanField(default=False)
+    fecha_completado = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['usuario', 'tarea'],
+                name='unique_usuario_tarea_bienvenida',
+            ),
+        ]
+        verbose_name = 'Registro de tarea de bienvenida'
+        verbose_name_plural = 'Registros de tareas de bienvenida'
+        ordering = ['tarea__orden', 'tarea_id']
+
+    def __str__(self):
+        estado = '✓' if self.completada else '…'
+        return f'{estado} {self.usuario} — {self.tarea.nombre}'
+
+
 class AvanceEspiritual(models.Model):
     ficha = models.ForeignKey(
         FichaPedagogica,
