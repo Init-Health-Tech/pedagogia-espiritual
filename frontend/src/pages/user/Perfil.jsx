@@ -36,7 +36,7 @@ export default function Perfil() {
 
   useEffect(() => {
     pedagogiaAPI.miFicha()
-      .then((r) => setProcesoFe(r.data?.modulo_actual_detalle?.nombre || ''))
+      .then((r) => setProcesoFe(r.data?.etapa_actual_detalle?.nombre || ''))
       .catch(() => setProcesoFe(''))
   }, [])
 

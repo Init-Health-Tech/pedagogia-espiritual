@@ -8,7 +8,7 @@ from django.utils import timezone
 from communications.models import Anuncio
 from content.models import CategoriaContenido, Contenido
 from groups.models import GrupoPastoreo
-from pedagogia.models import Modulo, PreguntaChecklist
+from pedagogia.models import Etapa, PreguntaChecklist
 from pedagogia.manual_demo import MANUAL_BUSQUEDA, PREGUNTAS_DIARIO
 from payments.models import Pago, PlanSuscripcion, Suscripcion
 
@@ -86,7 +86,7 @@ class Command(BaseCommand):
         ]
         modulos = {}
         for nombre, desc, orden, color in modulos_data:
-            m, _ = Modulo.objects.update_or_create(
+            m, _ = Etapa.objects.update_or_create(
                 orden=orden,
                 defaults={'nombre': nombre, 'descripcion': desc, 'color': color, 'activo': True},
             )
@@ -112,7 +112,7 @@ class Command(BaseCommand):
                 defaults={
                     'texto': texto,
                     'semana': semana,
-                    'modulo': mapa_corto.get(modulo_key),
+                    'etapa': mapa_corto.get(modulo_key),
                     'activa': True,
                     'ayuda': ayuda,
                 },
@@ -270,7 +270,7 @@ class Command(BaseCommand):
 
         if hasattr(member, 'ficha_pedagogica'):
             ficha = member.ficha_pedagogica
-            ficha.modulo_actual = modulos.get(2)
+            ficha.etapa_actual = modulos.get(2)
             ficha.recalcular_progreso()
 
         self.stdout.write(self.style.SUCCESS('Datos de demostración cargados correctamente.'))

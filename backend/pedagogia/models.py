@@ -4,41 +4,81 @@ from django.conf import settings
 from django.db import models
 
 
-class Modulo(models.Model):
-    """Módulo formativo (manual) del camino pedagógico."""
+class Etapa(models.Model):
+    """Etapa formativa del camino (Búsqueda, Discipulado, Consagración, Misión)."""
     nombre = models.CharField(max_length=150)
     descripcion = models.TextField(blank=True)
     orden = models.PositiveIntegerField(default=0)
     color = models.CharField(max_length=7, default='#6B8CAE')
-    manual_archivo = models.FileField(upload_to='manuales/', blank=True, null=True)
-    manual_url = models.URLField(blank=True, help_text='Enlace complementario opcional')
     contenido_manual = models.JSONField(
         default=list,
         blank=True,
-        help_text='Secciones del manual digital interactivo',
+        help_text='Secciones del manual digital interactivo (legado; se conserva temporalmente).',
     )
     activo = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['orden']
-        verbose_name = 'Módulo'
-        verbose_name_plural = 'Módulos'
+        verbose_name = 'Etapa'
+        verbose_name_plural = 'Etapas'
 
     def __str__(self):
         return self.nombre
 
 
-class PreguntaChecklist(models.Model):
-    texto = models.CharField(max_length=500)
+class Modulo(models.Model):
+    """Módulo formativo dentro de una Etapa."""
+    nombre = models.CharField(max_length=150)
+    descripcion = models.TextField(blank=True)
+    orden = models.PositiveIntegerField(default=1)
+    etapa = models.ForeignKey(
+        Etapa,
+        on_delete=models.CASCADE,
+        related_name='modulos',
+    )
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['etapa__orden', 'orden', 'id']
+        verbose_name = 'Módulo'
+        verbose_name_plural = 'Módulos'
+
+    def __str__(self):
+        return f'{self.etapa.nombre} · {self.nombre}'
+
+
+class Manual(models.Model):
+    """Manual (enlace) perteneciente a un Módulo."""
+    titulo = models.CharField(max_length=255)
+    enlace = models.URLField()
     orden = models.PositiveIntegerField(default=1)
     modulo = models.ForeignKey(
         Modulo,
+        on_delete=models.CASCADE,
+        related_name='manuales',
+    )
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['modulo__orden', 'orden', 'id']
+        verbose_name = 'Manual'
+        verbose_name_plural = 'Manuales'
+
+    def __str__(self):
+        return self.titulo
+
+
+class PreguntaChecklist(models.Model):
+    texto = models.CharField(max_length=500)
+    orden = models.PositiveIntegerField(default=1)
+    etapa = models.ForeignKey(
+        Etapa,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='preguntas',
-        help_text='Módulo al que pertenece esta pregunta (opcional)',
+        help_text='Etapa a la que pertenece esta pregunta (opcional)',
     )
     activa = models.BooleanField(default=True)
     ayuda = models.TextField(blank=True, help_text='Orientación para la reflexión semanal')
@@ -59,8 +99,8 @@ class FichaPedagogica(models.Model):
         on_delete=models.CASCADE,
         related_name='ficha_pedagogica',
     )
-    modulo_actual = models.ForeignKey(
-        Modulo,
+    etapa_actual = models.ForeignKey(
+        Etapa,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -75,8 +115,8 @@ class FichaPedagogica(models.Model):
         default=False,
         help_text='True cuando completó Diario y Ficha de todas las semanas de su etapa actual.',
     )
-    avance_pospuesto_para_modulo = models.ForeignKey(
-        Modulo,
+    avance_pospuesto_para_etapa = models.ForeignKey(
+        Etapa,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -294,6 +334,12 @@ class FichaAreaEvaluacion(models.Model):
     escala_min = models.PositiveSmallIntegerField(default=0)
     escala_max = models.PositiveSmallIntegerField(default=10)
     orden = models.PositiveIntegerField(default=0)
+    icono = models.CharField(
+        max_length=60,
+        blank=True,
+        default='Circle',
+        help_text='Nombre del ícono lucide-react (ej. Heart, BookOpen).',
+    )
     activa = models.BooleanField(default=True)
 
     class Meta:
@@ -337,6 +383,12 @@ class FichaPraxisItem(models.Model):
     """Ítem de praxis espiritual configurable (checklist semanal)."""
     nombre = models.CharField(max_length=200)
     orden = models.PositiveIntegerField(default=0)
+    icono = models.CharField(
+        max_length=60,
+        blank=True,
+        default='Circle',
+        help_text='Nombre del ícono lucide-react (ej. Wine, BookOpen).',
+    )
     activo = models.BooleanField(default=True)
 
     class Meta:

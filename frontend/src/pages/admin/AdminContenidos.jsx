@@ -28,7 +28,7 @@ import FormField from '../../components/common/FormField'
 import StatusBadge from '../../components/common/StatusBadge'
 import { colors } from '../../theme/muiTheme'
 
-const emptyForm = { titulo: '', descripcion: '', tipo: 'documento', modulo: '', url_externa: '', es_publico: false }
+const emptyForm = { titulo: '', descripcion: '', tipo: 'documento', etapa: '', url_externa: '', es_publico: false }
 
 const tipoOptions = {
   documento: 'Documento',
@@ -60,12 +60,12 @@ export default function AdminContenidos() {
   const [filtroTipo, setFiltroTipo] = useState('todos')
   const [filtroVisibilidad, setFiltroVisibilidad] = useState('todos')
   const [filtroEtapa, setFiltroEtapa] = useState('todos')
-  const [modulos, setModulos] = useState([])
+  const [etapas, setEtapas] = useState([])
 
   const load = () =>
-    Promise.all([contentAPI.list(), pedagogiaAPI.modulos()]).then(([c, m]) => {
+    Promise.all([contentAPI.list(), pedagogiaAPI.etapas()]).then(([c, e]) => {
       setItems(c.data.results || c.data)
-      setModulos(m.data.results || m.data)
+      setEtapas(e.data.results || e.data)
     })
 
   useEffect(() => { load().finally(() => setLoading(false)) }, [])
@@ -82,9 +82,9 @@ export default function AdminContenidos() {
       list = list.filter((c) => !c.es_publico)
     }
     if (filtroEtapa === 'sin') {
-      list = list.filter((c) => !c.modulo)
+      list = list.filter((c) => !c.etapa)
     } else if (filtroEtapa !== 'todos') {
-      list = list.filter((c) => String(c.modulo) === String(filtroEtapa))
+      list = list.filter((c) => String(c.etapa) === String(filtroEtapa))
     }
 
     const sorted = [...list].sort((a, b) => {
@@ -97,7 +97,7 @@ export default function AdminContenidos() {
 
   const crear = async (e) => {
     e.preventDefault()
-    await contentAPI.create({ ...form, modulo: form.modulo ? parseInt(form.modulo, 10) : null, es_publico: false })
+    await contentAPI.create({ ...form, etapa: form.etapa ? parseInt(form.etapa, 10) : null, es_publico: false })
     setForm(emptyForm)
     load()
   }
@@ -114,7 +114,7 @@ export default function AdminContenidos() {
       titulo: nombreContenido(contenido.titulo || ''),
       descripcion: contenido.descripcion || '',
       tipo: tipoOptions[contenido.tipo] ? contenido.tipo : 'documento',
-      modulo: contenido.modulo || '',
+      etapa: contenido.etapa || '',
       url_externa: contenido.url_externa || '',
       es_publico: Boolean(contenido.es_publico),
     })
@@ -130,12 +130,12 @@ export default function AdminContenidos() {
     if (!editing) return
     setSavingEdit(true)
     try {
-      const { titulo, descripcion, tipo, modulo, url_externa } = editForm
+      const { titulo, descripcion, tipo, etapa, url_externa } = editForm
       await contentAPI.update(editing.id, {
         titulo,
         descripcion,
         tipo,
-        modulo: modulo ? parseInt(modulo, 10) : null,
+        etapa: etapa ? parseInt(etapa, 10) : null,
         url_externa,
       })
       cerrarModificar()
@@ -175,10 +175,10 @@ export default function AdminContenidos() {
               {Object.entries(tipoOptions).map(([k, v]) => <MenuItem key={k} value={k}>{v}</MenuItem>)}
             </TextField>
           </FormField>
-          <FormField label="Módulo relacionado">
-            <TextField select fullWidth value={form.modulo} onChange={(e) => setForm({ ...form, modulo: e.target.value })} hiddenLabel>
-              <MenuItem value="">Sin módulo específico</MenuItem>
-              {modulos.map((m) => <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>)}
+          <FormField label="Etapa relacionada">
+            <TextField select fullWidth value={form.etapa} onChange={(e) => setForm({ ...form, etapa: e.target.value })} hiddenLabel>
+              <MenuItem value="">Sin etapa específica</MenuItem>
+              {etapas.map((et) => <MenuItem key={et.id} value={et.id}>{et.nombre}</MenuItem>)}
             </TextField>
           </FormField>
           <FormField label="Descripción">
@@ -251,8 +251,8 @@ export default function AdminContenidos() {
               >
                 <MenuItem value="todos">Todas</MenuItem>
                 <MenuItem value="sin">Sin etapa</MenuItem>
-                {modulos.map((m) => (
-                  <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>
+                {etapas.map((et) => (
+                  <MenuItem key={et.id} value={et.id}>{et.nombre}</MenuItem>
                 ))}
               </TextField>
             </Stack>
@@ -286,7 +286,7 @@ export default function AdminContenidos() {
                         </Typography>
                       </TableCell>
                       <TableCell>{tipoLabel[c.tipo] || c.tipo}</TableCell>
-                      <TableCell>{c.modulo_nombre || 'Sin etapa'}</TableCell>
+                      <TableCell>{c.etapa_nombre || 'Sin etapa'}</TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={1} alignItems="center">
                           <Switch
@@ -352,17 +352,17 @@ export default function AdminContenidos() {
                   ))}
                 </TextField>
               </FormField>
-              <FormField label="Módulo relacionado">
+              <FormField label="Etapa relacionada">
                 <TextField
                   select
                   fullWidth
-                  value={editForm.modulo}
-                  onChange={(e) => setEditForm({ ...editForm, modulo: e.target.value })}
+                  value={editForm.etapa}
+                  onChange={(e) => setEditForm({ ...editForm, etapa: e.target.value })}
                   hiddenLabel
                 >
-                  <MenuItem value="">Sin módulo específico</MenuItem>
-                  {modulos.map((m) => (
-                    <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>
+                  <MenuItem value="">Sin etapa específica</MenuItem>
+                  {etapas.map((et) => (
+                    <MenuItem key={et.id} value={et.id}>{et.nombre}</MenuItem>
                   ))}
                 </TextField>
               </FormField>

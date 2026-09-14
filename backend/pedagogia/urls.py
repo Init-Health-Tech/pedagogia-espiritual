@@ -2,18 +2,22 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     AvanceEspiritualViewSet,
+    EtapaViewSet,
     FichaAreaEvaluacionViewSet,
     FichaEntradaSemanalViewSet,
     FichaPedagogicaViewSet,
     FichaPraxisItemViewSet,
     FichaPraxisRegistroViewSet,
+    ManualViewSet,
     ModuloViewSet,
     PreguntaChecklistViewSet,
     TareaBienvenidaViewSet,
 )
 
 router = DefaultRouter()
+router.register('etapas', EtapaViewSet, basename='etapas')
 router.register('modulos', ModuloViewSet, basename='modulos')
+router.register('manuales', ManualViewSet, basename='manuales')
 router.register('preguntas', PreguntaChecklistViewSet, basename='preguntas')
 router.register('tareas-bienvenida', TareaBienvenidaViewSet, basename='tareas-bienvenida')
 router.register('fichas', FichaPedagogicaViewSet, basename='fichas')

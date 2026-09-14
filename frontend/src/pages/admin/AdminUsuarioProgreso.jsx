@@ -66,7 +66,7 @@ export default function AdminUsuarioProgreso() {
   const { userId } = useParams()
   const navigate = useNavigate()
   const [data, setData] = useState(null)
-  const [modulos, setModulos] = useState([])
+  const [etapas, setEtapas] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [expanded, setExpanded] = useState('documento')
@@ -74,10 +74,10 @@ export default function AdminUsuarioProgreso() {
   const [inicioBusy, setInicioBusy] = useState(false)
 
   const reload = () =>
-    Promise.all([adminAPI.userProgreso(userId), pedagogiaAPI.modulos()])
-      .then(([progresoRes, modulosRes]) => {
+    Promise.all([adminAPI.userProgreso(userId), pedagogiaAPI.etapas()])
+      .then(([progresoRes, etapasRes]) => {
         setData(progresoRes.data)
-        setModulos(modulosRes.data.results || modulosRes.data)
+        setEtapas(etapasRes.data.results || etapasRes.data)
       })
 
   useEffect(() => {
@@ -371,15 +371,15 @@ export default function AdminUsuarioProgreso() {
                   <Typography className="font-display" sx={{ fontSize: '1.15rem', color: colors.dark }}>
                     Etapas del camino
                   </Typography>
-                  {ficha.modulo_actual_detalle && (
+                  {ficha.etapa_actual_detalle && (
                     <Chip
                       size="small"
-                      label={ficha.modulo_actual_detalle.nombre.replace(/^Etapa [IVX]+ — /, '')}
+                      label={ficha.etapa_actual_detalle.nombre.replace(/^Etapa [IVX]+ — /, '')}
                       variant="outlined"
                     />
                   )}
                 </Stack>
-                <EtapasJourney modulos={modulos} etapaActualId={ficha.modulo_actual} />
+                <EtapasJourney etapas={etapas} etapaActualId={ficha.etapa_actual} />
               </Box>
 
               <Box

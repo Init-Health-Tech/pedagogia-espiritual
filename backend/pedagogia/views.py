@@ -7,11 +7,13 @@ from rest_framework.response import Response
 from accounts.permissions import IsModeratorOrAdmin
 from .models import (
     AvanceEspiritual,
+    Etapa,
     FichaAreaEvaluacion,
     FichaEntradaSemanal,
     FichaPedagogica,
     FichaPraxisItem,
     FichaPraxisRegistro,
+    Manual,
     Modulo,
     PreguntaChecklist,
     RespuestaChecklist,
@@ -29,6 +31,7 @@ from .bienvenida import (
 from .signals import asegurar_ficha
 from .serializers import (
     AvanceEspiritualSerializer,
+    EtapaSerializer,
     FichaAreaEvaluacionSerializer,
     FichaEntradaSemanalSerializer,
     FichaPedagogicaSerializer,
@@ -37,6 +40,7 @@ from .serializers import (
     FichaPraxisItemSerializer,
     FichaPraxisRegistroSerializer,
     GuardarSemanaFichaSerializer,
+    ManualSerializer,
     ModuloSerializer,
     PreguntaChecklistSerializer,
     ResponderChecklistSerializer,
@@ -47,15 +51,52 @@ from .serializers import (
 User = get_user_model()
 
 
-class ModuloViewSet(viewsets.ModelViewSet):
-    queryset = Modulo.objects.all()
-    serializer_class = ModuloSerializer
+class EtapaViewSet(viewsets.ModelViewSet):
+    queryset = Etapa.objects.prefetch_related('modulos__manuales')
+    serializer_class = EtapaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        qs = self.queryset
         if self.request.user.is_formador:
-            return Modulo.objects.all()
-        return Modulo.objects.filter(activo=True)
+            return qs
+        return qs.filter(activo=True)
+
+    def get_permissions(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return [IsModeratorOrAdmin()]
+        return super().get_permissions()
+
+
+class ModuloViewSet(viewsets.ModelViewSet):
+    queryset = Modulo.objects.select_related('etapa').prefetch_related('manuales')
+    serializer_class = ModuloSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ['etapa']
+
+    def get_queryset(self):
+        qs = self.queryset
+        if self.request.user.is_formador:
+            return qs
+        return qs.filter(activo=True, etapa__activo=True)
+
+    def get_permissions(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return [IsModeratorOrAdmin()]
+        return super().get_permissions()
+
+
+class ManualViewSet(viewsets.ModelViewSet):
+    queryset = Manual.objects.select_related('modulo', 'modulo__etapa')
+    serializer_class = ManualSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ['modulo']
+
+    def get_queryset(self):
+        qs = self.queryset
+        if self.request.user.is_formador:
+            return qs
+        return qs.filter(activo=True, modulo__activo=True, modulo__etapa__activo=True)
 
     def get_permissions(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
@@ -64,7 +105,7 @@ class ModuloViewSet(viewsets.ModelViewSet):
 
 
 class PreguntaChecklistViewSet(viewsets.ModelViewSet):
-    queryset = PreguntaChecklist.objects.select_related('modulo')
+    queryset = PreguntaChecklist.objects.select_related('etapa')
     serializer_class = PreguntaChecklistSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -114,7 +155,7 @@ class TareaBienvenidaViewSet(viewsets.ModelViewSet):
 
 class FichaPedagogicaViewSet(viewsets.ModelViewSet):
     queryset = FichaPedagogica.objects.select_related(
-        'usuario', 'modulo_actual', 'perfil',
+        'usuario', 'etapa_actual', 'perfil',
     ).prefetch_related('avances', 'respuestas_checklist')
     serializer_class = FichaPedagogicaSerializer
     permission_classes = [permissions.IsAuthenticated]

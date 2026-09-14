@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
 import TopBar from './TopBar'
 import PillNav from './PillNav'
 import { TOP_BAR_HEIGHT_REM, DOCK_HEIGHT_REM } from '../../theme/muiTheme'
-import { communicationsAPI } from '../../services/api'
+import { notificationsAPI } from '../../services/api'
 
 /** Altura aproximada del PillNav desktop (en rem, escala con el texto) */
 const DESKTOP_PILL_NAV_REM = 3.5
@@ -22,11 +22,15 @@ export default function HubShell({ navItems, children }) {
   )
   const sectionTitle = currentItem?.label || 'Inicio'
 
-  useEffect(() => {
-    communicationsAPI.noLeidos()
+  const refreshNotifications = useCallback(() => {
+    notificationsAPI.noLeidas()
       .then((res) => setNotificationCount(res.data.count || 0))
       .catch(() => {})
-  }, [location.pathname])
+  }, [])
+
+  useEffect(() => {
+    refreshNotifications()
+  }, [location.pathname, refreshNotifications])
 
   const topPad = isMobile
     ? `calc(${TOP_BAR_HEIGHT_REM}rem + 1.5rem)`
@@ -37,7 +41,11 @@ export default function HubShell({ navItems, children }) {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column' }}>
-      <TopBar sectionTitle={sectionTitle} notificationCount={notificationCount} />
+      <TopBar
+        sectionTitle={sectionTitle}
+        notificationCount={notificationCount}
+        onNotificationsChanged={refreshNotifications}
+      />
 
       {!isMobile && (
         <Box

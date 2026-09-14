@@ -24,9 +24,9 @@ import ConfirmDialog from '../../components/common/ConfirmDialog'
 import FormField from '../../components/common/FormField'
 import StatusBadge from '../../components/common/StatusBadge'
 
-const emptyForm = { texto: '', orden: 1, modulo: '', ayuda: '', activa: true }
+const emptyForm = { texto: '', orden: 1, etapa: '', ayuda: '', activa: true }
 
-function PreguntaFormFields({ form, setForm, modulos }) {
+function PreguntaFormFields({ form, setForm, etapas }) {
   return (
     <>
       <FormField label="Pregunta de reflexión" required helper="Esta pregunta aparecerá en la ficha pedagógica de cada miembro">
@@ -50,17 +50,17 @@ function PreguntaFormFields({ form, setForm, modulos }) {
           inputProps={{ min: 1, max: 20 }}
         />
       </FormField>
-      <FormField label="Módulo relacionado">
+      <FormField label="Etapa relacionada">
         <TextField
           select
           fullWidth
-          value={form.modulo}
-          onChange={(e) => setForm({ ...form, modulo: e.target.value })}
+          value={form.etapa}
+          onChange={(e) => setForm({ ...form, etapa: e.target.value })}
           hiddenLabel
         >
-          <MenuItem value="">Sin módulo específico</MenuItem>
-          {modulos.map((m) => (
-            <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>
+          <MenuItem value="">Sin etapa específica</MenuItem>
+          {etapas.map((et) => (
+            <MenuItem key={et.id} value={et.id}>{et.nombre}</MenuItem>
           ))}
         </TextField>
       </FormField>
@@ -83,7 +83,7 @@ function PreguntaFormFields({ form, setForm, modulos }) {
 
 export default function AdminPreguntas() {
   const [preguntas, setPreguntas] = useState([])
-  const [modulos, setModulos] = useState([])
+  const [etapas, setEtapas] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [editForm, setEditForm] = useState(emptyForm)
   const [editing, setEditing] = useState(null)
@@ -92,16 +92,16 @@ export default function AdminPreguntas() {
   const [confirmId, setConfirmId] = useState(null)
 
   const load = () =>
-    Promise.all([pedagogiaAPI.preguntas(), pedagogiaAPI.modulos()]).then(([p, m]) => {
+    Promise.all([pedagogiaAPI.preguntas(), pedagogiaAPI.etapas()]).then(([p, e]) => {
       setPreguntas(p.data.results || p.data)
-      setModulos(m.data.results || m.data)
+      setEtapas(e.data.results || e.data)
     })
 
   useEffect(() => { load().finally(() => setLoading(false)) }, [])
 
   const crear = async (e) => {
     e.preventDefault()
-    const payload = { ...form, modulo: form.modulo ? parseInt(form.modulo, 10) : null }
+    const payload = { ...form, etapa: form.etapa ? parseInt(form.etapa, 10) : null }
     await pedagogiaAPI.createPregunta(payload)
     setForm(emptyForm)
     load()
@@ -112,7 +112,7 @@ export default function AdminPreguntas() {
     setEditForm({
       texto: p.texto || '',
       orden: p.orden ?? 1,
-      modulo: p.modulo || '',
+      etapa: p.etapa || '',
       ayuda: p.ayuda || '',
       activa: Boolean(p.activa),
     })
@@ -130,7 +130,7 @@ export default function AdminPreguntas() {
     try {
       const payload = {
         ...editForm,
-        modulo: editForm.modulo ? parseInt(editForm.modulo, 10) : null,
+        etapa: editForm.etapa ? parseInt(editForm.etapa, 10) : null,
       }
       await pedagogiaAPI.updatePregunta(editing.id, payload)
       cerrarEditar()
@@ -157,7 +157,7 @@ export default function AdminPreguntas() {
       <Card sx={{ mb: 3 }}>
         <CardContent component="form" onSubmit={crear}>
           <Typography variant="h3" gutterBottom>Nueva pregunta</Typography>
-          <PreguntaFormFields form={form} setForm={setForm} modulos={modulos} />
+          <PreguntaFormFields form={form} setForm={setForm} etapas={etapas} />
           <Box sx={{ mt: 2 }}>
             <Button type="submit" variant="contained">Agregar pregunta</Button>
           </Box>
@@ -177,9 +177,9 @@ export default function AdminPreguntas() {
                     <StatusBadge status={p.activa ? 'active' : 'pending'} label={p.activa ? 'Activa' : 'Inactiva'} />
                   </Stack>
                   <Typography variant="body1">{p.texto}</Typography>
-                  {p.modulo_nombre && (
+                  {p.etapa_nombre && (
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                      {p.modulo_nombre}
+                      {p.etapa_nombre}
                     </Typography>
                   )}
                 </Box>
@@ -201,7 +201,7 @@ export default function AdminPreguntas() {
         <Box component="form" onSubmit={guardarEditar}>
           <DialogTitle sx={{ fontWeight: 400 }}>Editar pregunta</DialogTitle>
           <DialogContent dividers>
-            <PreguntaFormFields form={editForm} setForm={setEditForm} modulos={modulos} />
+            <PreguntaFormFields form={editForm} setForm={setEditForm} etapas={etapas} />
           </DialogContent>
           <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
             <Button onClick={cerrarEditar} disabled={savingEdit}>Cancelar</Button>

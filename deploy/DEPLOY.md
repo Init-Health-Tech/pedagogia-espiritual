@@ -172,6 +172,13 @@ python manage.py collectstatic --noinput
 sudo systemctl restart pedagogia-api
 ```
 
+Programar recordatorios diarios (pago 15/7/1 días; eventos con RSVP «voy» a 3 días y el día del evento):
+
+```bash
+# Ejemplo cron (diario 8:00)
+0 8 * * * cd /opt/apps/pedagogia-espiritual/backend && .venv/bin/python manage.py enviar_recordatorios
+```
+
 ---
 
 ## Variables de entorno de referencia

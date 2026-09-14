@@ -15,8 +15,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { Flame } from 'lucide-react'
+import { CalendarCheck, Flame, Map } from 'lucide-react'
 import AnimatedProgress from '../common/AnimatedProgress'
+import IconBadge from '../common/IconBadge'
 import { colors } from '../../theme/muiTheme'
 
 const PALETA_LINEAS = [
@@ -32,19 +33,40 @@ function etiquetaSemanas(n) {
   return n === 1 ? 'semana' : 'semanas'
 }
 
-function ResumenCard({ overline, children, caption }) {
+function ResumenCard({ overline, children, caption, icon: Icon, accent = colors.primary }) {
   return (
     <Card sx={{ flex: 1, border: `1px solid ${colors.border}`, minWidth: 0 }}>
       <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-        <Typography variant="overline" color="text.secondary" display="block">
-          {overline}
-        </Typography>
-        {children}
-        {caption && (
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
-            {caption}
-          </Typography>
-        )}
+        <Stack direction="row" spacing={1.5} alignItems="flex-start">
+          {Icon && (
+            <Box
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: 2,
+                bgcolor: colors.light,
+                border: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <Icon size={22} color={accent} strokeWidth={1.75} />
+            </Box>
+          )}
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Typography variant="overline" color="text.secondary" display="block">
+              {overline}
+            </Typography>
+            {children}
+            {caption && (
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                {caption}
+              </Typography>
+            )}
+          </Box>
+        </Stack>
       </CardContent>
     </Card>
   )
@@ -231,23 +253,20 @@ export default function FichaProgresoVista({
 
       {showResumenCards && (
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4 }}>
-          <ResumenCard overline="Etapa actual">
+          <ResumenCard overline="Etapa actual" icon={Map} accent={colors.primary}>
             <Typography variant="h3" sx={{ fontWeight: 400, mt: 0.5 }}>
               {etapaNombre}
             </Typography>
           </ResumenCard>
-          <ResumenCard overline="Ficha" caption="semanas acompañadas">
+          <ResumenCard overline="Ficha" caption="semanas acompañadas" icon={CalendarCheck} accent={colors.moss}>
             <Typography variant="h3" sx={{ fontWeight: 400, mt: 0.5 }}>
               {progreso.semanas_ficha_completadas || 0} de {progreso.semanas_disponibles || 0}
             </Typography>
           </ResumenCard>
-          <ResumenCard overline="Constancia" caption={etiquetaSemanas(racha)}>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
-              <Flame size={18} color={colors.secondary} strokeWidth={1.5} />
-              <Typography variant="h3" sx={{ fontWeight: 400 }}>
-                {racha}
-              </Typography>
-            </Stack>
+          <ResumenCard overline="Constancia" caption={etiquetaSemanas(racha)} icon={Flame} accent={colors.secondary}>
+            <Typography variant="h3" sx={{ fontWeight: 400, mt: 0.5 }}>
+              {racha}
+            </Typography>
           </ResumenCard>
         </Stack>
       )}
@@ -310,16 +329,30 @@ export default function FichaProgresoVista({
           {praxis.map((item) => (
             <Box key={item.item_id}>
               <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                justifyContent="space-between"
-                alignItems={{ xs: 'flex-start', sm: 'baseline' }}
-                spacing={0.5}
+                direction="row"
+                spacing={1.5}
+                alignItems={{ xs: 'flex-start', sm: 'center' }}
                 sx={{ mb: 0.75 }}
               >
-                <Typography variant="body1">{item.nombre}</Typography>
-                <Typography variant="caption" color="text.secondary">
-                  presente en {item.semanas_marcadas} de {item.semanas_disponibles} semanas
-                </Typography>
+                <IconBadge
+                  name={item.icono}
+                  accent={colors.moss}
+                  size={18}
+                  sx={{ width: 36, height: 36, minWidth: 36, minHeight: 36 }}
+                />
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: 'flex-start', sm: 'baseline' }}
+                    spacing={0.5}
+                  >
+                    <Typography variant="body1">{item.nombre}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      presente en {item.semanas_marcadas} de {item.semanas_disponibles} semanas
+                    </Typography>
+                  </Stack>
+                </Box>
               </Stack>
               <AnimatedProgress
                 value={item.porcentaje}

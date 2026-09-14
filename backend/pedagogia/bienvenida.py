@@ -5,7 +5,7 @@ from datetime import date
 from django.utils import timezone
 
 from accounts.models import User
-from .models import Modulo, TareaBienvenida, TareaBienvenidaRegistro
+from .models import Etapa, TareaBienvenida, TareaBienvenidaRegistro
 
 
 def tareas_activas():
@@ -42,16 +42,16 @@ def payload_sugerencia_inicio_formal(usuario):
         return None
 
     completa = bienvenida_completa(usuario)
-    primer_modulo = Modulo.objects.filter(activo=True).order_by('orden').first()
+    primer_etapa = Etapa.objects.filter(activo=True).order_by('orden').first()
     return {
         'bienvenida_completa': completa,
         'mostrar_aviso_miembro': completa,
         'mostrar_banner_coordinador': bool(
-            completa and not usuario.bienvenida_inicio_pospuesto and primer_modulo
+            completa and not usuario.bienvenida_inicio_pospuesto and primer_etapa
         ),
         'etapa_inicio': (
-            {'id': primer_modulo.id, 'nombre': primer_modulo.nombre}
-            if primer_modulo else None
+            {'id': primer_etapa.id, 'nombre': primer_etapa.nombre}
+            if primer_etapa else None
         ),
         **conteo_progreso(usuario),
     }
@@ -93,11 +93,11 @@ def confirmar_inicio_formal(usuario):
     from .signals import asegurar_ficha
     ficha = asegurar_ficha(usuario)
     ficha.fecha_inicio_camino = date.today()
-    if not ficha.modulo_actual_id:
-        primero = Modulo.objects.filter(activo=True).order_by('orden').first()
+    if not ficha.etapa_actual_id:
+        primero = Etapa.objects.filter(activo=True).order_by('orden').first()
         if primero:
-            ficha.modulo_actual = primero
-    ficha.save(update_fields=['fecha_inicio_camino', 'modulo_actual', 'updated_at'])
+            ficha.etapa_actual = primero
+    ficha.save(update_fields=['fecha_inicio_camino', 'etapa_actual', 'updated_at'])
     return usuario, True
 
 

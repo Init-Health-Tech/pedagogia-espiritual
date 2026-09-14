@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from accounts.models import User
-from .models import FichaPedagogica, FichaPerfil, Modulo
+from .models import Etapa, FichaPedagogica, FichaPerfil
 
 
 def asegurar_ficha(usuario):
@@ -18,11 +18,11 @@ def asegurar_ficha(usuario):
         joined = getattr(usuario, 'date_joined', None)
         ficha.fecha_inicio_camino = joined.date() if joined and hasattr(joined, 'date') else date.today()
         changed.append('fecha_inicio_camino')
-    if not ficha.modulo_actual_id:
-        primero = Modulo.objects.filter(activo=True).order_by('orden').first()
+    if not ficha.etapa_actual_id:
+        primero = Etapa.objects.filter(activo=True).order_by('orden').first()
         if primero:
-            ficha.modulo_actual = primero
-            changed.append('modulo_actual')
+            ficha.etapa_actual = primero
+            changed.append('etapa_actual')
     if changed:
         ficha.save(update_fields=[*changed, 'updated_at'])
     FichaPerfil.objects.get_or_create(ficha=ficha)

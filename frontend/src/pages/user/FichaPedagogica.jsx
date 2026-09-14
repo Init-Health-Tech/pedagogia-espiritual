@@ -15,12 +15,13 @@ import {
   Typography,
 } from '@mui/material'
 import { motion } from 'framer-motion'
-import { BookOpen, PenLine } from 'lucide-react'
+import { BookOpen, ClipboardList, ChartColumnIncreasing, PenLine } from 'lucide-react'
 import { pedagogiaAPI } from '../../services/api'
 import PageHeader from '../../components/common/PageHeader'
 import LoadingScreen from '../../components/common/LoadingScreen'
 import EmptyState from '../../components/common/EmptyState'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
+import IconBadge from '../../components/common/IconBadge'
 import EtapasJourney from '../../components/pedagogia/EtapasJourney'
 import ModuloManual from '../../components/pedagogia/ModuloManual'
 import MiProgresoTab from '../../components/pedagogia/MiProgresoTab'
@@ -69,10 +70,7 @@ function DiarioTab({
 
   return (
     <Stack spacing={2} sx={{ mb: 5 }} data-tour-id="camino-semanas">
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
-        <PenLine size={20} color={colors.primary} />
-        <Typography variant="h3">Diario semanal</Typography>
-      </Stack>
+      <Typography variant="h3" sx={{ mb: 0.5 }}>Diario semanal</Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
         Cada semana escribe con libertad. No hay respuestas correctas — es tu espacio personal de reflexión.
       </Typography>
@@ -109,7 +107,7 @@ function DiarioTab({
                 <Box sx={{ flex: 1, minWidth: 0, pr: 1 }}>
                   <Typography variant="overline" color="text.secondary">
                     Semana {item.semana || item.orden}
-                    {item.modulo_nombre && ` · ${item.modulo_nombre.replace(/^Etapa [IVX]+ — /, '')}`}
+                    {item.etapa_nombre && ` · ${item.etapa_nombre.replace(/^Etapa [IVX]+ — /, '')}`}
                   </Typography>
                   <Typography
                     variant="subtitle1"
@@ -367,7 +365,7 @@ function FichaTab({ ficha, onFichaUpdate }) {
         sx={{ mb: 2 }}
       >
         <Box>
-          <Typography variant="h3" sx={{ mb: 0.5 }}>Tu ficha semanal</Typography>
+          <Typography variant="h3" sx={{ mb: 0.5 }}>Ficha pedagógica</Typography>
           <Typography variant="body2" color="text.secondary">
             Misma semana que tu diario. Aquí miras con calma cómo has vivido la praxis y cómo te percibes.
           </Typography>
@@ -472,8 +470,18 @@ function FichaTab({ ficha, onFichaUpdate }) {
                               }))}
                             />
                           )}
-                          label={item.nombre}
-                          sx={{ py: 0.25 }}
+                          label={(
+                            <Stack direction="row" spacing={1.25} alignItems="center">
+                              <IconBadge
+                                name={item.icono}
+                                accent={colors.moss}
+                                size={18}
+                                sx={{ width: 32, height: 32, minWidth: 32, minHeight: 32 }}
+                              />
+                              <span>{item.nombre}</span>
+                            </Stack>
+                          )}
+                          sx={{ py: 0.25, alignItems: 'center', ml: 0 }}
                         />
                       ))}
                     </Stack>
@@ -500,9 +508,15 @@ function FichaTab({ ficha, onFichaUpdate }) {
                             const nums = rangeNums(area.escala_min, area.escala_max)
                             return (
                               <Box key={area.area_id}>
-                                <Typography variant="body1" sx={{ mb: 1 }}>
-                                  {area.nombre}
-                                </Typography>
+                                <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 1 }}>
+                                  <IconBadge
+                                    name={area.icono}
+                                    accent={colors.primary}
+                                    size={18}
+                                    sx={{ width: 32, height: 32, minWidth: 32, minHeight: 32 }}
+                                  />
+                                  <Typography variant="body1">{area.nombre}</Typography>
+                                </Stack>
                                 <Stack
                                   direction="row"
                                   flexWrap="wrap"
@@ -581,11 +595,11 @@ function FichaTab({ ficha, onFichaUpdate }) {
 export default function FichaPedagogica() {
   const { user } = useAuth()
   const [ficha, setFicha] = useState(null)
-  const [modulos, setModulos] = useState([])
+  const [etapas, setEtapas] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(null)
   const [drafts, setDrafts] = useState({})
-  const [manualModulo, setManualModulo] = useState(null)
+  const [manualEtapa, setManualEtapa] = useState(null)
   const [expandedWeek, setExpandedWeek] = useState(null)
   const [tab, setTab] = useState(0)
   const [tourOpen, setTourOpen] = useState(false)
@@ -593,10 +607,10 @@ export default function FichaPedagogica() {
   const enBienvenida = user?.estado_camino === 'bienvenida'
 
   const load = () =>
-    Promise.all([pedagogiaAPI.miFicha(), pedagogiaAPI.modulos()])
-      .then(([f, m]) => {
+    Promise.all([pedagogiaAPI.miFicha(), pedagogiaAPI.etapas()])
+      .then(([f, e]) => {
         setFicha(f.data)
-        setModulos(m.data.results || m.data)
+        setEtapas(e.data.results || e.data)
         const initial = {}
         ;(f.data.checklist || []).forEach((c) => {
           initial[c.pregunta_id] = c.nota || ''
@@ -637,7 +651,7 @@ export default function FichaPedagogica() {
   const checklist = ficha?.checklist || []
   const completadas = checklist.filter((c) => c.completada).length
   const progreso = ficha?.progreso_general || 0
-  const etapaActual = ficha?.modulo_actual
+  const etapaActual = ficha?.etapa_actual
 
   const guardarEntrada = async (item) => {
     const nota = (drafts[item.pregunta_id] || '').trim()
@@ -685,23 +699,26 @@ export default function FichaPedagogica() {
                 spacing={2}
                 sx={{ width: '100%' }}
               >
-                <Box sx={{ flex: 1, minWidth: 0, pr: 2 }}>
-                  <Typography variant="overline" color="text.secondary">Tu recorrido</Typography>
-                  <Typography variant="h2" color="secondary.main" sx={{ fontWeight: 400 }}>{progreso}%</Typography>
-                  <Typography variant="caption" color="text.secondary" display="block">
-                    {completadas} de {checklist.length} semanas escritas en tu diario
-                  </Typography>
-                  {fichaProgresoLabel && (
+                <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ flex: 1, minWidth: 0, pr: 2 }}>
+                  <IconBadge name="Route" accent={colors.secondary} />
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="overline" color="text.secondary">Tu recorrido</Typography>
+                    <Typography variant="h2" color="secondary.main" sx={{ fontWeight: 400 }}>{progreso}%</Typography>
                     <Typography variant="caption" color="text.secondary" display="block">
-                      {fichaProgresoLabel}
+                      {completadas} de {checklist.length} semanas escritas en tu diario
                     </Typography>
-                  )}
-                </Box>
-                {ficha?.modulo_actual_detalle && (
+                    {fichaProgresoLabel && (
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        {fichaProgresoLabel}
+                      </Typography>
+                    )}
+                  </Box>
+                </Stack>
+                {ficha?.etapa_actual_detalle && (
                   <Box sx={{ ml: 'auto', flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}>
                     <Chip
-                      label={`Etapa actual: ${ficha.modulo_actual_detalle.nombre.replace(/^Etapa [IVX]+ — /, '')}`}
-                      sx={{ bgcolor: `${ficha.modulo_actual_detalle.color}22`, borderColor: ficha.modulo_actual_detalle.color }}
+                      label={`Etapa actual: ${ficha.etapa_actual_detalle.nombre.replace(/^Etapa [IVX]+ — /, '')}`}
+                      sx={{ bgcolor: `${ficha.etapa_actual_detalle.color}22`, borderColor: ficha.etapa_actual_detalle.color }}
                       variant="outlined"
                     />
                   </Box>
@@ -710,10 +727,10 @@ export default function FichaPedagogica() {
               <AnimatedProgress value={progreso} />
               <Box data-tour-id="camino-etapas">
                 <EtapasJourney
-                  modulos={modulos}
+                  etapas={etapas}
                   etapaActualId={etapaActual}
-                  onSelect={(mod) => {
-                    if (mod.contenido_manual?.length) setManualModulo(mod)
+                  onSelect={(et) => {
+                    if (et.contenido_manual?.length) setManualEtapa(et)
                   }}
                 />
               </Box>
@@ -725,21 +742,43 @@ export default function FichaPedagogica() {
         </Card>
       </motion.div>
 
-      {manualModulo && (
+      {manualEtapa && (
         <Box sx={{ mb: 4 }}>
-          <ModuloManual modulo={manualModulo} onClose={() => setManualModulo(null)} />
+          <ModuloManual modulo={manualEtapa} onClose={() => setManualEtapa(null)} />
         </Box>
       )}
 
       <Tabs
         value={tab}
         onChange={(_, v) => setTab(v)}
-        sx={{ mb: 3 }}
+        variant="scrollable"
+        allowScrollButtonsMobile
+        sx={{
+          mb: 3,
+          '& .MuiTab-root': {
+            minHeight: 48,
+            fontSize: '1rem',
+            textTransform: 'none',
+            gap: 1,
+          },
+        }}
         data-tour-id="camino-pestanas"
       >
-        <Tab label="Diario semanal" sx={{ fontSize: '1rem' }} />
-        <Tab label="Ficha pedagógica" sx={{ fontSize: '1rem' }} />
-        <Tab label="Mi progreso" sx={{ fontSize: '1rem' }} />
+        <Tab
+          icon={<PenLine size={18} strokeWidth={1.75} />}
+          iconPosition="start"
+          label="Diario semanal"
+        />
+        <Tab
+          icon={<ClipboardList size={18} strokeWidth={1.75} />}
+          iconPosition="start"
+          label="Ficha pedagógica"
+        />
+        <Tab
+          icon={<ChartColumnIncreasing size={18} strokeWidth={1.75} />}
+          iconPosition="start"
+          label="Mi progreso"
+        />
       </Tabs>
 
       {tab === 0 && (
@@ -769,52 +808,118 @@ export default function FichaPedagogica() {
           <Typography variant="h3">Manuales por etapa</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Guías interactivas — no solo PDFs. Explora tips, reflexiones e imágenes de cada etapa.
+          Guías por módulo y manual interactivo cuando esté disponible. Explora tips, reflexiones e imágenes de cada etapa.
         </Typography>
 
         <Stack spacing={2}>
-          {modulos.map((mod) => {
-            const desbloqueado = Boolean(mod.contenido_manual?.length)
+          {etapas.map((etapa) => {
+            const hasInteractive = Boolean(etapa.contenido_manual?.length)
+            const modulos = etapa.modulos || []
+            const hasLinkedManual = modulos.some((mod) =>
+              (mod.manuales || []).some((man) => man.enlace),
+            )
+            const desbloqueado = hasInteractive || hasLinkedManual
+
             return (
               <Card
-                key={mod.id}
+                key={etapa.id}
                 sx={{
                   borderLeft: 4,
-                  borderColor: desbloqueado ? (mod.color || colors.primary) : colors.border,
+                  borderColor: desbloqueado ? (etapa.color || colors.primary) : colors.border,
                   bgcolor: desbloqueado ? colors.surface : colors.light,
                   opacity: desbloqueado ? 1 : 0.78,
                 }}
               >
                 <CardContent>
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    justifyContent="space-between"
-                    alignItems={{ xs: 'stretch', sm: 'center' }}
-                    spacing={2}
-                  >
-                    <Box sx={{ flex: 1, minWidth: 0, pr: { sm: 2 } }}>
-                      <Typography variant="overline" sx={{ color: desbloqueado ? 'text.secondary' : colors.muted }}>
-                        Etapa {mod.orden}
+                  <Stack spacing={2}>
+                    <Stack
+                      direction={{ xs: 'column', sm: 'row' }}
+                      justifyContent="space-between"
+                      alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+                      spacing={2}
+                    >
+                      <Box sx={{ flex: 1, minWidth: 0, pr: { sm: 2 } }}>
+                        <Typography variant="overline" sx={{ color: desbloqueado ? 'text.secondary' : colors.muted }}>
+                          Etapa {etapa.orden}
+                        </Typography>
+                        <Typography variant="subtitle1" fontWeight={600} sx={{ color: desbloqueado ? colors.dark : colors.muted }}>
+                          {etapa.nombre}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">{etapa.descripcion}</Typography>
+                      </Box>
+                      {hasInteractive && desbloqueado && (
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
+                          <Button
+                            variant="contained"
+                            onClick={() => setManualEtapa(etapa)}
+                            sx={{ minWidth: 168, px: 2.5 }}
+                          >
+                            Manual interactivo
+                          </Button>
+                        </Box>
+                      )}
+                    </Stack>
+
+                    {!desbloqueado ? (
+                      <Typography variant="body2" sx={{ color: colors.muted }}>
+                        Próximamente
                       </Typography>
-                      <Typography variant="subtitle1" fontWeight={600} sx={{ color: desbloqueado ? colors.dark : colors.muted }}>
-                        {mod.nombre}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">{mod.descripcion}</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexShrink: 0, alignSelf: { xs: 'flex-end', sm: 'center' } }}>
-                      <Button
-                        variant={desbloqueado ? 'contained' : 'outlined'}
-                        onClick={() => desbloqueado && setManualModulo(mod)}
-                        disabled={!desbloqueado}
-                        sx={{
-                          minWidth: 168,
-                          px: 2.5,
-                          ...(desbloqueado ? {} : { borderColor: colors.border, color: colors.muted }),
-                        }}
-                      >
-                        {desbloqueado ? 'Abrir manual' : 'Próximamente'}
-                      </Button>
-                    </Box>
+                    ) : (
+                      <Stack spacing={2}>
+                        {modulos.length === 0 && !hasInteractive && (
+                          <Typography variant="body2" color="text.secondary">
+                            Sin módulos publicados todavía.
+                          </Typography>
+                        )}
+                        {modulos.map((mod) => {
+                          const manuals = (mod.manuales || []).filter((man) => man.enlace)
+                          return (
+                            <Box
+                              key={mod.id}
+                              sx={{
+                                pl: { xs: 0, sm: 1.5 },
+                                borderLeft: { sm: `2px solid ${colors.border}` },
+                              }}
+                            >
+                              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                {mod.nombre}
+                              </Typography>
+                              {mod.descripcion && (
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                  {mod.descripcion}
+                                </Typography>
+                              )}
+                              {manuals.length === 0 ? (
+                                <Typography variant="caption" color="text.secondary">
+                                  Sin manuales con enlace
+                                </Typography>
+                              ) : (
+                                <Stack spacing={1}>
+                                  {manuals.map((man) => (
+                                    <Stack
+                                      key={man.id}
+                                      direction={{ xs: 'column', sm: 'row' }}
+                                      justifyContent="space-between"
+                                      alignItems={{ xs: 'stretch', sm: 'center' }}
+                                      spacing={1}
+                                    >
+                                      <Typography variant="body2">{man.titulo}</Typography>
+                                      <Button
+                                        size="small"
+                                        variant="outlined"
+                                        onClick={() => window.open(man.enlace, '_blank', 'noopener,noreferrer')}
+                                      >
+                                        Abrir manual
+                                      </Button>
+                                    </Stack>
+                                  ))}
+                                </Stack>
+                              )}
+                            </Box>
+                          )
+                        })}
+                      </Stack>
+                    )}
                   </Stack>
                 </CardContent>
               </Card>

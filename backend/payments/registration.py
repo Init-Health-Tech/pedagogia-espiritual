@@ -70,6 +70,9 @@ class RegistrarPagoSerializer(serializers.Serializer):
                 usuario.is_active_member = True
                 usuario.save(update_fields=['is_active_member'])
 
+            from notifications.services import cancelar_recordatorios_pago
+            cancelar_recordatorios_pago(usuario)
+
         return {
             'pago': pago,
             'suscripcion': suscripcion,

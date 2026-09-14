@@ -14,7 +14,7 @@ import HubShell from '../components/layout/HubShell'
 
 export const adminNavItems = [
   { to: '/admin/usuarios', icon: Users, label: 'Usuarios y accesos', shortLabel: 'Usuarios' },
-  { to: '/admin/modulos', icon: BookOpen, label: 'Módulos', shortLabel: 'Módulos' },
+  { to: '/admin/etapas', icon: BookOpen, label: 'Etapas', shortLabel: 'Etapas' },
   { to: '/admin/preguntas', icon: ListChecks, label: 'Checklist', shortLabel: 'Checklist' },
   { to: '/admin/ficha', icon: ClipboardList, label: 'Ficha Pedagógica', shortLabel: 'Ficha' },
   { to: '/admin/contenidos', icon: Film, label: 'Contenidos', shortLabel: 'Contenidos' },

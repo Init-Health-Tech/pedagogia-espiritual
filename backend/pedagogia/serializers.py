@@ -3,17 +3,18 @@ from rest_framework import serializers
 from accounts.serializers import UserSerializer
 from .models import (
     AvanceEspiritual,
+    Etapa,
     FichaAreaEvaluacion,
     FichaEntradaSemanal,
     FichaPedagogica,
     FichaPerfil,
     FichaPraxisItem,
     FichaPraxisRegistro,
+    Manual,
     Modulo,
     PreguntaChecklist,
     RespuestaChecklist,
     TareaBienvenida,
-    TareaBienvenidaRegistro,
 )
 
 # Campos de seguimiento pedagógico (label visible para el miembro)
@@ -35,14 +36,51 @@ PERFIL_NOTA_FIELDS = (
 )
 
 
+class ManualSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Manual
+        fields = ('id', 'titulo', 'enlace', 'orden', 'modulo', 'activo')
+
+
 class ModuloSerializer(serializers.ModelSerializer):
+    manuales = serializers.SerializerMethodField()
+
     class Meta:
         model = Modulo
-        fields = '__all__'
+        fields = ('id', 'nombre', 'descripcion', 'orden', 'etapa', 'activo', 'manuales')
+
+    def get_manuales(self, obj):
+        qs = obj.manuales.all()
+        request = self.context.get('request')
+        if not (request and getattr(request.user, 'is_formador', False)):
+            qs = qs.filter(activo=True)
+        return ManualSerializer(qs.order_by('orden', 'id'), many=True).data
+
+
+class EtapaSerializer(serializers.ModelSerializer):
+    modulos = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Etapa
+        fields = (
+            'id', 'nombre', 'descripcion', 'orden', 'color',
+            'contenido_manual', 'activo', 'created_at', 'modulos',
+        )
+
+    def get_modulos(self, obj):
+        qs = obj.modulos.all()
+        request = self.context.get('request')
+        if not (request and getattr(request.user, 'is_formador', False)):
+            qs = qs.filter(activo=True)
+        return ModuloSerializer(
+            qs.order_by('orden', 'id'),
+            many=True,
+            context=self.context,
+        ).data
 
 
 class PreguntaChecklistSerializer(serializers.ModelSerializer):
-    modulo_nombre = serializers.CharField(source='modulo.nombre', read_only=True)
+    etapa_nombre = serializers.CharField(source='etapa.nombre', read_only=True)
 
     class Meta:
         model = PreguntaChecklist
@@ -115,7 +153,7 @@ class FichaPerfilUpdateSerializer(serializers.ModelSerializer):
 
 class FichaPedagogicaSerializer(serializers.ModelSerializer):
     usuario_detalle = UserSerializer(source='usuario', read_only=True)
-    modulo_actual_detalle = ModuloSerializer(source='modulo_actual', read_only=True)
+    etapa_actual_detalle = EtapaSerializer(source='etapa_actual', read_only=True)
     avances = AvanceEspiritualSerializer(many=True, read_only=True)
     checklist = serializers.SerializerMethodField()
     perfil = FichaPerfilSerializer(read_only=True)
@@ -143,9 +181,9 @@ class FichaPedagogicaSerializer(serializers.ModelSerializer):
                 'semana': p.semana,
                 'texto': p.texto,
                 'ayuda': p.ayuda,
-                'modulo_id': p.modulo_id,
-                'modulo_nombre': p.modulo.nombre if p.modulo else None,
-                'completada': (r.completada if r else False) or bool(r and r.nota and len(r.nota.strip()) >= 15),
+                'etapa_id': p.etapa_id,
+                'etapa_nombre': p.etapa.nombre if p.etapa else None,
+                'completada': (r.completada if r else False) or bool(r and r.nota and r.nota.strip() and len(r.nota.strip()) >= 15),
                 'nota': r.nota if r else '',
                 'respuesta_id': r.id if r else None,
                 **disp,
@@ -205,6 +243,7 @@ def build_ficha_semanal(ficha):
                     'item_id': item.id,
                     'nombre': item.nombre,
                     'orden': item.orden,
+                    'icono': item.icono or 'Circle',
                     'cumplido': bool(praxis_s.get(item.id, False)),
                 }
                 for item in praxis_items
@@ -217,6 +256,7 @@ def build_ficha_semanal(ficha):
                     'escala_min': area.escala_min,
                     'escala_max': area.escala_max,
                     'orden': area.orden,
+                    'icono': area.icono or 'Circle',
                     'puntaje': entradas_s.get(area.id),
                 }
                 for area in areas
@@ -236,11 +276,12 @@ def build_ficha_semanal(ficha):
             'escala_min': a.escala_min,
             'escala_max': a.escala_max,
             'orden': a.orden,
+            'icono': a.icono or 'Circle',
         }
         for a in areas
     ]
     praxis_payload = [
-        {'id': p.id, 'nombre': p.nombre, 'orden': p.orden}
+        {'id': p.id, 'nombre': p.nombre, 'orden': p.orden, 'icono': p.icono or 'Circle'}
         for p in praxis_items
     ]
 
@@ -369,17 +410,18 @@ def build_ficha_progreso(ficha, checklist=None):
             'item_id': item.id,
             'nombre': item.nombre,
             'orden': item.orden,
+            'icono': item.icono or 'Circle',
             'semanas_marcadas': marcadas,
             'semanas_disponibles': n_disp,
             'porcentaje': pct,
         })
 
     etapa = None
-    if ficha.modulo_actual_id:
+    if ficha.etapa_actual_id:
         etapa = {
-            'id': ficha.modulo_actual_id,
-            'nombre': ficha.modulo_actual.nombre if ficha.modulo_actual else '',
-            'color': getattr(ficha.modulo_actual, 'color', None),
+            'id': ficha.etapa_actual_id,
+            'nombre': ficha.etapa_actual.nombre if ficha.etapa_actual else '',
+            'color': getattr(ficha.etapa_actual, 'color', None),
         }
 
     return {
@@ -398,7 +440,7 @@ class FichaPedagogicaUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = FichaPedagogica
         fields = (
-            'modulo_actual', 'progreso_general', 'sacramentos_recibidos',
+            'etapa_actual', 'progreso_general', 'sacramentos_recibidos',
             'compromisos_espirituales', 'notas_formador', 'fecha_inicio_camino',
         )
 

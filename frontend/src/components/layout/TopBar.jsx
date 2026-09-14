@@ -16,17 +16,18 @@ import {
 } from '@mui/material'
 import { Bell, LogOut, User, LayoutDashboard, Shield } from 'lucide-react'
 import TorLogo from '../common/TorLogo'
+import NotificationsDrawer from './NotificationsDrawer'
 import { useAuth } from '../../context/AuthContext'
 import { TOP_BAR_HEIGHT_REM, colors } from '../../theme/muiTheme'
 
-export default function TopBar({ sectionTitle, notificationCount = 0 }) {
+export default function TopBar({ sectionTitle, notificationCount = 0, onNotificationsChanged }) {
   const { user, logout, isAdmin } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [anchor, setAnchor] = useState(null)
+  const [notifOpen, setNotifOpen] = useState(false)
 
   const isAdminArea = location.pathname.startsWith('/admin')
-  const messagesPath = isAdminArea ? '/admin/anuncios' : '/app/comunicacion'
   const profilePath = '/app/perfil'
 
   const initials = (user?.first_name?.[0] || user?.username?.[0] || '?').toUpperCase()
@@ -74,7 +75,7 @@ export default function TopBar({ sectionTitle, notificationCount = 0 }) {
         <Tooltip title="Notificaciones">
           <Button
             aria-label="Notificaciones"
-            onClick={() => navigate(messagesPath)}
+            onClick={() => setNotifOpen(true)}
             startIcon={(
               <Badge badgeContent={notificationCount || null} sx={{ '& .MuiBadge-badge': { bgcolor: colors.blue, color: '#fff' } }} max={99}>
                 <Bell size={20} strokeWidth={1.75} />
@@ -156,6 +157,12 @@ export default function TopBar({ sectionTitle, notificationCount = 0 }) {
           <ListItemText primary="Cerrar sesión" primaryTypographyProps={{ fontSize: '1rem' }} />
         </MenuItem>
       </Menu>
+
+      <NotificationsDrawer
+        open={notifOpen}
+        onClose={() => setNotifOpen(false)}
+        onChanged={onNotificationsChanged}
+      />
     </Box>
   )
 }

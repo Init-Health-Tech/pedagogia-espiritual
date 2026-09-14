@@ -30,7 +30,7 @@ import AdminPagos from './pages/admin/AdminPagos'
 import AdminGrupos from './pages/admin/AdminGrupos'
 import AdminAnuncios from './pages/admin/AdminAnuncios'
 import AdminEventos from './pages/admin/AdminEventos'
-import AdminModulos from './pages/admin/AdminModulos'
+import AdminEtapas from './pages/admin/AdminEtapas'
 import AdminPreguntas from './pages/admin/AdminPreguntas'
 import AdminFichaPedagogica from './pages/admin/AdminFichaPedagogica'
 
@@ -95,7 +95,8 @@ export default function App() {
         <Route path="grupos" element={<AdminGrupos />} />
         <Route path="anuncios" element={<AdminAnuncios />} />
         <Route path="eventos" element={<AdminEventos />} />
-        <Route path="modulos" element={<AdminModulos />} />
+        <Route path="etapas" element={<AdminEtapas />} />
+        <Route path="modulos" element={<Navigate to="/admin/etapas" replace />} />
         <Route path="preguntas" element={<AdminPreguntas />} />
         <Route path="ficha" element={<AdminFichaPedagogica />} />
       </Route>

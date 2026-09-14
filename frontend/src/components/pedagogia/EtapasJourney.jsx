@@ -2,21 +2,21 @@ import { Box, Stack, Typography } from '@mui/material'
 import { Check } from 'lucide-react'
 import { colors } from '../../theme/muiTheme'
 
-export default function EtapasJourney({ modulos = [], etapaActualId, onSelect }) {
-  const sorted = [...modulos].sort((a, b) => a.orden - b.orden)
+export default function EtapasJourney({ etapas = [], etapaActualId, onSelect }) {
+  const sorted = [...etapas].sort((a, b) => a.orden - b.orden)
   let currentIdx = sorted.findIndex((m) => m.id === etapaActualId)
   if (currentIdx < 0 && sorted.length) currentIdx = 0
 
   return (
     <Box sx={{ overflowX: 'auto', pb: 1 }}>
       <Stack direction="row" spacing={0} alignItems="flex-start" sx={{ minWidth: { xs: 560, md: '100%' } }}>
-        {sorted.map((mod, i) => {
-          const accent = mod.color || colors.primary
+        {sorted.map((etapa, i) => {
+          const accent = etapa.color || colors.primary
           const isPast = i < currentIdx
           const isCurrent = i === currentIdx
 
           return (
-            <Box key={mod.id} sx={{ flex: 1, position: 'relative', px: 1 }}>
+            <Box key={etapa.id} sx={{ flex: 1, position: 'relative', px: 1 }}>
               {i < sorted.length - 1 && (
                 <Box
                   sx={{
@@ -32,7 +32,7 @@ export default function EtapasJourney({ modulos = [], etapaActualId, onSelect })
               )}
               <Stack alignItems="center" spacing={0.75} sx={{ position: 'relative', zIndex: 1 }}>
                 <Box
-                  onClick={() => onSelect?.(mod)}
+                  onClick={() => onSelect?.(etapa)}
                   sx={{
                     width: 40,
                     height: 40,
@@ -50,7 +50,7 @@ export default function EtapasJourney({ modulos = [], etapaActualId, onSelect })
                   }}
                 >
                   {isPast ? <Check size={18} /> : (
-                    <Typography variant="caption" fontWeight={700}>{mod.orden}</Typography>
+                    <Typography variant="caption" fontWeight={700}>{etapa.orden}</Typography>
                   )}
                 </Box>
                 <Typography
@@ -63,7 +63,7 @@ export default function EtapasJourney({ modulos = [], etapaActualId, onSelect })
                     lineHeight: 1.3,
                   }}
                 >
-                  {mod.nombre.replace(/^Etapa [IVX]+ — /, '')}
+                  {etapa.nombre.replace(/^Etapa [IVX]+ — /, '')}
                 </Typography>
                 {isCurrent && (
                   <Typography

@@ -2,12 +2,14 @@ from django.contrib import admin
 
 from .models import (
     AvanceEspiritual,
+    Etapa,
     FichaAreaEvaluacion,
     FichaEntradaSemanal,
     FichaPedagogica,
     FichaPerfil,
     FichaPraxisItem,
     FichaPraxisRegistro,
+    Manual,
     Modulo,
     PreguntaChecklist,
     RespuestaChecklist,
@@ -16,17 +18,31 @@ from .models import (
 )
 
 
-@admin.register(Modulo)
-class ModuloAdmin(admin.ModelAdmin):
+@admin.register(Etapa)
+class EtapaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'orden', 'activo', 'color')
     list_filter = ('activo',)
     ordering = ('orden',)
 
 
+@admin.register(Modulo)
+class ModuloAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'etapa', 'orden', 'activo')
+    list_filter = ('activo', 'etapa')
+    ordering = ('etapa__orden', 'orden')
+
+
+@admin.register(Manual)
+class ManualAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'modulo', 'orden', 'activo')
+    list_filter = ('activo', 'modulo__etapa')
+    ordering = ('modulo__orden', 'orden')
+
+
 @admin.register(PreguntaChecklist)
 class PreguntaChecklistAdmin(admin.ModelAdmin):
-    list_display = ('orden', 'texto', 'modulo', 'activa')
-    list_filter = ('activa', 'modulo')
+    list_display = ('orden', 'texto', 'etapa', 'activa')
+    list_filter = ('activa', 'etapa')
     ordering = ('orden',)
 
 
@@ -48,8 +64,8 @@ class FichaPerfilInline(admin.StackedInline):
 
 @admin.register(FichaPedagogica)
 class FichaPedagogicaAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'modulo_actual', 'progreso_general', 'updated_at')
-    list_filter = ('modulo_actual',)
+    list_display = ('usuario', 'etapa_actual', 'progreso_general', 'updated_at')
+    list_filter = ('etapa_actual',)
     inlines = [FichaPerfilInline, RespuestaChecklistInline, AvanceEspiritualInline]
 
 
@@ -66,14 +82,14 @@ class FichaPerfilAdmin(admin.ModelAdmin):
 
 @admin.register(FichaAreaEvaluacion)
 class FichaAreaEvaluacionAdmin(admin.ModelAdmin):
-    list_display = ('orden', 'nombre', 'grupo_grafica', 'escala_min', 'escala_max', 'activa')
+    list_display = ('orden', 'nombre', 'grupo_grafica', 'icono', 'escala_min', 'escala_max', 'activa')
     list_filter = ('activa', 'grupo_grafica')
     ordering = ('orden',)
 
 
 @admin.register(FichaPraxisItem)
 class FichaPraxisItemAdmin(admin.ModelAdmin):
-    list_display = ('orden', 'nombre', 'activo')
+    list_display = ('orden', 'nombre', 'icono', 'activo')
     list_filter = ('activo',)
     ordering = ('orden',)
 

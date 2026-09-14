@@ -6,6 +6,7 @@ import { BookOpen, ClipboardList, MessageCircle, Users } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import HubActionCard from '../../components/common/HubActionCard'
 import AnimatedProgress from '../../components/common/AnimatedProgress'
+import IconBadge from '../../components/common/IconBadge'
 import ProximosEventosCard from '../../components/user/ProximosEventosCard'
 import SectionHelpButton from '../../components/help/SectionHelpButton'
 import MemberGuidedTour from '../../components/help/MemberGuidedTour'
@@ -74,9 +75,9 @@ export default function DashboardHome({
   const hasRepeatedUse = completedItems >= INTERACTIONS_FOR_FREQUENT
     || (progreso > 0 && daysSince(user?.date_joined) >= DAYS_FOR_FREQUENT)
 
-  const continueTo = ficha?.modulo_actual ? '/app/ficha' : '/app/ficha-espiritual'
-  const continueLabel = ficha?.modulo_actual_detalle?.nombre
-    ? `Continúa: ${ficha.modulo_actual_detalle.nombre}`
+  const continueTo = ficha?.etapa_actual ? '/app/ficha' : '/app/ficha-espiritual'
+  const continueLabel = ficha?.etapa_actual_detalle?.nombre
+    ? `Continúa: ${ficha.etapa_actual_detalle.nombre}`
     : 'Ficha pedagógica – Espiritual'
 
   const actividad = [
@@ -148,10 +149,13 @@ export default function DashboardHome({
                   spacing={2}
                   sx={{ mb: 2 }}
                 >
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography variant="overline">Tu progreso</Typography>
-                    <Typography variant="body1">Diario semanal y etapas de formación</Typography>
-                  </Box>
+                  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
+                    <IconBadge name="Route" accent={colors.primary} />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="overline">Tu progreso</Typography>
+                      <Typography variant="body1">Diario semanal y etapas de formación</Typography>
+                    </Box>
+                  </Stack>
                   <Typography
                     variant="h3"
                     sx={{

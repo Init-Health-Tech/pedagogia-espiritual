@@ -69,7 +69,7 @@ class ChangePasswordView(APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.select_related('ficha_pedagogica', 'ficha_pedagogica__modulo_actual').order_by('-date_joined')
+    queryset = User.objects.select_related('ficha_pedagogica', 'ficha_pedagogica__etapa_actual').order_by('-date_joined')
     serializer_class = UserAdminSerializer
     permission_classes = [IsAdminUser]
     filterset_fields = ['role', 'is_active_member', 'is_active']
@@ -131,7 +131,7 @@ class UserViewSet(viewsets.ModelViewSet):
         ficha = (
             FichaPedagogica.objects
             .filter(usuario=usuario)
-            .select_related('usuario', 'modulo_actual', 'perfil')
+            .select_related('usuario', 'etapa_actual', 'perfil')
             .prefetch_related('avances', 'respuestas_checklist__pregunta')
             .first()
         )

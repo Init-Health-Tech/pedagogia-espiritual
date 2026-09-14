@@ -34,9 +34,9 @@ class TutorialVideoViewSet(viewsets.ModelViewSet):
 
 
 class ContenidoViewSet(viewsets.ModelViewSet):
-    queryset = Contenido.objects.select_related('categoria', 'modulo', 'creado_por')
+    queryset = Contenido.objects.select_related('categoria', 'etapa', 'creado_por')
     serializer_class = ContenidoSerializer
-    filterset_fields = ['tipo', 'categoria', 'modulo', 'es_publico']
+    filterset_fields = ['tipo', 'categoria', 'etapa', 'es_publico']
     search_fields = ['titulo', 'descripcion']
 
     def get_permissions(self):

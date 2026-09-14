@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  MenuItem,
   Stack,
   Tab,
   Tabs,
@@ -24,6 +25,9 @@ import EmptyState from '../../components/common/EmptyState'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import FormField from '../../components/common/FormField'
 import StatusBadge from '../../components/common/StatusBadge'
+import IconBadge from '../../components/common/IconBadge'
+import { LUCIDE_ICON_OPTIONS } from '../../components/common/lucideIcons'
+import { colors } from '../../theme/muiTheme'
 
 const emptyArea = {
   nombre: '',
@@ -31,13 +35,38 @@ const emptyArea = {
   escala_min: 0,
   escala_max: 10,
   orden: 1,
+  icono: 'Circle',
   activa: true,
 }
 
 const emptyPraxis = {
   nombre: '',
   orden: 1,
+  icono: 'Circle',
   activo: true,
+}
+
+function IconoSelectField({ form, setForm }) {
+  return (
+    <FormField label="Ícono" helper="Ícono lucide-react visible para el miembro">
+      <TextField
+        select
+        fullWidth
+        value={form.icono || 'Circle'}
+        onChange={(e) => setForm({ ...form, icono: e.target.value })}
+        hiddenLabel
+      >
+        {LUCIDE_ICON_OPTIONS.map((opt) => (
+          <MenuItem key={opt.value} value={opt.value}>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <IconBadge name={opt.value} size={18} accent={colors.primary} sx={{ width: 32, height: 32, minWidth: 32, minHeight: 32 }} />
+              <span>{opt.label}</span>
+            </Stack>
+          </MenuItem>
+        ))}
+      </TextField>
+    </FormField>
+  )
 }
 
 function AreaFormFields({ form, setForm }) {
@@ -99,6 +128,7 @@ function AreaFormFields({ form, setForm }) {
           />
         </FormField>
       </Stack>
+      <IconoSelectField form={form} setForm={setForm} />
       <FormControlLabel
         control={
           <Checkbox
@@ -136,6 +166,7 @@ function PraxisFormFields({ form, setForm }) {
           inputProps={{ min: 0 }}
         />
       </FormField>
+      <IconoSelectField form={form} setForm={setForm} />
       <FormControlLabel
         control={
           <Checkbox
@@ -179,6 +210,7 @@ function AreasTab() {
       escala_min: a.escala_min ?? 0,
       escala_max: a.escala_max ?? 10,
       orden: a.orden ?? 1,
+      icono: a.icono || 'Circle',
       activa: Boolean(a.activa),
     })
   }
@@ -235,7 +267,9 @@ function AreasTab() {
           {items.map((a) => (
             <Card key={a.id} sx={{ opacity: a.activa ? 1 : 0.75 }}>
               <CardContent sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+                  <IconBadge name={a.icono} accent={colors.primary} />
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }} flexWrap="wrap">
                     <Typography variant="overline">Orden {a.orden}</Typography>
                     <StatusBadge status={a.activa ? 'active' : 'pending'} label={a.activa ? 'Activa' : 'Inactiva'} />
@@ -247,7 +281,8 @@ function AreasTab() {
                   <Typography variant="body2" color="text.secondary">
                     Escala: {a.escala_min} – {a.escala_max}
                   </Typography>
-                </Box>
+                  </Box>
+                </Stack>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button size="small" variant="outlined" onClick={() => abrirEditar(a)}>
                     Editar
@@ -315,6 +350,7 @@ function PraxisTab() {
     setEditForm({
       nombre: p.nombre || '',
       orden: p.orden ?? 1,
+      icono: p.icono || 'Circle',
       activo: Boolean(p.activo),
     })
   }
@@ -370,13 +406,16 @@ function PraxisTab() {
           {items.map((p) => (
             <Card key={p.id} sx={{ opacity: p.activo ? 1 : 0.75 }}>
               <CardContent sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+                  <IconBadge name={p.icono} accent={colors.moss} />
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                     <Typography variant="overline">Orden {p.orden}</Typography>
                     <StatusBadge status={p.activo ? 'active' : 'pending'} label={p.activo ? 'Activo' : 'Inactivo'} />
                   </Stack>
                   <Typography variant="body1">{p.nombre}</Typography>
-                </Box>
+                  </Box>
+                </Stack>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button size="small" variant="outlined" onClick={() => abrirEditar(p)}>
                     Editar

@@ -51,13 +51,21 @@ export const authAPI = {
 export const pedagogiaAPI = {
   miFicha: () => api.get('/pedagogia/fichas/mi_ficha/'),
   fichas: () => api.get('/pedagogia/fichas/'),
-  modulos: () => api.get('/pedagogia/modulos/'),
-  preguntas: () => api.get('/pedagogia/preguntas/'),
-  responderChecklist: (data) => api.post('/pedagogia/fichas/responder_checklist/', data),
-  updateFicha: (id, data) => api.patch(`/pedagogia/fichas/${id}/`, data),
+  etapas: () => api.get('/pedagogia/etapas/'),
+  createEtapa: (data) => api.post('/pedagogia/etapas/', data),
+  updateEtapa: (id, data) => api.patch(`/pedagogia/etapas/${id}/`, data),
+  deleteEtapa: (id) => api.delete(`/pedagogia/etapas/${id}/`),
+  modulos: (params) => api.get('/pedagogia/modulos/', { params }),
   createModulo: (data) => api.post('/pedagogia/modulos/', data),
   updateModulo: (id, data) => api.patch(`/pedagogia/modulos/${id}/`, data),
   deleteModulo: (id) => api.delete(`/pedagogia/modulos/${id}/`),
+  manuales: (params) => api.get('/pedagogia/manuales/', { params }),
+  createManual: (data) => api.post('/pedagogia/manuales/', data),
+  updateManual: (id, data) => api.patch(`/pedagogia/manuales/${id}/`, data),
+  deleteManual: (id) => api.delete(`/pedagogia/manuales/${id}/`),
+  preguntas: () => api.get('/pedagogia/preguntas/'),
+  responderChecklist: (data) => api.post('/pedagogia/fichas/responder_checklist/', data),
+  updateFicha: (id, data) => api.patch(`/pedagogia/fichas/${id}/`, data),
   createPregunta: (data) => api.post('/pedagogia/preguntas/', data),
   updatePregunta: (id, data) => api.patch(`/pedagogia/preguntas/${id}/`, data),
   deletePregunta: (id) => api.delete(`/pedagogia/preguntas/${id}/`),
@@ -134,6 +142,13 @@ export const eventsAPI = {
   delete: (id) => api.delete(`/events/eventos/${id}/`),
   rsvp: (id, respuesta) => api.post(`/events/eventos/${id}/rsvp/`, { respuesta }),
   respuestas: (id) => api.get(`/events/eventos/${id}/respuestas/`),
+}
+
+export const notificationsAPI = {
+  list: () => api.get('/notifications/'),
+  noLeidas: () => api.get('/notifications/no_leidas/'),
+  marcarLeida: (id) => api.post(`/notifications/${id}/marcar_leida/`),
+  marcarTodasLeidas: () => api.post('/notifications/marcar_todas_leidas/'),
 }
 
 export const adminAPI = {

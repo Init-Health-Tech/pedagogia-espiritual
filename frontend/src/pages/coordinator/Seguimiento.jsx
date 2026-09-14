@@ -24,7 +24,7 @@ import { colors } from '../../theme/muiTheme'
 
 export default function CoordinatorSeguimiento() {
   const [fichas, setFichas] = useState([])
-  const [modulos, setModulos] = useState([])
+  const [etapas, setEtapas] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
   const [notas, setNotas] = useState('')
@@ -32,11 +32,11 @@ export default function CoordinatorSeguimiento() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    Promise.all([pedagogiaAPI.fichas(), pedagogiaAPI.modulos()])
-      .then(([f, m]) => {
+    Promise.all([pedagogiaAPI.fichas(), pedagogiaAPI.etapas()])
+      .then(([f, e]) => {
         const lista = f.data.results || f.data
         setFichas(lista.filter((fi) => fi.usuario_detalle?.role === 'member'))
-        setModulos(m.data.results || m.data)
+        setEtapas(e.data.results || e.data)
       })
       .finally(() => setLoading(false))
   }, [])
@@ -44,7 +44,7 @@ export default function CoordinatorSeguimiento() {
   const abrirFicha = (ficha) => {
     setSelected(ficha)
     setNotas(ficha.notas_formador || '')
-    setEtapaId(ficha.modulo_actual || '')
+    setEtapaId(ficha.etapa_actual || '')
   }
 
   const guardarSeguimiento = async () => {
@@ -52,7 +52,7 @@ export default function CoordinatorSeguimiento() {
     setSaving(true)
     try {
       const payload = { notas_formador: notas }
-      if (etapaId) payload.modulo_actual = etapaId
+      if (etapaId) payload.etapa_actual = etapaId
       const { data } = await pedagogiaAPI.updateFicha(selected.id, payload)
       setFichas((prev) => prev.map((f) => (f.id === data.id ? data : f)))
       setSelected(data)
@@ -98,10 +98,10 @@ export default function CoordinatorSeguimiento() {
                             {semanas} semanas en diario · {f.progreso_general}% avance
                           </Typography>
                         </Box>
-                        {f.modulo_actual_detalle && (
+                        {f.etapa_actual_detalle && (
                           <Chip
                             size="small"
-                            label={f.modulo_actual_detalle.nombre.replace(/^Etapa [IVX]+ — /, '')}
+                            label={f.etapa_actual_detalle.nombre.replace(/^Etapa [IVX]+ — /, '')}
                             variant="outlined"
                           />
                         )}
@@ -126,8 +126,8 @@ export default function CoordinatorSeguimiento() {
                 </Typography>
 
                 <EtapasJourney
-                  modulos={modulos}
-                  etapaActualId={selected.modulo_actual}
+                  etapas={etapas}
+                  etapaActualId={selected.etapa_actual}
                 />
 
                 <FormControl fullWidth sx={{ mt: 3, mb: 2 }}>
@@ -138,8 +138,8 @@ export default function CoordinatorSeguimiento() {
                     value={etapaId}
                     onChange={(e) => setEtapaId(e.target.value)}
                   >
-                    {modulos.map((m) => (
-                      <MenuItem key={m.id} value={m.id}>{m.nombre}</MenuItem>
+                    {etapas.map((et) => (
+                      <MenuItem key={et.id} value={et.id}>{et.nombre}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>

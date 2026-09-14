@@ -1,29 +1,29 @@
 """Lógica de sugerencia de avance de etapa (completitud, no puntajes)."""
 
 from .models import (
+    Etapa,
     FichaEntradaSemanal,
     FichaPedagogica,
     FichaPraxisRegistro,
-    Modulo,
     PreguntaChecklist,
     RespuestaChecklist,
 )
 
 
-def semanas_de_etapa(modulo_id):
-    if not modulo_id:
+def semanas_de_etapa(etapa_id):
+    if not etapa_id:
         return set()
     semanas = set()
-    for p in PreguntaChecklist.objects.filter(activa=True, modulo_id=modulo_id):
+    for p in PreguntaChecklist.objects.filter(activa=True, etapa_id=etapa_id):
         semanas.add(p.semana or p.orden)
     return semanas
 
 
-def siguiente_modulo(modulo_actual):
-    if not modulo_actual:
+def siguiente_etapa(etapa_actual):
+    if not etapa_actual:
         return None
     return (
-        Modulo.objects.filter(activo=True, orden__gt=modulo_actual.orden)
+        Etapa.objects.filter(activo=True, orden__gt=etapa_actual.orden)
         .order_by('orden')
         .first()
     )
@@ -66,9 +66,9 @@ def recalcular_listo_para_avanzar(ficha):
         return False
 
     listo = False
-    if ficha.modulo_actual_id:
-        semanas = semanas_de_etapa(ficha.modulo_actual_id)
-        if semanas and siguiente_modulo(ficha.modulo_actual):
+    if ficha.etapa_actual_id:
+        semanas = semanas_de_etapa(ficha.etapa_actual_id)
+        if semanas and siguiente_etapa(ficha.etapa_actual):
             listo = True
             for s in semanas:
                 if not diario_completo(ficha, s) or not ficha_completa(ficha.usuario, s):
@@ -83,24 +83,24 @@ def recalcular_listo_para_avanzar(ficha):
 
 def sugerencia_avance_para_coordinador(ficha):
     """True si el banner del coordinador debe mostrarse."""
-    if not ficha or not ficha.listo_para_avanzar or not ficha.modulo_actual_id:
+    if not ficha or not ficha.listo_para_avanzar or not ficha.etapa_actual_id:
         return False
-    if ficha.avance_pospuesto_para_modulo_id == ficha.modulo_actual_id:
+    if ficha.avance_pospuesto_para_etapa_id == ficha.etapa_actual_id:
         return False
-    return siguiente_modulo(ficha.modulo_actual) is not None
+    return siguiente_etapa(ficha.etapa_actual) is not None
 
 
 def payload_sugerencia_avance(ficha):
-    if not ficha or not ficha.modulo_actual:
+    if not ficha or not ficha.etapa_actual:
         return None
-    siguiente = siguiente_modulo(ficha.modulo_actual)
+    siguiente = siguiente_etapa(ficha.etapa_actual)
     return {
         'listo_para_avanzar': ficha.listo_para_avanzar,
         'mostrar_banner_coordinador': sugerencia_avance_para_coordinador(ficha),
         'mostrar_aviso_miembro': bool(ficha.listo_para_avanzar and siguiente),
         'etapa_actual': {
-            'id': ficha.modulo_actual_id,
-            'nombre': ficha.modulo_actual.nombre,
+            'id': ficha.etapa_actual_id,
+            'nombre': ficha.etapa_actual.nombre,
         },
         'siguiente_etapa': (
             {'id': siguiente.id, 'nombre': siguiente.nombre}
@@ -110,22 +110,22 @@ def payload_sugerencia_avance(ficha):
 
 
 def confirmar_avance(ficha):
-    siguiente = siguiente_modulo(ficha.modulo_actual)
+    siguiente = siguiente_etapa(ficha.etapa_actual)
     if not siguiente:
         return ficha, False
-    ficha.modulo_actual = siguiente
+    ficha.etapa_actual = siguiente
     ficha.listo_para_avanzar = False
-    ficha.avance_pospuesto_para_modulo = None
+    ficha.avance_pospuesto_para_etapa = None
     ficha.save(update_fields=[
-        'modulo_actual', 'listo_para_avanzar', 'avance_pospuesto_para_modulo', 'updated_at',
+        'etapa_actual', 'listo_para_avanzar', 'avance_pospuesto_para_etapa', 'updated_at',
     ])
     recalcular_listo_para_avanzar(ficha)
     return ficha, True
 
 
 def posponer_avance(ficha):
-    if not ficha.modulo_actual_id:
+    if not ficha.etapa_actual_id:
         return ficha
-    ficha.avance_pospuesto_para_modulo = ficha.modulo_actual
-    ficha.save(update_fields=['avance_pospuesto_para_modulo', 'updated_at'])
+    ficha.avance_pospuesto_para_etapa = ficha.etapa_actual
+    ficha.save(update_fields=['avance_pospuesto_para_etapa', 'updated_at'])
     return ficha

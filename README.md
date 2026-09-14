@@ -43,6 +43,12 @@ python manage.py seed_data
 python manage.py runserver 8005
 ```
 
+Recordatorios diarios (pagos y eventos) en cron o Task Scheduler:
+
+```bash
+python manage.py enviar_recordatorios
+```
+
 ### Frontend
 
 ```bash
